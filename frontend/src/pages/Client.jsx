@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import MainHeader from "../components/header/mainHeader/MainHeader";
 import PageNav from "../components/nav/PageNav/PageNav";
 import MainFooter from "../components/footer/mainFooter/MainFooter";
+import Sidebar from "../components/sidebar/sidebar";
+import Main from "../components/main/Main"
 import useUser from "../store/useUser";
 import HomeView from "../views/client/homeView";
 import DemandsView from "../views/client/demandsView";
@@ -10,10 +12,30 @@ import MatchView from "../views/client/matchView";
 import ProfileView from "../views/client/profileView";
 import "./styles/ClientPage.css";
 
+
+
 function Client() {
   const user = useUser((state) => state.user);
   const navigate = useNavigate();
+  const role = useUser((state) => state.role);
+  const logout = useUser((state) => state.logout);
   const [activeView, setActiveView] = useState("home");
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("token");
+    navigate("/");
+    console.log("Logged out");
+  };
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+    if (role !== "client") {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   const renderView = () => {
     switch (activeView) {
@@ -33,11 +55,10 @@ function Client() {
   return (
     <>
       {user && (
-        <div className="clientPage">
-          <MainHeader />
-          <PageNav setActiveView={setActiveView} activeView={activeView} />
-          <div className="contentPage">{renderView()}</div>
-          <MainFooter />
+      <div className="app-container">
+
+        <Sidebar setActiveView={setActiveView} activeView={activeView} />
+        <div className="contentPage">{renderView()}</div>
         </div>
       )}
     </>
