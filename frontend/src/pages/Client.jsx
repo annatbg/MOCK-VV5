@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import MainHeader from "../components/header/mainHeader/MainHeader";
 import PageNav from "../components/nav/PageNav/PageNav";
 import MainFooter from "../components/footer/mainFooter/MainFooter";
+import Sidebar from "../components/sidebar/sidebar";
+import Main from "../components/main/Main"
 import useUser from "../store/useUser";
 import HomeUser from "../views/homeUser";
 import MatchUser from "../views/matchUser";
@@ -10,6 +12,7 @@ import DemandsUser from "../views/demandsUser";
 import ProfileUser from "../views/profileUser";
 import SettingsUser from "../views/settingsUser";
 import "./styles/UserPage.css";
+import NotificationUser from "../views/notificationUser";
 
 function Client() {
   const user = useUser((state) => state.user);
@@ -46,6 +49,8 @@ function Client() {
         return <DemandsUser />;
       case "match":
         return <MatchUser />;
+      case "notification":
+        return <NotificationUser />
       default:
         return <HomeUser />;
     }
@@ -54,14 +59,22 @@ function Client() {
   return (
     <>
       {user && (
-        <div className="userPage">
-          <MainHeader />
-          <div className="contentPage">
-            <PageNav setActiveView={setActiveView} activeView={activeView} />
-            {renderView()}
-          </div>
-          <MainFooter />
+      <div className="app-container">
+        {/* <Sidebar setActiveView={setActiveView} activeView={activeView}/> */}
+
+        <div className="contentPage">
+        <Sidebar setActiveView={setActiveView} activeView={activeView} />
+        {renderView()}
         </div>
+
+        
+      </div>
+        // <div className="userPage">
+        //   {/* <MainHeader /> */}
+        // <div>
+        // <MainFooter />
+        // </div>
+        // </div>
       )}
     </>
   );
