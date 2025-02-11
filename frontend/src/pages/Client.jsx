@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import MainHeader from "../components/header/mainHeader/MainHeader";
 import PageNav from "../components/nav/PageNav/PageNav";
 import MainFooter from "../components/footer/mainFooter/MainFooter";
-import Sidebar from "../components/sidebar/sidebar";
-import Main from "../components/main/Main"
+import SideBar from "../components/sidebar/Sidebar";
+import Main from "../components/main/Main";
 import useUser from "../store/useUser";
 import HomeUser from "../views/homeUser";
 import MatchUser from "../views/matchUser";
@@ -50,7 +50,7 @@ function Client() {
       case "match":
         return <MatchUser />;
       case "notification":
-        return <NotificationUser />
+        return <NotificationUser />;
       default:
         return <HomeUser />;
     }
@@ -59,16 +59,14 @@ function Client() {
   return (
     <>
       {user && (
-      <div className="app-container">
-        {/* <Sidebar setActiveView={setActiveView} activeView={activeView}/> */}
+        <div className="app-container">
+          {/* <Sidebar setActiveView={setActiveView} activeView={activeView}/> */}
 
-        <div className="contentPage">
-        <Sidebar setActiveView={setActiveView} activeView={activeView} />
-        {renderView()}
+          <div className="contentPage">
+            <SideBar setActiveView={setActiveView} activeView={activeView} />
+            {renderView()}
+          </div>
         </div>
-
-        
-      </div>
         // <div className="userPage">
         //   {/* <MainHeader /> */}
         // <div>

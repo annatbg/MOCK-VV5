@@ -39,50 +39,47 @@
   border-radius: 50%;
 } */
 
-.app-container{
+.app-container {
   /* display: grid;
   grid-template-columns: auto 1fr;  */
   display: flex;
   min-height: 100vh;
-  min-height: 100dvh;
 }
 
-#sidebar{
-  box-sizing: border-box;
-  height: 100vh;
-  width: 250px;
+#sidebar {
   padding: 5px 1em;
-
+  height: 100vh;
   border-right: 1px solid #333;
 
   position: sticky;
   top: 0;
   align-self: start;
 }
-#sidebar ul{
+#sidebar ul {
   list-style: none;
 }
-#sidebar > ul > li:first-child{
+#sidebar > ul > li:first-child {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
 }
-#sidebar ul li.active a{
+#sidebar ul li.active a {
   color: purple;
 
-  svg{
+  svg {
     fill: purple;
   }
 }
-#sidebar a, #sidebar .dropdown-btn{
-  border-radius: .5em;
-  padding: .85em;
+#sidebar a,
+#sidebar .dropdown-btn {
+  border-radius: 0.5em;
+  padding: 0.85em;
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 1em;
 }
-.dropdown-btn{
+.dropdown-btn {
   width: 100%;
   text-align: left;
   background: none;
@@ -94,55 +91,62 @@
   flex-shrink: 0;
   fill: purple;
 }
-#sidebar a span{
-flex-grow: 1;
+#sidebar a span {
+  flex-grow: 1;
 }
-#sidebar a:hover{
+#sidebar a:hover {
   background-color: green;
 }
-#sidebar .sub-menu{
+#sidebar .sub-menu {
   display: grid;
   transition: 300ms ease-in-out;
 }
-#sidebar .sub-menu.show{
+#sidebar .sub-menu.show {
   height: auto;
 }
 
-#toggle-btn{
-margin-left: auto;
-padding: 1em;
-border: none;
-border-radius: .5em;
-background: none;
-cursor: pointer;
+#toggle-btn {
+  margin-left: auto;
+  padding: 1em;
+  border: none;
+  border-radius: 0.5em;
+  background: none;
+  cursor: pointer;
 
-svg{
-  transition: rotate 150ms ease;
+  svg {
+    transition: rotate 150ms ease;
+  }
 }
-}
-#toggle-btn:hover{
+#toggle-btn:hover {
   background-color: green;
 }
 
-main{
+main {
   padding: min(30px, 7%);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-main p{
+main p {
   margin-top: 5px;
   margin-bottom: 15px;
 }
-.container{
+.container {
   border: 1px solid black;
   border-radius: 1em;
   margin-bottom: 20px;
   padding: min(3em, 15%);
 
-
-  h2, p { margin-top: 1em;}
+  h2,
+  p {
+    margin-top: 1em;
+  }
 }
 .logo {
   color: green;
+}
+
+/* added */
+.contentPage {
+  display: flex;
 }
