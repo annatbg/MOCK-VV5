@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import MainHeader from "../components/header/mainHeader/MainHeader";
 import PageNav from "../components/nav/PageNav/PageNav";
 import MainFooter from "../components/footer/mainFooter/MainFooter";
-import Sidebar from "../components/sidebar/sidebar";
-import Main from "../components/main/Main"
+import SideBar from "../components/sidebar/Sidebar";
+import Main from "../components/main/Main";
 import useUser from "../store/useUser";
 import HomeView from "../views/client/homeView";
 import DemandsView from "../views/client/demandsView";
@@ -55,10 +55,12 @@ function Client() {
   return (
     <>
       {user && (
-      <div className="app-container">
+        <div className="app-container">
 
-        <Sidebar setActiveView={setActiveView} activeView={activeView} />
-        <div className="contentPage">{renderView()}</div>
+          <div className="contentPage">
+            <Sidebar setActiveView={setActiveView} activeView={activeView} />
+            {renderView()}
+          </div>        
         </div>
       )}
     </>
