@@ -19,7 +19,7 @@ const fetchUserData = async (user, endpoint) => {
 
 const updateUser = async (updateData) => {
   try {
-    const response = await fetch(`${API_URL}/user/edit`, {
+    const response = await fetch(API_URL + "/user/edit",{
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(updateData),
