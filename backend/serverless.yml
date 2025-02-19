@@ -38,6 +38,8 @@ resources:
             AttributeType: S
           - AttributeName: author
             AttributeType: S
+          - AttributeName: createdAt
+            AttributeType: S
         KeySchema:
           - AttributeName: demandId
             KeyType: HASH
@@ -46,6 +48,12 @@ resources:
           - IndexName: author-index
             KeySchema:
               - AttributeName: author
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: createdAt-index
+            KeySchema:
+              - AttributeName: createdAt
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

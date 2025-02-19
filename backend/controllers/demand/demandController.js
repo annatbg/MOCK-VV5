@@ -1,9 +1,12 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../../services/db/db");
 const {
+
+  ScanCommand,
   PutCommand,
   QueryCommand,
-  ScanCommand,
+
+
 } = require("@aws-sdk/lib-dynamodb");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
 
@@ -104,22 +107,34 @@ const fetchAllDemands = async (req, res) => {
       TableName: DEMANDS_TABLE,
     };
 
+    console.log("Scanning DynamoDB with params:", params);
+
     const { Items } = await db.send(new ScanCommand(params));
 
+    console.log("Scan result:", Items);
+
     if (!Items || Items.length === 0) {
-      console.error("No demands found in the database.");
-      return res.status(404).json({ message: "No demands found." });
+      console.error("No demands found.");
+      return res
+        .status(404)
+        .json({ message: "No demands found in the table." });
     }
+
+    const sortedItems = Items.sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+    );
 
     res.status(200).json({
       message: "Demands retrieved successfully!",
-      data: Items,
+      data: sortedItems,
     });
   } catch (error) {
-    console.error("Error fetching all demands:", error);
+    console.error("Error fetching demands:", error);
     console.error("Stack Trace:", error.stack);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+
 };
 
 module.exports = { createDemand, fetchMyDemands, fetchAllDemands };
