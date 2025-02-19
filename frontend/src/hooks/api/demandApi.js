@@ -4,10 +4,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 const createDemand = async (formData) => {
   try {
     const token = useUser.getState().token;
-    const user = useUser.getState().user;
+    // const user = useUser.getState().user;
 
-    console.log("data", formData.formData);
-    console.log("token", token);
+    // console.log("data", formData.formData);
+    // console.log("token", token);
 
     const response = await fetch(`${API_URL}/demand`, {
       method: "POST",
@@ -31,4 +31,47 @@ const createDemand = async (formData) => {
   }
 };
 
-export { createDemand };
+const fetchMyDemands = async () => {
+  // const user = useUser.getState().user;
+  const token = useUser.getState().token;
+
+  const response = await fetch(`${API_URL}/demand`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch demands");
+  }
+
+  return response.json();
+};
+
+const fetchAllDemands = async () => {
+  console.log("Fetching from:", `${API_URL}/demands/all`); // Logga URL
+
+  try {
+    const response = await fetch(`${API_URL}/demands/all`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("Response status:", response.status); // Logga status
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch demands");
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Fetch error:", error.message);
+    throw error;
+  }
+};
+
+export { createDemand, fetchMyDemands, fetchAllDemands };
