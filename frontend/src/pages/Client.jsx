@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainHeader from "../components/header/mainHeader/MainHeader";
 import PageNav from "../components/nav/PageNav/PageNav";
 import MainFooter from "../components/footer/mainFooter/MainFooter";
-import SideBar from "../components/sidebar/Sidebar";
+import SideBar from "../components/sidebar/sidebar";
 import Main from "../components/main/Main";
 import useUser from "../store/useUser";
 import HomeUser from "../views/homeUser";
@@ -59,7 +59,7 @@ function Client() {
   return (
     <>
       {user && (
-        <div className="app-container">
+        <div>
           {/* <Sidebar setActiveView={setActiveView} activeView={activeView}/> */}
 
           <div className="contentPage">
@@ -67,12 +67,6 @@ function Client() {
             {renderView()}
           </div>
         </div>
-        // <div className="userPage">
-        //   {/* <MainHeader /> */}
-        // <div>
-        // <MainFooter />
-        // </div>
-        // </div>
       )}
     </>
   );

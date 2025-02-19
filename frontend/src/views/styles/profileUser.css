@@ -1,0 +1,43 @@
+.profileView {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        width: 100%;
+        margin: 25px;
+
+}
+.profileContainer {
+    display: flex;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 20px 20px 50px 20px;
+    margin: 20px 0;
+    width: 100%;
+ 
+}
+.profileDescription {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 0.5px solid black;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    width: 100%;
+}
+.profileUserData {
+    padding-left: 20px;
+}
+.profileImage {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 2px solid black;
+}
+.profileLocation {
+    padding-top: 200px;
+}

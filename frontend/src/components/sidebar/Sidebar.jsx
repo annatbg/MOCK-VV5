@@ -4,7 +4,7 @@ import "./Sidebar.css"; // Antag att du har en CSS-fil
 const Sidebar = ({ activeView, setActiveView }) => {
   return (
     <nav id="sidebar">
-      <ul>
+      <ul className="nav-list">
         <li>
           <svg
             className="logo"
@@ -21,11 +21,11 @@ const Sidebar = ({ activeView, setActiveView }) => {
               />
               <path
                 d="M23.4295 21.3049H18.6517C18.3067 22.0537 17.7824 22.6819 17.1366 23.1205C16.4907 23.5591 15.7484 23.7909 14.9916 23.7904C12.5188 23.7904 10.5188 21.2672 10.5188 18.2181C10.5188 15.0911 12.5188 12.5318 14.9916 12.5318C15.7376 12.5425 16.4674 12.7751 17.1051 13.2055C17.7429 13.6359 18.2651 14.2482 18.6177 14.979H23.3951C22.3791 10.6104 19.1933 7.97461 14.9916 7.97461C9.73893 7.97461 5.97754 12.5683 5.97754 18.1807C5.97754 23.7932 9.73893 28.3098 14.9916 28.3098C19.2278 28.3098 22.4127 25.7123 23.4295 21.3049Z"
-                fill="white"
+                fill="black"
               />
               <path
                 d="M26.4385 14.9789H31.2157C31.5608 14.2299 32.0854 13.6015 32.7316 13.1629C33.3778 12.7244 34.1204 12.4928 34.8775 12.4938C37.3499 12.4938 39.3497 15.0171 39.3497 18.0659C39.3497 21.193 37.3499 23.7524 34.8775 23.7524C34.1316 23.7417 33.4019 23.5091 32.7642 23.0788C32.1266 22.6485 31.6044 22.0362 31.2518 21.3056H26.4733C27.4892 25.6738 30.6746 28.3098 34.8775 28.3098C40.1295 28.3098 43.8905 23.7164 43.8905 18.1032C43.8905 12.4901 40.1275 7.97461 34.8775 7.97461C30.6418 7.97461 27.4572 10.5718 26.4405 14.9789"
-                fill="white"
+                fill="black"
               />
             </g>
             <defs>
@@ -40,19 +40,10 @@ const Sidebar = ({ activeView, setActiveView }) => {
             </defs>
           </svg>
 
-          <button id="toggle-btn">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              height="24px"
-              viewBox="0 -960 960 960"
-              width="24px"
-              fill="#e8eaed"
-            >
-              <path d="m242-200 200-280-200-280h98l200 280-200 280h-98Zm238 0 200-280-200-280h98l200 280-200 280h-98Z" />
-            </svg>
-          </button>
+         
         </li>
         <li
+        id="pages"
           className={activeView === "home" ? "active" : ""}
           onClick={() => setActiveView("home")}
         >
@@ -65,9 +56,10 @@ const Sidebar = ({ activeView, setActiveView }) => {
           >
             <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" />
           </svg>
-          <span>Home</span>
+          <span className="page-name">Home</span>
         </li>
         <li
+        id="pages"
           className={activeView === "profile" ? "active" : ""}
           onClick={() => setActiveView("profile")}
         >
@@ -80,9 +72,10 @@ const Sidebar = ({ activeView, setActiveView }) => {
           >
             <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" />
           </svg>
-          <span>Profile</span>
+          <span className="page-name">Profile</span>
         </li>
         <li
+        id="pages"
           className={activeView === "demands" ? "active" : ""}
           onClick={() => setActiveView("demands")}
         >
@@ -95,9 +88,10 @@ const Sidebar = ({ activeView, setActiveView }) => {
           >
             <path d="M360-240h440v-107H360v107ZM160-613h120v-107H160v107Zm0 187h120v-107H160v107Zm0 186h120v-107H160v107Zm200-186h440v-107H360v107Zm0-187h440v-107H360v107ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Z" />
           </svg>
-          <span>Demands</span>
+          <span className="page-name">Demands</span>
         </li>
         <li
+        id="pages"
           className={activeView === "match" ? "active" : ""}
           onClick={() => setActiveView("match")}
         >
@@ -111,14 +105,9 @@ const Sidebar = ({ activeView, setActiveView }) => {
             <path d="M320-200q-117 0-198.5-81.5T40-480q0-117 81.5-198.5T320-760q27 0 52.5 5t49.5 14q-17 14-32 30.5T362-676q-10-2-20.5-3t-21.5-1q-83 0-141.5 58.5T120-480q0 83 58.5 141.5T320-280q11 0 21.5-1t20.5-3q13 18 28 34.5t32 30.5q-24 9-49.5 14t-52.5 5Zm320 0q-27 0-52.5-5T538-219q17-14 32-30.5t28-34.5q11 2 21 3t21 1q83 0 141.5-58.5T840-480q0-83-58.5-141.5T640-680q-11 0-21 1t-21 3q-13-18-28-34.5T538-741q24-9 49.5-14t52.5-5q117 0 198.5 81.5T920-480q0 117-81.5 198.5T640-200Zm-160-50q-57-39-88.5-100T360-480q0-69 31.5-130T480-710q57 39 88.5 100T600-480q0 69-31.5 130T480-250Z" />
           </svg>
 
-          <span>Match e</span>
+          <span className="page-name">Match</span>
         </li>
-        {/* <li>
-        <a href="#"></a>
-        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M0-240v-63q0-43 44-70t116-27q13 0 25 .5t23 2.5q-14 21-21 44t-7 48v65H0Zm240 0v-65q0-32 17.5-58.5T307-410q32-20 76.5-30t96.5-10q53 0 97.5 10t76.5 30q32 20 49 46.5t17 58.5v65H240Zm540 0v-65q0-26-6.5-49T754-397q11-2 22.5-2.5t23.5-.5q72 0 116 26.5t44 70.5v63H780Zm-455-80h311q-10-20-55.5-35T480-370q-55 0-100.5 15T325-320ZM160-440q-33 0-56.5-23.5T80-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T160-440Zm640 0q-33 0-56.5-23.5T720-520q0-34 23.5-57t56.5-23q34 0 57 23t23 57q0 33-23 56.5T800-440Zm-320-40q-50 0-85-35t-35-85q0-51 35-85.5t85-34.5q51 0 85.5 34.5T600-600q0 50-34.5 85T480-480Zm0-80q17 0 28.5-11.5T520-600q0-17-11.5-28.5T480-640q-17 0-28.5 11.5T440-600q0 17 11.5 28.5T480-560Zm1 240Zm-1-280Z"/></svg>
-        <span>Members</span>
-      </li> */}
-        <li
+        <li id="pages"
           className={activeView === "notifications" ? "active" : ""}
           onClick={() => setActiveView("notifications")}
         >
@@ -131,7 +120,7 @@ const Sidebar = ({ activeView, setActiveView }) => {
           >
             <path d="M160-200v-80h80v-280q0-83 50-147.5T420-792v-28q0-25 17.5-42.5T480-880q25 0 42.5 17.5T540-820v28q80 20 130 84.5T720-560v280h80v80H160Zm320-300Zm0 420q-33 0-56.5-23.5T400-160h160q0 33-23.5 56.5T480-80ZM320-280h320v-280q0-66-47-113t-113-47q-66 0-113 47t-47 113v280Z" />
           </svg>
-          <span>Notifications</span>
+          <span className="page-name">Notifications</span>
         </li>
       </ul>
     </nav>
