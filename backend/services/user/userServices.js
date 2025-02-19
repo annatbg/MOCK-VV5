@@ -21,13 +21,7 @@ const userExists = async (email) => {
   }
 };
 
-const createUser = async (
-  email,
-  password,
-  organisation,
-  firstName,
-  lastName
-) => {
+const createUser = async (email, password, organisation, firstName, lastName) => {
   console.log(`Creating new user with email: ${email}`);
   const hashedPassword = await bcrypt.hash(password, 10);
   console.log(`Password hashed for user ${email}`);
@@ -57,7 +51,6 @@ const createUser = async (
 };
 
 const editUser = async (currentUser, targetEmail, updateData) => {
-  
   if (
     currentUser.email !== targetEmail &&
     currentUser.role !== "developer" &&
@@ -108,6 +101,8 @@ const editUser = async (currentUser, targetEmail, updateData) => {
     console.error("Error updating user:", err);
     throw new Error("Error updating user");
   }
+
+  return updatedUser;
 };
 
 module.exports = { userExists, createUser, editUser };

@@ -1,4 +1,4 @@
-const { createUser, userExists } = require("../../services/user/userServices");
+const { createUser, userExists, editUser: editUserService } = require("../../services/user/userServices");
 const { comparePassword } = require("../../services/utils/bcrypt");
 const { generateToken } = require("../../services/utils/jwt");
 
@@ -78,9 +78,29 @@ const fetchUser = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.error("Error in login:", err);
+    console.error("Error in fetchUser:", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports = { signupUser, loginUser, fetchUser };
+const editUser = async (req, res) => {
+  const currentUser = req.user; // Sätts av auth-middleware
+  const updateData = req.body;
+  const targetEmail = currentUser.email;
+
+  try {
+    const updatedUser = await editUserService(currentUser, targetEmail, updateData);
+    if (updatedUser.password) {
+      delete updatedUser.password;
+    }
+    return res.status(200).json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error("Error in editUser:", err);
+    return res.status(500).json({ message: err.message || "Internal server error" });
+  }
+};
+
+module.exports = { signupUser, loginUser, fetchUser, editUser };
