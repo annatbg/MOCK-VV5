@@ -1,11 +1,23 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../../services/db/db");
 const {
+
   ScanCommand,
   PutCommand,
   QueryCommand,
+
+
 } = require("@aws-sdk/lib-dynamodb");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
+
+// Definiera tillåtna kategorier
+const allowedCategories = [
+  "Technology",
+  "Health",
+  "Education",
+  "Finance",
+  "Environment",
+];
 
 const createDemand = async (req, res) => {
   try {
@@ -14,6 +26,15 @@ const createDemand = async (req, res) => {
 
     if (!author || !title || !demand || !category) {
       return res.status(400).json({ message: "All fields are required!" });
+    }
+
+    // Validera om kategorin är tillåten
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({
+        message: `Invalid category! Allowed categories: ${allowedCategories.join(
+          ", "
+        )}`,
+      });
     }
 
     const newDemand = {
@@ -113,7 +134,7 @@ const fetchAllDemands = async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal Server Error", error: error.message });
-  }
+
 };
 
 module.exports = { createDemand, fetchMyDemands, fetchAllDemands };
