@@ -1,3 +1,4 @@
+import useUser from "../../store/useUser";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const fetchUserData = async (user, endpoint) => {
@@ -19,9 +20,13 @@ const fetchUserData = async (user, endpoint) => {
 
 const updateUser = async (updateData) => {
   try {
-    const response = await fetch(API_URL + "/user/edit",{
+    const token = useUser.getState().token;
+    const response = await fetch(API_URL + "/user/edit", {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(updateData),
     });
     const result = await response.json();
