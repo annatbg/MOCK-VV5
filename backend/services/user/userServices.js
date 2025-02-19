@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
+const { GetCommand, PutCommand, DeleteCommand } = require("@aws-sdk/lib-dynamodb");
 const db = require("../../services/db/db");
 const bcrypt = require("bcryptjs");
 const { v4: uuidv4 } = require("uuid");
@@ -56,4 +56,58 @@ const createUser = async (
   }
 };
 
-module.exports = { userExists, createUser };
+const editUser = async (currentUser, targetEmail, updateData) => {
+  
+  if (
+    currentUser.email !== targetEmail &&
+    currentUser.role !== "developer" &&
+    currentUser.role !== "admin"
+  ) {
+    throw new Error("Not authorized to edit this user");
+  }
+
+  const existingUser = await userExists(targetEmail);
+  if (!existingUser) {
+    throw new Error("User does not exist");
+  }
+
+  if (updateData.password) {
+    updateData.password = await bcrypt.hash(updateData.password, 10);
+  }
+
+  let newEmail = targetEmail;
+  if (updateData.email && updateData.email !== targetEmail) {
+    const userWithNewEmail = await userExists(updateData.email);
+    if (userWithNewEmail) {
+      throw new Error("User with the new email already exists");
+    }
+    newEmail = updateData.email;
+  }
+
+  const updatedUser = { ...existingUser, ...updateData };
+  updatedUser.email = newEmail;
+
+  const putParams = {
+    TableName: TABLE_NAME,
+    Item: updatedUser,
+  };
+
+  try {
+    await db.send(new PutCommand(putParams));
+    console.log(`User ${targetEmail} successfully updated.`);
+
+    if (newEmail !== targetEmail) {
+      const deleteParams = {
+        TableName: TABLE_NAME,
+        Key: { email: targetEmail },
+      };
+      await db.send(new DeleteCommand(deleteParams));
+      console.log(`Old user record ${targetEmail} deleted.`);
+    }
+  } catch (err) {
+    console.error("Error updating user:", err);
+    throw new Error("Error updating user");
+  }
+};
+
+module.exports = { userExists, createUser, editUser };
