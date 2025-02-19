@@ -30,19 +30,26 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(`Login attempt for email: ${email}`);
 
   try {
     const user = await userExists(email);
+    console.log(`User not found: ${email}`);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log(`User found: ${email}, verifying password...`);
+
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
+      console.log(`Invalid password for user: ${email}`);
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = generateToken(user.email);
+
+    console.log(`Token generated for user: ${email}`);
 
     delete user.password;
 
@@ -52,7 +59,7 @@ const loginUser = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.error("Error in login:", err);
+    console.error("Error in login: ${email}", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
