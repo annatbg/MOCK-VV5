@@ -59,7 +59,7 @@ function Client() {
   return (
     <>
       {user && (
-        <div>
+        <div className="app-container">
           {/* <Sidebar setActiveView={setActiveView} activeView={activeView}/> */}
 
           <div className="contentPage">
