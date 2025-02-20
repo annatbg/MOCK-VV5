@@ -21,6 +21,9 @@ const fetchUserData = async (user, endpoint) => {
 const updateUser = async (updateData) => {
   try {
     const token = useUser.getState().token;
+    console.log("updateUser: Token:", token);
+    console.log("updateUser: Update data:", updateData);
+
     const response = await fetch(API_URL + "/user/edit", {
       method: "PUT",
       headers: {
@@ -29,12 +32,17 @@ const updateUser = async (updateData) => {
       },
       body: JSON.stringify(updateData),
     });
+    console.log("updateUser: Response status:", response.status);
+
     const result = await response.json();
+    console.log("updateUser: Response result:", result);
+
     if (!response.ok) {
       throw new Error(result.message || "Update failed");
     }
     return result;
   } catch (error) {
+    console.error("updateUser: Error:", error);
     throw new Error("An error occurred while updating profile: " + error.message);
   }
 };

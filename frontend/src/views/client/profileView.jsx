@@ -34,18 +34,22 @@ const ProfileUser = () => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+    console.log("editData before update:", editData);
     try {
       const result = await updateUser(editData);
-      console.log("Profile updated:", result);
+      console.log("Profile updated result:", result);
       setUserData({ user: result.user });
-      // Om email ändras, kan global state behöva uppdateras:
-      // setUser(result.user, result.token);
+      setUser(result.user, result.token );
+      console.log("Updated state:", useUser.getState());
       setMessage("Profile updated successfully!");
       setIsEditing(false);
     } catch (error) {
+      console.error("Error in handleEditSubmit:", error);
       setMessage(error.message);
     }
   };
+  
+  
 
   return (
     <div className="profileView">

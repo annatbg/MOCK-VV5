@@ -50,9 +50,9 @@ const createUser = async (email, password, organisation, firstName, lastName) =>
   }
 };
 
-const editUser = async (currentUser, targetEmail, updateData) => {
+const editUserService = async (currentUser, targetEmail, updateData) => {
   if (
-    currentUser.email !== targetEmail &&
+    (currentUser.username !== targetEmail) &&
     currentUser.role !== "developer" &&
     currentUser.role !== "admin"
   ) {
@@ -64,8 +64,15 @@ const editUser = async (currentUser, targetEmail, updateData) => {
     throw new Error("User does not exist");
   }
 
-  if (updateData.password) {
-    updateData.password = await bcrypt.hash(updateData.password, 10);
+  if (updateData.password && updateData.password.trim().length > 0) {
+    if (updateData.password === existingUser.password) {
+      delete updateData.password;
+    } else {
+
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+  } else {
+    delete updateData.password;
   }
 
   let newEmail = targetEmail;
@@ -105,4 +112,5 @@ const editUser = async (currentUser, targetEmail, updateData) => {
   return updatedUser;
 };
 
-module.exports = { userExists, createUser, editUser };
+
+module.exports = { userExists, createUser, editUserService };
