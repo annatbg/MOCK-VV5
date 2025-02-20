@@ -39,10 +39,16 @@
   border-radius: 50%;
 } */
 
-
+.app-container {
+  /* display: grid;
+  grid-template-columns: auto 1fr;  */
+  display: flex;
+  min-height: 100vh;
+}
 
 #sidebar {
   padding: 5px 1em;
+  height: 100vh;
   height: 100vh;
   border-right: 1px solid #333;
 
@@ -51,20 +57,28 @@
   align-self: start;
 }
 #sidebar ul {
+#sidebar ul {
   list-style: none;
 }
+#sidebar > ul > li:first-child {
 #sidebar > ul > li:first-child {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
 }
 #sidebar ul li.active a {
+#sidebar ul li.active a {
   color: purple;
 
+  svg {
   svg {
     fill: purple;
   }
 }
+#sidebar a,
+#sidebar .dropdown-btn {
+  border-radius: 0.5em;
+  padding: 0.85em;
 #sidebar a,
 #sidebar .dropdown-btn {
   border-radius: 0.5em;
@@ -74,6 +88,7 @@
   align-items: center;
   gap: 1em;
 }
+.dropdown-btn {
 .dropdown-btn {
   width: 100%;
   text-align: left;
@@ -88,14 +103,19 @@
 }
 #sidebar a span {
   flex-grow: 1;
+#sidebar a span {
+  flex-grow: 1;
 }
+#sidebar a:hover {
 #sidebar a:hover {
   background-color: green;
 }
 #sidebar .sub-menu {
+#sidebar .sub-menu {
   display: grid;
   transition: 300ms ease-in-out;
 }
+#sidebar .sub-menu.show {
 #sidebar .sub-menu.show {
   height: auto;
 }
@@ -107,15 +127,27 @@
   border-radius: 0.5em;
   background: none;
   cursor: pointer;
+#toggle-btn {
+  margin-left: auto;
+  padding: 1em;
+  border: none;
+  border-radius: 0.5em;
+  background: none;
+  cursor: pointer;
 
+  svg {
+    transition: rotate 150ms ease;
+  }
   svg {
     transition: rotate 150ms ease;
   }
 }
 #toggle-btn:hover {
+#toggle-btn:hover {
   background-color: green;
 }
 
+main {
 main {
   padding: min(30px, 7%);
   display: flex;
@@ -123,9 +155,11 @@ main {
   align-items: center;
 }
 main p {
+main p {
   margin-top: 5px;
   margin-bottom: 15px;
 }
+.container {
 .container {
   border: 1px solid black;
   border-radius: 1em;
@@ -136,9 +170,18 @@ main p {
   p {
     margin-top: 1em;
   }
+  h2,
+  p {
+    margin-top: 1em;
+  }
 }
 .logo {
   color: #333;
+}
+
+/* added */
+.contentPage {
+  display: flex;
 }
 
 /* added */

@@ -21,11 +21,11 @@ const Sidebar = ({ activeView, setActiveView }) => {
               />
               <path
                 d="M23.4295 21.3049H18.6517C18.3067 22.0537 17.7824 22.6819 17.1366 23.1205C16.4907 23.5591 15.7484 23.7909 14.9916 23.7904C12.5188 23.7904 10.5188 21.2672 10.5188 18.2181C10.5188 15.0911 12.5188 12.5318 14.9916 12.5318C15.7376 12.5425 16.4674 12.7751 17.1051 13.2055C17.7429 13.6359 18.2651 14.2482 18.6177 14.979H23.3951C22.3791 10.6104 19.1933 7.97461 14.9916 7.97461C9.73893 7.97461 5.97754 12.5683 5.97754 18.1807C5.97754 23.7932 9.73893 28.3098 14.9916 28.3098C19.2278 28.3098 22.4127 25.7123 23.4295 21.3049Z"
-                fill="black"
+                fill="white"
               />
               <path
                 d="M26.4385 14.9789H31.2157C31.5608 14.2299 32.0854 13.6015 32.7316 13.1629C33.3778 12.7244 34.1204 12.4928 34.8775 12.4938C37.3499 12.4938 39.3497 15.0171 39.3497 18.0659C39.3497 21.193 37.3499 23.7524 34.8775 23.7524C34.1316 23.7417 33.4019 23.5091 32.7642 23.0788C32.1266 22.6485 31.6044 22.0362 31.2518 21.3056H26.4733C27.4892 25.6738 30.6746 28.3098 34.8775 28.3098C40.1295 28.3098 43.8905 23.7164 43.8905 18.1032C43.8905 12.4901 40.1275 7.97461 34.8775 7.97461C30.6418 7.97461 27.4572 10.5718 26.4405 14.9789"
-                fill="black"
+                fill="white"
               />
             </g>
             <defs>
@@ -40,10 +40,19 @@ const Sidebar = ({ activeView, setActiveView }) => {
             </defs>
           </svg>
 
-         
+          <button id="toggle-btn">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              height="24px"
+              viewBox="0 -960 960 960"
+              width="24px"
+              fill="#e8eaed"
+            >
+              <path d="m242-200 200-280-200-280h98l200 280-200 280h-98Zm238 0 200-280-200-280h98l200 280-200 280h-98Z" />
+            </svg>
+          </button>
         </li>
         <li
-        id="pages"
           className={activeView === "home" ? "active" : ""}
           onClick={() => setActiveView("home")}
         >
@@ -56,10 +65,9 @@ const Sidebar = ({ activeView, setActiveView }) => {
           >
             <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" />
           </svg>
-          <span className="page-name">Home</span>
+          <span>Home</span>
         </li>
         <li
-        id="pages"
           className={activeView === "profile" ? "active" : ""}
           onClick={() => setActiveView("profile")}
         >
@@ -72,10 +80,9 @@ const Sidebar = ({ activeView, setActiveView }) => {
           >
             <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" />
           </svg>
-          <span className="page-name">Profile</span>
+          <span>Profile</span>
         </li>
         <li
-        id="pages"
           className={activeView === "demands" ? "active" : ""}
           onClick={() => setActiveView("demands")}
         >
@@ -88,10 +95,9 @@ const Sidebar = ({ activeView, setActiveView }) => {
           >
             <path d="M360-240h440v-107H360v107ZM160-613h120v-107H160v107Zm0 187h120v-107H160v107Zm0 186h120v-107H160v107Zm200-186h440v-107H360v107Zm0-187h440v-107H360v107ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Z" />
           </svg>
-          <span className="page-name">Demands</span>
+          <span>Demands</span>
         </li>
         <li
-        id="pages"
           className={activeView === "match" ? "active" : ""}
           onClick={() => setActiveView("match")}
         >
