@@ -6,7 +6,7 @@ const AllDemands = () => {
   return (
     <ListComponent
       fetchFunction={fetchAllDemands}
-      title="Mina Behov"
+      title="All demands"
       renderItem={(demand) => (
         <>
           <h3>{demand.title}</h3>
