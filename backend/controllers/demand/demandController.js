@@ -1,7 +1,23 @@
 const { v4: uuidv4 } = require("uuid");
 const db = require("../../services/db/db");
-const { PutCommand, QueryCommand } = require("@aws-sdk/lib-dynamodb");
+const {
+
+  ScanCommand,
+  PutCommand,
+  QueryCommand,
+
+
+} = require("@aws-sdk/lib-dynamodb");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
+
+// Definiera tillåtna kategorier
+const allowedCategories = [
+  "Technology",
+  "Health",
+  "Education",
+  "Finance",
+  "Environment",
+];
 
 const createDemand = async (req, res) => {
   try {
@@ -10,6 +26,15 @@ const createDemand = async (req, res) => {
 
     if (!author || !title || !demand || !category) {
       return res.status(400).json({ message: "All fields are required!" });
+    }
+
+    // Validera om kategorin är tillåten
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({
+        message: `Invalid category! Allowed categories: ${allowedCategories.join(
+          ", "
+        )}`,
+      });
     }
 
     const newDemand = {
@@ -75,4 +100,41 @@ const fetchMyDemands = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-module.exports = { createDemand, fetchMyDemands };
+
+const fetchAllDemands = async (req, res) => {
+  try {
+    const params = {
+      TableName: DEMANDS_TABLE,
+    };
+
+    console.log("Scanning DynamoDB with params:", params);
+
+    const { Items } = await db.send(new ScanCommand(params));
+
+    console.log("Scan result:", Items);
+
+    if (!Items || Items.length === 0) {
+      console.error("No demands found.");
+      return res
+        .status(404)
+        .json({ message: "No demands found in the table." });
+    }
+
+    const sortedItems = Items.sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+    );
+
+    res.status(200).json({
+      message: "Demands retrieved successfully!",
+      data: sortedItems,
+    });
+  } catch (error) {
+    console.error("Error fetching demands:", error);
+    console.error("Stack Trace:", error.stack);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+
+};
+}
+module.exports = { createDemand, fetchMyDemands, fetchAllDemands };

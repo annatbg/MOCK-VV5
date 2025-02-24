@@ -1,4 +1,4 @@
-const { createUser, userExists } = require("../../services/user/userServices");
+const { createUser, userExists, editUserService } = require("../../services/user/userServices");
 const { comparePassword } = require("../../services/utils/bcrypt");
 const { generateToken } = require("../../services/utils/jwt");
 
@@ -30,19 +30,26 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(`Login attempt for email: ${email}`);
 
   try {
     const user = await userExists(email);
+    console.log(`User not found: ${email}`);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log(`User found: ${email}, verifying password...`);
+
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
+      console.log(`Invalid password for user: ${email}`);
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
     const token = generateToken(user.email);
+
+    console.log(`Token generated for user: ${email}`);
 
     delete user.password;
 
@@ -52,7 +59,7 @@ const loginUser = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.error("Error in login:", err);
+    console.error("Error in login: ${email}", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -71,9 +78,32 @@ const fetchUser = async (req, res) => {
       user,
     });
   } catch (err) {
-    console.error("Error in login:", err);
+    console.error("Error in fetchUser:", err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports = { signupUser, loginUser, fetchUser };
+const editUser = async (req, res) => {
+  const currentUser = req.user;
+  const updateData = req.body;
+  const targetEmail = currentUser.username;
+  
+  try {
+    const updatedUser = await editUserService(currentUser, targetEmail, updateData);
+    const newToken = generateToken(updatedUser.email);
+    if (updatedUser.password) {
+      delete updatedUser.password;
+    }
+    return res.status(200).json({
+      message: "User updated successfully",
+      user: updatedUser,
+      token: newToken,
+    });
+  } catch (err) {
+    console.error("Error in editUser:", err);
+    return res.status(500).json({ message: err.message || "Internal server error" });
+  }
+};
+
+
+module.exports = { signupUser, loginUser, fetchUser, editUser };
