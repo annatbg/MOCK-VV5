@@ -121,5 +121,5 @@ const fetchAllDemands = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
-
+}
 module.exports = { createDemand, fetchMyDemands, fetchAllDemands };
