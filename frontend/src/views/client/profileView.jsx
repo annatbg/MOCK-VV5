@@ -4,7 +4,7 @@ import { fetchUserData, updateUser } from "../../hooks/api/userApi";
 import "./styles/ProfileView.css";
 const API_URL = import.meta.env.VITE_API_URL;
 
-const ProfileUser = () => {
+const ProfileView = () => {
   const [userData, setUserData] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
@@ -151,4 +151,4 @@ const ProfileUser = () => {
   );
 };
 
-export default ProfileUser;
+export default ProfileView;
