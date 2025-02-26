@@ -74,4 +74,31 @@ const fetchAllDemands = async () => {
   }
 };
 
-export { createDemand, fetchMyDemands, fetchAllDemands };
+const fetchDemandsByIds = async (ids) => {
+  try {
+    const token = useUser.getState().token;
+    // Använd "ids" query-param om det är en array
+    const queryParam = Array.isArray(ids)
+      ? `ids=${ids.join(",")}`
+      : `id=${ids}`;
+    // Viktigt: anropa endpointen /demand/ids
+    const response = await fetch(`${API_URL}/demand/ids?${queryParam}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log("[fetchDemandsByIds] Request URL:", `${API_URL}/demand/ids?${queryParam}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch demand(s)");
+    }
+    const result = await response.json();
+    console.log("[fetchDemandsByIds] Response:", result);
+    return result;
+  } catch (error) {
+    throw new Error(`An error occurred while fetching demand(s): ${error.message}`);
+  }
+};
+
+export { createDemand, fetchMyDemands, fetchAllDemands, fetchDemandsByIds };
