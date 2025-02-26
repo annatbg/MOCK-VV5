@@ -160,6 +160,6 @@ const Sidebar = ({ activeView, setActiveView }) => {
       </ul>
     </nav>
   );
-};
+}
 
 export default Sidebar;
