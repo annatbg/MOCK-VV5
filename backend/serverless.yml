@@ -40,6 +40,10 @@ resources:
             AttributeType: S
           - AttributeName: createdAt
             AttributeType: S
+          - AttributeName: category
+            AttributeType: S
+          - AttributeName: matches
+            AttributeType: S
         KeySchema:
           - AttributeName: demandId
             KeyType: HASH
@@ -57,3 +61,16 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
+          - IndexName: category-index
+            KeySchema:
+              - AttributeName: category
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: matches-index
+            KeySchema:
+              - AttributeName: matches
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+  ```

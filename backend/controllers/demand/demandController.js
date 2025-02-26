@@ -4,10 +4,11 @@ const {
   PutCommand,
   QueryCommand,
   ScanCommand,
+  UpdateCommand
 } = require("@aws-sdk/lib-dynamodb");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
 
-// Definiera tillåtna kategorier
+// Tillåtna kategorier
 const allowedCategories = [
   "Technology",
   "Health",
@@ -25,33 +26,58 @@ const createDemand = async (req, res) => {
       return res.status(400).json({ message: "All fields are required!" });
     }
 
-    // Validera om kategorin är tillåten
+    // Validate allowed category
     if (!allowedCategories.includes(category)) {
       return res.status(400).json({
-        message: `Invalid category! Allowed categories: ${allowedCategories.join(
-          ", "
-        )}`,
+        message: `Invalid category! Allowed categories: ${allowedCategories.join(", ")}`,
       });
     }
 
+    // Query existing demands in the same category 'matches'
+    const queryParams = {
+      TableName: DEMANDS_TABLE,
+      IndexName: "category-index",
+      KeyConditionExpression: "category = :category",
+      ExpressionAttributeValues: { ":category": category },
+    };
+
+    const { Items: matchingDemands } = await db.send(new QueryCommand(queryParams));
+    const matchingDemandIds = matchingDemands ? matchingDemands.map(item => item.demandId) : [];
+
+    // Create new demand item
+    const newDemandId = uuidv4();
     const newDemand = {
-      demandId: uuidv4(),
+      demandId: newDemandId,
       author,
       title,
       demand,
       category,
       createdAt: new Date().toISOString(),
+      matches: matchingDemandIds,
     };
 
-    const params = {
+    // Save the new demand
+    await db.send(new PutCommand({
       TableName: DEMANDS_TABLE,
       Item: newDemand,
-    };
+    }));
 
-    await db.send(new PutCommand(params));
+    // Update existing demands to add the new demandId to their matches
+    for (const match of matchingDemands) {
+      const updateParams = {
+        TableName: DEMANDS_TABLE,
+        Key: { demandId: match.demandId },
+        UpdateExpression: "SET matches = list_append(if_not_exists(matches, :emptyList), :newMatch)",
+        ExpressionAttributeValues: {
+          ":newMatch": [newDemandId],
+          ":emptyList": [],
+        },
+      };
+      await db.send(new UpdateCommand(updateParams));
+    }
 
     res.status(201).json({
-      message: "Demand created successfully!",
+      message: "Demand created successfully and matches updated!",
       data: newDemand,
     });
   } catch (error) {
@@ -59,6 +85,7 @@ const createDemand = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 const fetchMyDemands = async (req, res) => {
   try {
@@ -71,7 +98,7 @@ const fetchMyDemands = async (req, res) => {
 
     const params = {
       TableName: DEMANDS_TABLE,
-      IndexName: "author-index", // GSI -- needs to be added in AWS
+      IndexName: "author-index",
       KeyConditionExpression: "author = :author",
       ExpressionAttributeValues: {
         ":author": author,
