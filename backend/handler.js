@@ -26,10 +26,11 @@ app.use((req, res, next) => {
 // Routes
 app.post("/signup", userController.signupUser);
 app.post("/login", userController.loginUser);
+
 app.post("/demand", auth, demandController.createDemand);
 app.get("/demand", auth, demandController.fetchMyDemands);
 app.get("/demands/all", demandController.fetchAllDemands);
-
+app.get("/demand/ids", auth, demandController.fetchDemandsByIds);
 
 app.post("/user/fetch", userController.fetchUser);
 app.put("/user/edit", auth, userController.editUser);
