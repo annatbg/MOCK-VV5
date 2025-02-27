@@ -6,7 +6,6 @@ const {
   ScanCommand,
   GetCommand,
   DeleteCommand,
-
 } = require("@aws-sdk/lib-dynamodb");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
 
@@ -21,45 +20,44 @@ const allowedCategories = [
 
 const createDemand = async (req, res) => {
   try {
-    const author = req.user?.username;
-    const { demandId } = req.params;
+    const author = req.user.username;
+    const { title, demand, category } = req.body;
 
-    if (!author) {
-      return res.status(400).json({ message: "User not authenticated" });
+    if (!author || !title || !demand || !category) {
+      return res.status(400).json({ message: "All fields are required!" });
     }
 
-    if (!demandId) {
-      return res.status(400).json({ message: "Demand ID is required" });
+    // Validera om kategorin är tillåten
+    if (!allowedCategories.includes(category)) {
+      return res.status(400).json({
+        message: `Invalid category! Allowed categories: ${allowedCategories.join(
+          ", "
+        )}`,
+      });
     }
 
-    // Hämta demand för att verifiera att den tillhör användaren
-    const getParams = {
-      TableName: DEMANDS_TABLE,
-      Key: { demandId },
+    const newDemand = {
+      demandId: uuidv4(),
+      author,
+      title,
+      demand,
+      category,
+      createdAt: new Date().toISOString(),
     };
 
-    const { Item } = await db.send(new GetCommand(getParams));
-
-    if (!Item) {
-      return res.status(404).json({ message: "Demand not found" });
-    }
-
-    if (Item.author !== author) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to delete this demand" });
-    }
-    // Radera demanden
-    const deleteParams = {
+    const params = {
       TableName: DEMANDS_TABLE,
-      Key: { demandId },
+      Item: newDemand,
     };
 
-    await db.send(new DeleteCommand(deleteParams));
+    await db.send(new PutCommand(params));
 
-    res.status(200).json({ message: "Demand deleted successfully!" });
+    res.status(201).json({
+      message: "Demand created successfully!",
+      data: newDemand,
+    });
   } catch (error) {
-    console.error("Error deleting demand:", error);
+    console.error("Error creating demand:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
@@ -124,7 +122,6 @@ const fetchAllDemands = async (req, res) => {
     console.error("Stack Trace:", error.stack);
     res.status(500).json({ message: "Internal Server Error" });
   }
-
 };
 
 const deleteDemand = async (req, res) => {
@@ -185,4 +182,3 @@ module.exports = {
   fetchAllDemands,
   deleteDemand,
 };
-
