@@ -1,8 +1,6 @@
-/* .pagenav {
+.pagenav {
   background-color: #333;
   padding: 10px;
-  border-radius: 0 0 8px 8px;
-  border-top: 3px solid black;
 }
 
 .pagenav ul {
@@ -29,4 +27,4 @@
 .pagenav ul li.active {
   color: #fff;
   text-decoration: underline;
-} */
+}
