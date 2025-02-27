@@ -64,6 +64,7 @@ const CreateDemand = () => {
         <span className="demandForm-arrow">{isFormOpen ? "▲" : "▼"}</span>
       </h3>
 
+      <div className="demandForm-container">
       {isFormOpen && (
         <form onSubmit={handleSubmit} className="demandForm-form">
           <label htmlFor="title" className="demandForm-label">
@@ -79,7 +80,7 @@ const CreateDemand = () => {
             disabled={loading}
           />
 
-          <label htmlFor="demand" className="demandForm-label">
+          <label htmlFor="demand" className="demandForm-label-behov">
             Behov:
           </label>
           <input
@@ -88,7 +89,7 @@ const CreateDemand = () => {
             value={formData.demand}
             onChange={handleChange}
             placeholder="Beskriv ditt behov..."
-            className="demandForm-input"
+            className="demandForm-input-behov"
             disabled={loading}
           />
 
@@ -118,7 +119,9 @@ const CreateDemand = () => {
             {loading ? "Submitting..." : "Skapa behov"}
           </button>
         </form>
-      )}
+      )}    
+
+      </div>
     </>
   );
 };
