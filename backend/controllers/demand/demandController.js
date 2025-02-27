@@ -6,6 +6,7 @@ const {
   ScanCommand,
   GetCommand,
   DeleteCommand,
+
 } = require("@aws-sdk/lib-dynamodb");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
 
@@ -123,6 +124,7 @@ const fetchAllDemands = async (req, res) => {
     console.error("Stack Trace:", error.stack);
     res.status(500).json({ message: "Internal Server Error" });
   }
+
 };
 
 const deleteDemand = async (req, res) => {
@@ -183,3 +185,4 @@ module.exports = {
   fetchAllDemands,
   deleteDemand,
 };
+

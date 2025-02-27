@@ -1,0 +1,15 @@
+#pages {
+    display: flex;
+    align-items: flex-end;
+    text-align: center;
+    margin: 15px;
+    padding: 10px;
+    font-size: larger;
+}
+.page-name {
+    margin-left: 15px;
+}
+.nav-list {
+    padding: 10px;
+    
+}
