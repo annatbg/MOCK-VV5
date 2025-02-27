@@ -22,7 +22,7 @@ const ListComponent = ({ fetchFunction, title, renderItem }) => {
   if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
 
   return (
-    <div>
+    <div className="listContainer">
       <h2 className="listHeader">{title}</h2>
       <ul className="list">
         {items.length > 0 ? (

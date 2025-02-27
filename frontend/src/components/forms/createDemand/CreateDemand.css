@@ -1,11 +1,19 @@
+.demandForm-container {
+  display: flex;
+  width: 100%;
+}
 .demandForm-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 3px;
+  width: 100%;
+  margin: 5px 30px;
+
 }
 
 .demandForm-label {
   font-weight: 500;
+
 }
 
 .demandForm-input {
@@ -13,8 +21,17 @@
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 16px;
+  display: flex;
+  flex-direction: column;
 }
 
+.demandForm-input-behov {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  height: 100px;
+}
 .demandForm-input:disabled {
   background-color: #e0e0e0;
 }
@@ -28,6 +45,7 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s;
+  margin-top: 10px;
 }
 
 .demandForm-button:hover {

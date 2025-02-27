@@ -1,173 +1,17 @@
-/* .contentPage {
-  flex: 1;
-  width: 80%;
-  margin: auto;
+html {
+  background-color: #F8DAC7;
+
 }
-
-.contentPage__user {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-.contentPage__user h2 {
-  flex: 1;
-  text-align: center;
-}
-
-.contentPage__user .contentPage__user-logoutBTN {
-  margin-left: auto;
-  margin-right: 20px;
-}
-.contentPage__user-logoutBTN {
-  background-color: #333;
-  color: #fff;
-  border: 2px solid black;
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 10px;
-}
-.contentPage__user-logoutBTN:hover {
-  text-decoration: underline;
-}
-
-.picture {
-  margin-top: 50px;
-  width: 100px;
-  height: 100px;
-  background: red;
-  border-radius: 50%;
-} */
-
-.app-container {
-  /* display: grid;
-  grid-template-columns: auto 1fr;  */
-  display: flex;
-  min-height: 100vh;
-}
-
-#sidebar {
-  padding: 5px 1em;
-  height: 100vh;
-  height: 100vh;
-  border-right: 1px solid #333;
-
-  position: sticky;
-  top: 0;
-  align-self: start;
-}
-
-#sidebar ul {
-  list-style: none;
-}
-
-#sidebar > ul > li:first-child {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
-}
-
-#sidebar ul li.active a {
-  color: purple;
-
-  svg {
-    fill: purple;
-  }
-}
-
-#sidebar a,
-#sidebar .dropdown-btn {
-  border-radius: 0.5em;
-  padding: 0.85em;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 1em;
-}
-
-.dropdown-btn {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  font: inherit;
-  cursor: pointer;
-}
-#sidebar svg {
-  flex-shrink: 0;
-  fill: purple;
-}
-
-#sidebar a span {
-  flex-grow: 1;
-}
-
-#sidebar a:hover {
-  background-color: green;
-}
-
-#sidebar .sub-menu {
-  display: grid;
-  transition: 300ms ease-in-out;
-}
-
-#sidebar .sub-menu.show {
-  height: auto;
-}
-
-
-#toggle-btn {
-  margin-left: auto;
-  padding: 1em;
-  border: none;
-  border-radius: 0.5em;
-  background: none;
-  cursor: pointer;
-
-
-  svg {
-    transition: rotate 150ms ease;
-  }
-}
-
-#toggle-btn:hover {
-  background-color: green;
-}
-
-
-main {
-  padding: min(30px, 7%);
+.clientContainer {
   display: flex;
   flex-direction: column;
-  align-items: center;
-}
+  width: 100%;
+  background-color: #F8DAC7;
 
-main p {
-  margin-top: 5px;
-  margin-bottom: 15px;
-}
-
-.container {
-  border: 1px solid black;
-  border-radius: 1em;
-  margin-bottom: 20px;
-  padding: min(3em, 15%);
-
-  h2,
-  p {
-    margin-top: 1em;
-  }
-}
-.logo {
-  color: #333;
 }
 
 /* added */
 .contentPage {
   display: flex;
-}
 
-/* added */
-.contentPage {
-  display: flex;
 }
