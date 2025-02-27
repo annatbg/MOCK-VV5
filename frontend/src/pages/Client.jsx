@@ -6,7 +6,7 @@ import DemandsView from "../views/client/demandsView";
 import MatchView from "../views/client/matchView";
 import ProfileView from "../views/client/profileView";
 import NotificationsView from "../views/client/notificationsView";
-import Sidebar from "../components/sidebar/sidebar";
+import Sidebar from "../components/sidebar/Sidebar";
 import "./styles/ClientPage.css";
 
 
@@ -43,7 +43,7 @@ function Client() {
   return (
     <>
       {user && (
-        <div className="app-container">
+        <div className="clientContainer">
           <div className="contentPage">
             <Sidebar setActiveView={setActiveView} activeView={activeView} />
             {renderView()}

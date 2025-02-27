@@ -20,22 +20,34 @@ const MyDemands = () => {
       fetchFunction={fetchMyDemands}
       title="My demands"
       renderItem={(demand) => (
+        <>
+          <div className="demandCard">
+          <div className="demandContent">
+            <h3 className="demandTitle">{demand.title}</h3>
+            <p className="demandDemand">{demand.demand}</p>
+          </div>
+          <p className="demandCategory">
+
         <div key={demand.demandId}>
           <h3>{demand.title}</h3>
           <p>{demand.demand}</p>
           <p>
             <strong>Kategori:</strong> {demand.category}
           </p>
-          <p>
+          <p className="demandAuthor">
             <em>Skapad av: {demand.author}</em>
           </p>
+        </div>
+        
           <Button
             onClick={() => handleDelete(demand.demandId)}
             label="Delete"
             variant="danger"
           />
-        </div>
+              
+        
       )}
+      </>
     />
   );
 };

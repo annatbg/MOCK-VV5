@@ -1,0 +1,40 @@
+.demandCard {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-end;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 50px;
+}
+.demandContent {
+
+
+}
+.demandTitle {
+
+    margin: 0px;
+
+}
+
+.demandDemand {
+
+    margin: 0px;
+
+}
+
+.demandCategory {
+
+    margin: 0px;
+
+}
+
+.demandAuthor {
+
+    margin: 0px;
+
+}
+.demandSvg {
+
+}
