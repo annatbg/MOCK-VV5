@@ -74,4 +74,29 @@ const fetchAllDemands = async () => {
   }
 };
 
-export { createDemand, fetchMyDemands, fetchAllDemands };
+const deleteDemand = async (demandId) => {
+  try {
+    const token = useUser.getState().token;
+
+    const response = await fetch(`${API_URL}/demand/${demandId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      return result;
+    } else {
+      throw new Error(result.message || "Failed to delete demand");
+    }
+  } catch (error) {
+    throw new Error(
+      `An error occurred while deleting demand: ${error.message}`
+    );
+  }
+};
+
+export { createDemand, fetchMyDemands, fetchAllDemands, deleteDemand };
