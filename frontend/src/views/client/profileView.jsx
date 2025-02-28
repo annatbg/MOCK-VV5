@@ -56,7 +56,7 @@ const ProfileView = () => {
       {userData ? (
         <div className="profileContainer">
           <div className="profileImage">
-            <img alt="Profile" />
+            <h2>KB</h2>
             <p className="profileLocation">location</p>
           </div>
           <div className="profileUserData">
