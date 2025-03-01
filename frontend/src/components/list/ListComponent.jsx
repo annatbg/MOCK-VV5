@@ -26,8 +26,8 @@ const ListComponent = ({ fetchFunction, title, renderItem }) => {
       <h2 className="listHeader">{title}</h2>
       <ul className="list">
         {items.length > 0 ? (
-          items.map((item) => (
-            <li className="listItem" key={item.id || item.demandId}>
+          items.map((item, index) => (
+            <li className="listItem" key={item.demand?.demandId || `item-${index}`}>
               {renderItem(item)}
             </li>
           ))
@@ -40,9 +40,9 @@ const ListComponent = ({ fetchFunction, title, renderItem }) => {
 };
 
 ListComponent.propTypes = {
-  fetchFunction: PropTypes.func.isRequired, // Måste vara en funktion
-  title: PropTypes.string.isRequired, // Måste vara en sträng
-  renderItem: PropTypes.func.isRequired, // Måste vara en funktion
+  fetchFunction: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  renderItem: PropTypes.func.isRequired,
 };
 
 export default ListComponent;

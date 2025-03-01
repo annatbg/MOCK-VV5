@@ -4,10 +4,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 const createDemand = async (formData) => {
   try {
     const token = useUser.getState().token;
-    // const user = useUser.getState().user;
-
-    // console.log("data", formData.formData);
-    // console.log("token", token);
 
     const response = await fetch(`${API_URL}/demand`, {
       method: "POST",
@@ -105,7 +101,7 @@ const fetchDemandsByIds = async (ids) => {
     // Använd "ids" query-param om det är en array
     const queryParam = Array.isArray(ids)
       ? `ids=${ids.join(",")}`
-      : `id=${ids}`;
+      : `ids=${ids}`;
     // Viktigt: anropa endpointen /demand/ids
     const response = await fetch(`${API_URL}/demand/ids?${queryParam}`, {
       method: "GET",
