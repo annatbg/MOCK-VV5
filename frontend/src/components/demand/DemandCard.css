@@ -82,52 +82,123 @@
     0 10px 24px rgba(0, 0, 0, 0.06);
 }
 
+/* Fix the demand card header layout to prevent overlap */
 .demand-card-header {
   display: flex;
+  flex-wrap: wrap; /* Allow contents to wrap */
   justify-content: space-between;
   align-items: center;
   padding: 0.24em;
   border-bottom: 1px dashed rgba(79, 140, 57, 0.5);
+  gap: 8px; /* Add gap between elements */
+  margin-bottom: 10px; /* Add space below header */
+  min-height: 40px; /* Ensure minimum height for header */
+  width: 100%; /* Ensure full width */
+  position: relative; /* For proper z-index handling */
+  z-index: 5; /* Higher than description */
+  background: inherit; /* Ensure header has background */
+  border-radius: 12px 12px 0 0; /* Match card border radius for top */
 }
 
+/* Fix title overflow */
 .demand-card h3 {
   margin: 0;
   color: #1d1d1f;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+  flex: 1 1 auto; /* Allow it to shrink but also grow */
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
-  flex: 1;
+  max-width: 100%;
+  padding-right: 8px; /* Add space for category */
+  box-sizing: border-box;
 }
 
+/* Make category tag more compact */
 .demand-card .category {
   background-color: rgba(79, 140, 57, 0.15);
   color: #4f8c39;
-  padding: 0.3em 0.7em;
+  padding: 0.2em 0.5em;
   border-radius: 4px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
+  flex: 0 0 auto; /* Don't allow to grow or shrink */
 }
 
+/* Fix description container to not overlap */
 .demand-card .descriptionContainer {
   padding: 0.5em;
   border: 1px dashed rgba(79, 140, 57, 0.3);
   border-radius: 8px;
-  margin: 1em 0em 1em 0;
+  margin: 0.5em 0;
   display: flex;
   min-width: 100%;
-  min-height: 50%;
   flex: 1;
+  position: relative;
+  z-index: 1;
+  overflow-y: auto; /* Allow scrolling for long descriptions */
+  max-height: 200px; /* Limit height for very long descriptions */
 }
 
-.demand-card .description {
-  margin: 0;
-  font-size: 1.5rem;
-  letter-spacing: 0.02em;
-  color: #535353;
-  line-height: 1.5;
-  white-space: wrap;
+/* Ensure match actions are positioned correctly */
+.match-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 4px 0;
+  flex: 1 0 100%; /* Take full width on wrap */
+  order: 3; /* Place after title and category */
+}
+
+/* Order elements in header for better wrapping */
+.demand-card-header h3 {
+  order: 1;
+}
+
+.demand-card-header .category {
+  order: 2;
+}
+
+/* Add clear spacing after any wrapped elements */
+.demand-card-header:after {
+  content: "";
+  flex-basis: 100%;
+  height: 0;
+  order: 4;
+}
+
+/* Match the primary demand styling */
+.demand-card.primary-demand .demand-card-header {
+  padding-bottom: 10px;
+  border-bottom-width: 2px;
+}
+
+.demand-card.primary-demand h3 {
+  font-size: 1.8rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .demand-card-header {
+    padding: 0.5em;
+  }
+  
+  .demand-card h3 {
+    font-size: 1.3rem;
+    flex-basis: 100%; /* Take full width on very small screens */
+  }
+  
+  .demand-card .category {
+    margin-top: 4px;
+  }
+  
+  .match-actions {
+    margin-top: 8px;
+  }
 }
 
 .demand-card-footer {
@@ -144,4 +215,103 @@
   padding-top: 0.5em;
   border-top: 1px dashed rgba(79, 140, 57, 0.5);  
   white-space: nowrap;
+}
+
+/* Match actions and status styling */
+.match-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 10px;
+}
+
+.match-action-button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.match-action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.confirm-button {
+  background-color: #4f8c39;
+  color: white;
+}
+
+.reject-button {
+  background-color: #c62828;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #f57f17;
+  color: white;
+}
+
+.undo-button {
+  background-color: #2196f3;
+  color: white;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  margin-left: 10px;
+}
+
+.new-badge {
+  background-color: #2196f3;
+}
+
+.confirmedByMe-badge {
+  background-color: #ff9800;
+}
+
+.confirmedByThem-badge {
+  background-color: #4caf50;
+  animation: pulse 2s infinite;
+}
+
+.matched-badge {
+  background-color: #4f8c39;
+}
+
+.rejectedByMe-badge {
+  background-color: #c62828;
+  text-decoration: line-through;
+}
+
+/* Card status styles */
+.confirmed-by-me-card {
+  border-left: 4px solid #ff9800;
+}
+
+.confirmed-by-them-card {
+  border-left: 4px solid #4caf50;
+}
+
+.matched-card {
+  border-left: 4px solid #4f8c39;
+}
+
+.rejected-card {
+  opacity: 0.7;
+  border-left: 4px solid #c62828;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { opacity: 0.8; }
 }

@@ -27,17 +27,22 @@ app.use((req, res, next) => {
 app.post("/signup", userController.signupUser);
 app.post("/login", userController.loginUser);
 
+// Demand routes
 app.post("/demand", auth, demandController.createDemand);
 app.get("/demand", auth, demandController.fetchMyDemands);
 app.get("/demands/all", demandController.fetchAllDemands);
-app.delete("/demand/:demandId", auth, demandController.deleteDemand);
 app.get("/demand/ids", auth, demandController.fetchDemandsByIds);
+
+// Match route that belongs to a demand but won't conflict with the demand ID route
+app.put("/demand/matches/:demandId", auth, demandController.updateDemandMatches);
+
+// Keep the delete route as is, since it's working correctly
+app.delete("/demand/:demandId", auth, demandController.deleteDemand);
 
 app.post("/user/fetch", userController.fetchUser);
 app.put("/user/edit", auth, userController.editUser);
 
 // Catch-all for 404 errors
 app.use(notFoundController.error);
-
 
 exports.handler = serverless(app);
