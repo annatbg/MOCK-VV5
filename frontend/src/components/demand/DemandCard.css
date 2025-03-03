@@ -85,47 +85,51 @@
 /* Fix the demand card header layout to prevent overlap */
 .demand-card-header {
   display: flex;
-  flex-wrap: wrap; /* Allow contents to wrap */
   justify-content: space-between;
   align-items: center;
-  padding: 0.24em;
+  padding: 0.5em;
   border-bottom: 1px dashed rgba(79, 140, 57, 0.5);
-  gap: 8px; /* Add gap between elements */
-  margin-bottom: 10px; /* Add space below header */
-  min-height: 40px; /* Ensure minimum height for header */
-  width: 100%; /* Ensure full width */
-  position: relative; /* For proper z-index handling */
-  z-index: 5; /* Higher than description */
-  background: inherit; /* Ensure header has background */
-  border-radius: 12px 12px 0 0; /* Match card border radius for top */
+  margin-bottom: 5px;
+  min-height: 40px;
+  width: 100%;
+  position: relative;
+  z-index: 5;
+  background: inherit;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Group title and category together */
+.title-category-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0; /* Allow proper flexbox shrinking */
+  overflow: hidden;
 }
 
 /* Fix title overflow */
 .demand-card h3 {
   margin: 0;
+  margin-right: 10px; /* Space between title and category */
   color: #1d1d1f;
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  flex: 1 1 auto; /* Allow it to shrink but also grow */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 100%;
-  padding-right: 8px; /* Add space for category */
-  box-sizing: border-box;
 }
 
 /* Make category tag more compact */
 .demand-card .category {
   background-color: rgba(79, 140, 57, 0.15);
   color: #4f8c39;
-  padding: 0.2em 0.5em;
+  padding: 0.2em 0.6em;
   border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 600;
   white-space: nowrap;
-  flex: 0 0 auto; /* Don't allow to grow or shrink */
+  flex-shrink: 0;
 }
 
 /* Fix description container to not overlap */
@@ -144,14 +148,16 @@
 }
 
 /* Ensure match actions are positioned correctly */
+.match-actions-container {
+  padding: 0.5em 0.5em 0;
+}
+
 .match-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
-  margin: 4px 0;
-  flex: 1 0 100%; /* Take full width on wrap */
-  order: 3; /* Place after title and category */
+  margin-bottom: 8px;
 }
 
 /* Order elements in header for better wrapping */
@@ -198,6 +204,21 @@
   
   .match-actions {
     margin-top: 8px;
+  }
+}
+
+@media (max-width: 500px) {
+  .demand-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .title-category-wrapper {
+    margin-bottom: 6px;
+  }
+  
+  .status-badge {
+    align-self: flex-end;
   }
 }
 
@@ -268,6 +289,7 @@
   font-weight: 600;
   color: white;
   margin-left: 10px;
+  flex-shrink: 0; /* Prevent badge from shrinking */
 }
 
 .new-badge {

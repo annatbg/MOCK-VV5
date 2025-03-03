@@ -7,13 +7,12 @@ import {
   undoRejection
 } from "../../hooks/api/demandApi";
 import ListComponent from "../../components/list/ListComponent";
-import DemandCard from "../../components/demand/DemandCard";
+import MatchGroup from "../../components/match/MatchGroup";
 import "./styles/MatchView.css";
 
 const MatchView = () => {
-  const [activeCards, setActiveCards] = useState({});
-  const [activeConfirmedCards, setActiveConfirmedCards] = useState({});
   const [updatedMatches, setUpdatedMatches] = useState({});
+  const [matchStats, setMatchStats] = useState({ total: 0, withConfirmed: 0 });
 
   const fetchMatchData = useCallback(async () => {
     console.log("[MatchView] Start fetching my demands");
@@ -25,6 +24,8 @@ const MatchView = () => {
       
       const myDemands = myDemandsResponse.data || [];
       const items = [];
+      let demandsWithMatches = 0;
+      let demandsWithConfirmed = 0;
       
       for (const demand of myDemands) {
         try {
@@ -35,6 +36,7 @@ const MatchView = () => {
           // Extract match IDs and statuses
           const matchIdsToFetch = [];
           const matchStatusMap = {};
+          let hasMatchedStatus = false;
           
           demand.matches.forEach(match => {
             const matchId = typeof match === 'object' ? match.id : match;
@@ -42,10 +44,19 @@ const MatchView = () => {
             
             matchIdsToFetch.push(matchId);
             matchStatusMap[matchId] = status;
+            
+            if (status === 'matched') {
+              hasMatchedStatus = true;
+            }
           });
           
           if (matchIdsToFetch.length === 0) {
             continue;
+          }
+          
+          demandsWithMatches++;
+          if (hasMatchedStatus) {
+            demandsWithConfirmed++;
           }
           
           console.log(`[MatchView] Fetching matches for demand ${demand.demandId}`);
@@ -85,6 +96,12 @@ const MatchView = () => {
         }
       }
       
+      // Update stats for the title
+      setMatchStats({
+        total: demandsWithMatches,
+        withConfirmed: demandsWithConfirmed
+      });
+      
       return { data: items };
       
     } catch (err) {
@@ -103,7 +120,7 @@ const MatchView = () => {
           updatedState[demandId] = { matches: [] };
         }
         // Find and update the match status
-        const matchIndex = updatedState[demandId].matches?.findIndex?.(m => m.demandId === matchId);
+        const matchIndex = updatedState[demandId]?.matches?.findIndex?.(m => m.demandId === matchId);
         if (matchIndex >= 0) {
           updatedState[demandId].matches[matchIndex].status = 'confirmedByMe';
         }
@@ -111,7 +128,6 @@ const MatchView = () => {
       });
     } catch (error) {
       console.error("Failed to confirm match:", error);
-      // Could add error state handling here
     }
   };
 
@@ -125,7 +141,7 @@ const MatchView = () => {
           updatedState[demandId] = { matches: [] };
         }
         // Find and update the match status
-        const matchIndex = updatedState[demandId].matches?.findIndex?.(m => m.demandId === matchId);
+        const matchIndex = updatedState[demandId]?.matches?.findIndex?.(m => m.demandId === matchId);
         if (matchIndex >= 0) {
           updatedState[demandId].matches[matchIndex].status = 'rejectedByMe';
         }
@@ -146,7 +162,7 @@ const MatchView = () => {
           updatedState[demandId] = { matches: [] };
         }
         // Find and update the match status
-        const matchIndex = updatedState[demandId].matches?.findIndex?.(m => m.demandId === matchId);
+        const matchIndex = updatedState[demandId]?.matches?.findIndex?.(m => m.demandId === matchId);
         if (matchIndex >= 0) {
           updatedState[demandId].matches[matchIndex].status = 'new';
         }
@@ -157,93 +173,32 @@ const MatchView = () => {
     }
   };
 
-  const renderMatchItem = (item) => {
-    const demandGroupId = item.demand.demandId || Math.random().toString();
+  // Create a dynamic title based on match stats
+  const getDynamicTitle = () => {
+    if (matchStats.total === 0) {
+      return "You have no demands with possible matches";
+    }
     
-    // Separate confirmed and unconfirmed matches
-    const confirmedMatches = item.matches.filter(match => match.status === 'matched');
-    const otherMatches = item.matches.filter(match => match.status !== 'matched');
+    if (matchStats.withConfirmed === 0) {
+      return `You have ${matchStats.total} demand${matchStats.total > 1 ? 's' : ''} with possible matches`;
+    }
     
-    return (
-      <div className="match-group">
-        <div className="primary-section">
-          <DemandCard
-            title={item.demand.title}
-            demand={item.demand.demand}
-            category={item.demand.category}
-            author={item.demand.author}
-            className="primary-demand"
-          />
-          
-          {/* Confirmed matches displayed horizontally next to primary demand */}
-          {confirmedMatches.length > 0 && (
-            <div className="confirmed-matches">
-              <h4>Active Collaborations:</h4>
-              <div className="confirmed-card-stack">
-                {confirmedMatches.map((match, index) => (
-                  <DemandCard
-                    key={`confirmed-${match.demandId}`}
-                    title={match.title || "Unknown title"}
-                    demand={match.demand || "No details available"}
-                    category={match.category || "Other"}
-                    author={match.author || "Unknown"}
-                    className="confirmed-match-item"
-                    isStackable={true}
-                    isOnTop={activeConfirmedCards[demandGroupId] === index}
-                    onSelect={() => {
-                      setActiveConfirmedCards(prev => ({
-                        ...prev,
-                        [demandGroupId]: index
-                      }));
-                    }}
-                    matchActions={{
-                      status: match.status,
-                      // No action buttons needed for confirmed matches
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {/* Other matches displayed below as before */}
-        {otherMatches.length > 0 && (
-          <div className="matches">
-            <h4>Potential Matches:</h4>
-            <div className="card-stack">
-              {otherMatches.map((match, index) => (
-                <DemandCard
-                  key={`other-${match.demandId}`}
-                  title={match.title || "Unknown title"}
-                  demand={match.demand || "No details available"}
-                  category={match.category || "Other"}
-                  author={match.author || "Unknown"}
-                  className="match-item"
-                  isStackable={true}
-                  isOnTop={activeCards[demandGroupId] === index}
-                  onSelect={() => {
-                    setActiveCards(prev => ({
-                      ...prev,
-                      [demandGroupId]: index
-                    }));
-                  }}
-                  matchActions={{
-                    status: match.status,
-                    onConfirm: () => handleConfirm(item.demand.demandId, match.demandId),
-                    onReject: () => handleReject(item.demand.demandId, match.demandId),
-                    onCancel: () => handleCancel(item.demand.demandId, match.demandId, match.status)
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        )}
+    if (matchStats.withConfirmed === matchStats.total) {
+      return `You have ${matchStats.total} demand${matchStats.total > 1 ? 's' : ''} with active collaborations`;
+    }
+    
+    return `You have ${matchStats.total} demand${matchStats.total > 1 ? 's' : ''} with possible matches and ${matchStats.withConfirmed} with active collaborations`;
+  };
 
-        {otherMatches.length === 0 && confirmedMatches.length === 0 && (
-          <p className="no-matches-message">No matches found for this demand.</p>
-        )}
-      </div>
+  const renderMatchGroup = (item) => {
+    return (
+      <MatchGroup
+        demand={item.demand}
+        matches={item.matches}
+        onConfirmMatch={handleConfirm}
+        onRejectMatch={handleReject}
+        onCancelAction={handleCancel}
+      />
     );
   };
 
@@ -251,9 +206,9 @@ const MatchView = () => {
     <div className="match-view">
       <ListComponent
         fetchFunction={fetchMatchData}
-        title="Matchade behov"
-        renderItem={renderMatchItem}
-        refreshOnMount={true} // Always refresh when component mounts
+        title={getDynamicTitle()}
+        renderItem={renderMatchGroup}
+        refreshOnMount={true}
       />
     </div>
   );
