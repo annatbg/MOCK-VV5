@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import "./DemandCard.css";
+import useUser from "../../store/useUser";
 
 const DemandCard = ({ 
   title, 
@@ -11,43 +12,72 @@ const DemandCard = ({
   isStackable = false,
   isOnTop = false,
   onSelect = () => {},
-  headerExtras, // New prop for additional header content (like status badges)
-  belowHeader // New prop for content below header (like action buttons)
+  headerExtras,
+  belowHeader, // We'll rename this to actionButtons for clarity
+  initialExpanded = false
 }) => {
+  const [isExpanded, setIsExpanded] = useState(initialExpanded);
+  
+  // Get current user and check if this card belongs to them
+  const { user } = useUser();
+  const isMine = user?.email === author;
+
   const handleClick = () => {
     if (isStackable) {
       onSelect();
     }
+  };
+  
+  const toggleExpand = (e) => {
+    e.stopPropagation(); // Prevent firing the card's onClick handler
+    setIsExpanded(!isExpanded);
   };
 
   const cardClasses = [
     "demand-card",
     className || "",
     isStackable ? "stackable-card" : "",
-    isOnTop ? "card-on-top" : ""
+    isOnTop ? "card-on-top" : "",
+    isMine ? "my-demand" : "other-demand",
+    isExpanded ? "expanded" : "collapsed"
   ].filter(Boolean).join(" ");
 
   return (
     <div className={cardClasses} onClick={handleClick}>
+      {/* Chevron toggle button at top */}
+      <button 
+        className="expand-toggle-button" 
+        onClick={toggleExpand}
+        aria-label={isExpanded ? "Collapse" : "Expand"}
+        title={isExpanded ? "Collapse" : "Expand"}
+      >
+        <div className="chevron-icon"></div>
+      </button>
+      
       <div className="demand-card-header">
         <div className="title-category-wrapper">
           <h3>{title}</h3>
           <span className="category">{category}</span>
         </div>
         
-        {/* Render any additional header content */}
         {headerExtras}
       </div>
       
-      {/* Render any content below header */}
-      {belowHeader}
-      
-      <div className="descriptionContainer">
-        <p className="description">{demand}</p>
-      </div>
-      <div className="demand-card-footer">
-        <p className="author">Skapad av: {author}</p>
-      </div>
+      {/* Only show these parts when expanded */}
+      {isExpanded && (
+        <>
+          <div className="descriptionContainer">
+            <p className="description">{demand}</p>
+          </div>
+          
+          {/* Action buttons moved below description */}
+          {belowHeader && <div className="action-buttons-container">{belowHeader}</div>}
+          
+          <div className="demand-card-footer">
+            <p className="author">Skapad av: {author}</p>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -62,7 +92,8 @@ DemandCard.propTypes = {
   isOnTop: PropTypes.bool,
   onSelect: PropTypes.func,
   headerExtras: PropTypes.node,
-  belowHeader: PropTypes.node
+  belowHeader: PropTypes.node,
+  initialExpanded: PropTypes.bool
 };
 
 export default DemandCard;

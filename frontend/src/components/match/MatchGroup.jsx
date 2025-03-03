@@ -28,6 +28,7 @@ const MatchGroup = ({
           category={demand.category}
           author={demand.author}
           className="primary-demand"
+          initialExpanded={true} // Primary demand is expanded by default
         />
         
         {/* Confirmed matches displayed horizontally next to primary demand */}
@@ -43,7 +44,7 @@ const MatchGroup = ({
                   isStackable={true}
                   isOnTop={activeConfirmedIndex === index}
                   onSelect={() => setActiveConfirmedIndex(index)}
-                  // No actions needed for confirmed matches
+                  initialExpanded={false} // Collapsed by default
                 />
               ))}
             </div>
@@ -67,6 +68,7 @@ const MatchGroup = ({
                 onConfirm={() => onConfirmMatch(demandId, match.demandId)}
                 onReject={() => onRejectMatch(demandId, match.demandId)}
                 onCancel={() => onCancelAction(demandId, match.demandId, match.status)}
+                initialExpanded={false} // Collapsed by default
               />
             ))}
           </div>

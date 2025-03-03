@@ -13,7 +13,8 @@ const MatchCard = ({
   onConfirm,
   onReject,
   onCancel,
-  className = ""
+  className = "",
+  initialExpanded = false // Default to collapsed
 }) => {
   // Extract all relevant demand data
   const { title, demand, category, author, status, demandId } = matchData;
@@ -46,6 +47,7 @@ const MatchCard = ({
           onCancel={status === "matched" ? undefined : onCancel}
         />
       }
+      initialExpanded={initialExpanded}
     />
   );
 };
@@ -65,7 +67,8 @@ MatchCard.propTypes = {
   onConfirm: PropTypes.func,
   onReject: PropTypes.func,
   onCancel: PropTypes.func,
-  className: PropTypes.string
+  className: PropTypes.string,
+  initialExpanded: PropTypes.bool
 };
 
 export default MatchCard;

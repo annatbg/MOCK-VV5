@@ -33,7 +33,7 @@
 
 /* Match action buttons */
 .match-actions-container {
-  padding: 0.5em 0.5em 0;
+  padding: 0.5em 0;
 }
 
 .match-actions {
@@ -41,7 +41,7 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
-  margin-bottom: 8px;
+  margin: 0;
 }
 
 .match-action-button {
