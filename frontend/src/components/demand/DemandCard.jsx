@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import "./DemandCard.css";
 import useUser from "../../store/useUser";
+import DemandActionButtons from "./DemandActionButtons";
 
 const DemandCard = ({ 
   title, 
@@ -14,7 +15,9 @@ const DemandCard = ({
   onSelect = () => {},
   headerExtras,
   belowHeader, // We'll rename this to actionButtons for clarity
-  initialExpanded = false
+  initialExpanded = false,
+  onEdit = () => {},
+  onDelete = () => {}
 }) => {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   
@@ -31,6 +34,16 @@ const DemandCard = ({
   const toggleExpand = (e) => {
     e.stopPropagation(); // Prevent firing the card's onClick handler
     setIsExpanded(!isExpanded);
+  };
+
+  const handleEdit = (e) => {
+    e.stopPropagation(); // Prevent card click
+    onEdit();
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation(); // Prevent card click
+    onDelete();
   };
 
   const cardClasses = [
@@ -70,8 +83,15 @@ const DemandCard = ({
             <p className="description">{demand}</p>
           </div>
           
-          {/* Action buttons moved below description */}
-          {belowHeader && <div className="action-buttons-container">{belowHeader}</div>}
+          {/* Action buttons container that shows either passed buttons or own-demand buttons */}
+          <div className="action-buttons-container">
+            {isMine ? (
+              <DemandActionButtons 
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ) : belowHeader}
+          </div>
           
           <div className="demand-card-footer">
             <p className="author">Skapad av: {author}</p>
@@ -93,7 +113,9 @@ DemandCard.propTypes = {
   onSelect: PropTypes.func,
   headerExtras: PropTypes.node,
   belowHeader: PropTypes.node,
-  initialExpanded: PropTypes.bool
+  initialExpanded: PropTypes.bool,
+  onEdit: PropTypes.func,
+  onDelete: PropTypes.func
 };
 
 export default DemandCard;

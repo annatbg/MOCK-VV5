@@ -208,6 +208,14 @@
   margin-bottom: 8px;
 }
 
+/* Add specific styling for the action buttons container */
+.action-buttons-container {
+  display: flex;
+  justify-content: flex-end;
+  margin: 8px 0;
+  width: 100%;
+}
+
 /* Order elements in header for better wrapping */
 .demand-card-header h3 {
   order: 1;
@@ -442,9 +450,7 @@
 }
 
 /* Adjust for primary demand cards that are shown expanded by default */
-.demand-card.primary-demand {
-  min-height: 200px; /* Keep primary demands at reasonable height */
-}
+
 
 /* Additional responsive adjustments for expand/collapse */
 @media (max-width: 768px) {
