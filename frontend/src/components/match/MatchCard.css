@@ -1,0 +1,8 @@
+/* MatchCard-specific styles */
+.match-card {
+  position: relative;
+}
+
+.match-card-confirmed {
+  box-shadow: 0 0 0 2px #4caf50;
+}

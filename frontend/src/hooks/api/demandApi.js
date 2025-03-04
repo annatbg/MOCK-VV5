@@ -122,4 +122,46 @@ const fetchDemandsByIds = async (ids) => {
   }
 };
 
+// Match status management functions
+export const updateMatchStatus = async (demandId, matchId, status) => {
+  try {
+    console.log(`[demandApi] Updating match status: ${demandId}, ${matchId}, ${status}`);
+    const token = useUser.getState().token;
+
+    // Updated URL to use the new endpoint that's more semantically accurate
+    const response = await fetch(`${API_URL}/demand/matches/${demandId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ matchId, status }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to update match status to ${status}`);
+    }
+
+    const result = await response.json();
+    console.log(`[demandApi] Match status updated: ${status}`, result);
+    return result;
+  } catch (error) {
+    console.error(`[demandApi] Error updating match status to ${status}:`, error);
+    throw error;
+  }
+};
+
+export const confirmMatch = async (demandId, matchId) => {
+  return updateMatchStatus(demandId, matchId, "confirmedByMe");
+};
+
+export const rejectMatch = async (demandId, matchId) => {
+  return updateMatchStatus(demandId, matchId, "rejectedByMe");
+};
+
+export const undoRejection = async (demandId, matchId) => {
+  return updateMatchStatus(demandId, matchId, "new");
+};
+
+// Export all functions
 export { createDemand, fetchMyDemands, fetchAllDemands, deleteDemand, fetchDemandsByIds };
