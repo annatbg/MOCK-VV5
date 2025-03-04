@@ -4,7 +4,8 @@ import {
   fetchDemandsByIds,
   confirmMatch,
   rejectMatch,
-  undoRejection
+  undoRejection,
+  deleteDemand // Import this function if it exists
 } from "../../hooks/api/demandApi";
 import ListComponent from "../../components/list/ListComponent";
 import MatchGroup from "../../components/match/MatchGroup";
@@ -173,6 +174,27 @@ const MatchView = () => {
     }
   };
 
+  const handleDeleteDemand = async (demandId) => {
+    try {
+      // Call your API to delete the demand
+      await deleteDemand(demandId);
+      
+      // Optimistically update the UI - remove this demand from state
+      setUpdatedMatches(prev => {
+        const newState = { ...prev };
+        delete newState[demandId];
+        return newState;
+      });
+      
+      // Force refresh the list to reflect changes
+      // If your ListComponent has a refresh method exposed via ref, you could call it here
+      // Otherwise, use some other state to trigger a refetch
+      
+    } catch (error) {
+      console.error("Failed to delete demand:", error);
+    }
+  };
+
   // Create a dynamic title based on match stats
   const getDynamicTitle = () => {
     if (matchStats.total === 0) {
@@ -198,6 +220,7 @@ const MatchView = () => {
         onConfirmMatch={handleConfirm}
         onRejectMatch={handleReject}
         onCancelAction={handleCancel}
+        onDeleteDemand={handleDeleteDemand} // Pass the delete handler
       />
     );
   };

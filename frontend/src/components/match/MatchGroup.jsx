@@ -9,7 +9,8 @@ const MatchGroup = ({
   matches, 
   onConfirmMatch, 
   onRejectMatch, 
-  onCancelAction 
+  onCancelAction,
+  onDeleteDemand // Add this prop
 }) => {
   const [activeMatchIndex, setActiveMatchIndex] = useState(-1);
   const [activeConfirmedIndex, setActiveConfirmedIndex] = useState(-1);
@@ -27,6 +28,8 @@ const MatchGroup = ({
           demand={demand.demand}
           category={demand.category}
           author={demand.author}
+          demandId={demand.demandId} // Pass demandId
+          onDelete={onDeleteDemand} // Pass the delete handler
           className="primary-demand"
           initialExpanded={true} // Primary demand is expanded by default
         />
@@ -102,7 +105,8 @@ MatchGroup.propTypes = {
   ).isRequired,
   onConfirmMatch: PropTypes.func.isRequired,
   onRejectMatch: PropTypes.func.isRequired,
-  onCancelAction: PropTypes.func.isRequired
+  onCancelAction: PropTypes.func.isRequired,
+  onDeleteDemand: PropTypes.func // Add this to propTypes
 };
 
 export default MatchGroup;
