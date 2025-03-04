@@ -278,5 +278,285 @@ const deleteDemand = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+const updateDemandMatches = async (req, res) => {
+  try {
+    const author = req.user?.username;
+    const { demandId } = req.params;
+    const { matchId, status } = req.body;
 
-module.exports = { createDemand, fetchMyDemands, fetchAllDemands, fetchDemandsByIds, deleteDemand };
+    console.log(`[updateDemandMatches] Updating match status: ${demandId}, ${matchId}, ${status}`);
+
+    if (!author) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!demandId) {
+      return res.status(400).json({ message: "Demand ID is required" });
+    }
+
+    if (!matchId) {
+      return res.status(400).json({ message: "Match ID is required" });
+    }
+
+    if (!status) {
+      return res.status(400).json({ message: "Status is required" });
+    }
+
+    // Validate status
+    const validStatuses = ['new', 'confirmedByMe', 'confirmedByThem', 'matched', 'rejectedByMe'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        message: `Invalid status. Valid statuses are: ${validStatuses.join(', ')}` 
+      });
+    }
+
+    // Get the current demand to verify ownership
+    const getParams = {
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+    };
+
+    const { Item: demand } = await db.send(new GetCommand(getParams));
+
+    if (!demand) {
+      return res.status(404).json({ message: "Demand not found" });
+    }
+
+    // Verify ownership
+    if (demand.author !== author) {
+      return res.status(403).json({ message: "Unauthorized to update this demand" });
+    }
+
+    // Find the match in the matches array
+    let matches = demand.matches || [];
+    let matchIndex = -1;
+    let existingMatch = null;
+    let previousStatus = null;
+
+    // Find the match in the array (either as string or object)
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      if (
+        match === matchId || 
+        (typeof match === 'object' && match.id === matchId)
+      ) {
+        matchIndex = i;
+        existingMatch = match;
+        previousStatus = typeof match === 'object' ? match.status : 'new';
+        break;
+      }
+    }
+
+    if (matchIndex === -1) {
+      return res.status(404).json({ message: "Match not found in demand" });
+    }
+
+    // Create the updated match object
+    const updatedMatch = {
+      id: matchId,
+      status: status,
+      updatedAt: new Date().toISOString()
+    };
+
+    // If the match was an object, preserve other properties
+    if (typeof existingMatch === 'object' && existingMatch !== null) {
+      for (const [key, value] of Object.entries(existingMatch)) {
+        if (!['id', 'status', 'updatedAt'].includes(key)) {
+          updatedMatch[key] = value;
+        }
+      }
+    }
+
+    // Create a new matches array with the updated match
+    const updatedMatches = [...matches];
+    updatedMatches[matchIndex] = updatedMatch;
+
+    // Update the demand
+    const updateParams = {
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+      UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+      ExpressionAttributeValues: {
+        ":matches": updatedMatches,
+        ":updatedAt": new Date().toISOString()
+      },
+      ReturnValues: "ALL_NEW"
+    };
+
+    const { Attributes: updatedDemand } = await db.send(new UpdateCommand(updateParams));
+
+    // Update the corresponding demand based on status change
+    try {
+      // Get the matching demand
+      const matchDemandParams = {
+        TableName: DEMANDS_TABLE,
+        Key: { demandId: matchId }
+      };
+
+      const { Item: matchDemand } = await db.send(new GetCommand(matchDemandParams));
+      
+      if (!matchDemand) {
+        console.warn(`Matching demand ${matchId} not found`);
+      } else {
+        console.log(`[updateDemandMatches] Found matching demand from ${matchDemand.author}`);
+        
+        // Find this demand in the matching demand's matches array
+        const matchingMatches = matchDemand.matches || [];
+        let matchingIndex = -1;
+        let matchingExistingStatus = null;
+
+        for (let i = 0; i < matchingMatches.length; i++) {
+          const match = matchingMatches[i];
+          if (
+            match === demandId || 
+            (typeof match === 'object' && match.id === demandId)
+          ) {
+            matchingIndex = i;
+            matchingExistingStatus = typeof match === 'object' ? match.status : 'new';
+            break;
+          }
+        }
+
+        console.log(`[updateDemandMatches] Matching index: ${matchingIndex}, Status: ${matchingExistingStatus}`);
+
+        // If found, update accordingly
+        if (matchingIndex !== -1) {
+          let updatedMatchingMatches = [...matchingMatches];
+          
+          // Handle different status changes
+          if (status === 'rejectedByMe') {
+            console.log(`[updateDemandMatches] Removing match from other user's view`);
+            // Remove this demand from the other demand's matches (hide from them)
+            updatedMatchingMatches.splice(matchingIndex, 1);
+          } else if (previousStatus === 'rejectedByMe' && status === 'new') {
+            console.log(`[updateDemandMatches] Restoring match to other user's view`);
+            // Add this demand back to the other demand's matches
+            updatedMatchingMatches[matchingIndex] = {
+              id: demandId,
+              status: 'new',
+              updatedAt: new Date().toISOString()
+            };
+          } else if (status === 'confirmedByMe') {
+            console.log(`[updateDemandMatches] Setting match as confirmedByMe, checking other side`);
+            
+            // Check if the other side has already confirmed
+            if (matchingExistingStatus === 'confirmedByMe') {
+              console.log(`[updateDemandMatches] Both sides confirmed! Setting to matched`);
+              // Both sides have confirmed - set to matched on both sides
+              
+              // First update the matching demand
+              updatedMatchingMatches[matchingIndex] = {
+                id: demandId,
+                status: 'matched',
+                updatedAt: new Date().toISOString()
+              };
+              
+              // Then update our demand again to ensure consistency
+              // This is a separate operation to ensure both sides show as matched
+              const finalUpdateParams = {
+                TableName: DEMANDS_TABLE,
+                Key: { demandId },
+                UpdateExpression: "SET matches[" + matchIndex + "].status = :status, matches[" + matchIndex + "].updatedAt = :updatedAt",
+                ExpressionAttributeValues: {
+                  ":status": "matched",
+                  ":updatedAt": new Date().toISOString()
+                }
+              };
+              
+              try {
+                await db.send(new UpdateCommand(finalUpdateParams));
+                console.log(`[updateDemandMatches] Successfully updated our side to matched`);
+                
+                // Update the response data to reflect the matched status
+                if (updatedDemand && updatedDemand.matches && updatedDemand.matches[matchIndex]) {
+                  updatedDemand.matches[matchIndex].status = 'matched';
+                  updatedDemand.matches[matchIndex].updatedAt = new Date().toISOString();
+                }
+              } catch (updateError) {
+                console.error(`[updateDemandMatches] Error updating our side to matched:`, updateError);
+              }
+            } else {
+              console.log(`[updateDemandMatches] Setting other side to confirmedByThem`);
+              // Set to confirmedByThem on the other demand
+              updatedMatchingMatches[matchingIndex] = {
+                id: demandId,
+                status: 'confirmedByThem',
+                updatedAt: new Date().toISOString()
+              };
+            }
+          }
+          
+          // Update the matching demand
+          const updateMatchDemandParams = {
+            TableName: DEMANDS_TABLE,
+            Key: { demandId: matchId },
+            UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+            ExpressionAttributeValues: {
+              ":matches": updatedMatchingMatches,
+              ":updatedAt": new Date().toISOString()
+            }
+          };
+          
+          try {
+            await db.send(new UpdateCommand(updateMatchDemandParams));
+            console.log(`[updateDemandMatches] Successfully updated matching demand`);
+          } catch (updateError) {
+            console.error(`[updateDemandMatches] Error updating matching demand:`, updateError);
+            throw updateError;  // Re-throw to be caught by outer catch
+          }
+        } else {
+          // Case: Undoing rejection but match not found in other demand
+          if (previousStatus === 'rejectedByMe' && status === 'new') {
+            console.log(`[updateDemandMatches] Restoring match that was completely removed`);
+            // Re-add the match to the other demand's matches
+            const updatedMatchingMatches = [...matchingMatches, {
+              id: demandId,
+              status: 'new',
+              updatedAt: new Date().toISOString()
+            }];
+            
+            // Update the matching demand to add back our demand
+            const updateMatchDemandParams = {
+              TableName: DEMANDS_TABLE,
+              Key: { demandId: matchId },
+              UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+              ExpressionAttributeValues: {
+                ":matches": updatedMatchingMatches,
+                ":updatedAt": new Date().toISOString()
+              }
+            };
+            
+            try {
+              await db.send(new UpdateCommand(updateMatchDemandParams));
+              console.log(`[updateDemandMatches] Successfully restored match to other demand`);
+            } catch (updateError) {
+              console.error(`[updateDemandMatches] Error restoring match:`, updateError);
+            }
+          } else {
+            console.log(`[updateDemandMatches] Match not found in other demand's matches array`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("[updateDemandMatches] Error updating matching demand:", err);
+      // We still want to continue and return success for the initial update
+    }
+
+    res.status(200).json({
+      message: "Match status updated successfully!",
+      data: updatedDemand
+    });
+  } catch (error) {
+    console.error("[updateDemandMatches] Error updating match status:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = { 
+  createDemand, 
+  fetchMyDemands, 
+  fetchAllDemands, 
+  fetchDemandsByIds, 
+  deleteDemand,
+  updateDemandMatches
+};
