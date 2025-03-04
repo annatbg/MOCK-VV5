@@ -12,6 +12,7 @@ function Home() {
     organisation: "",
     firstName: "",
     lastName: "",
+    location: "",
   });
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ function Home() {
       organisation: "",
       firstName: "",
       lastName: "",
+      location: "",
     });
     setMessage("");
   };
@@ -69,11 +71,11 @@ function Home() {
   };
 
   return (
-    <div className="container">
+    <div className="home-container">
       <h1>{isLogin ? "Login" : "Signup"}</h1>
       {isLogin ? (
         <form onSubmit={handleLogin}>
-          <div className="form-group">
+          <div className="home-form-group">
             <label htmlFor="email">email:</label>
             <br />
             <input
@@ -86,7 +88,7 @@ function Home() {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="home-form-group">
             <label htmlFor="password">Password:</label>
             <br />
             <input
@@ -105,7 +107,7 @@ function Home() {
         </form>
       ) : (
         <form onSubmit={handleSignup}>
-          <div className="form-group">
+          <div className="home-form-group">
             <label htmlFor="email">email:</label>
             <br />
             <input
@@ -118,7 +120,7 @@ function Home() {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="home-form-group">
             <label htmlFor="password">Password:</label>
             <br />
             <input
@@ -131,7 +133,7 @@ function Home() {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="home-form-group">
             <label htmlFor="organisation">Organisation:</label>
             <br />
             <input
@@ -144,7 +146,7 @@ function Home() {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="home-form-group">
             <label htmlFor="firstName">First Name:</label>
             <br />
             <input
@@ -157,7 +159,7 @@ function Home() {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          <div className="home-form-group">
             <label htmlFor="lastName">Last Name:</label>
             <br />
             <input
@@ -170,12 +172,25 @@ function Home() {
               onChange={handleChange}
             />
           </div>
+          <div className="home-form-group">
+            <label htmlFor="location">Location:</label>
+            <br />
+            <input
+              type="text"
+              id="location"
+              name="location"
+              required
+              className="input-field"
+              value={formData.location}
+              onChange={handleChange}
+            />
+          </div>
           <button type="submit" className="submit-button">
             Signup
           </button>
         </form>
       )}
-      {message && <p className="success-message">{message}</p>}
+      {message && <p className="home-success-message">{message}</p>}
       <p className="toggle-message">
         {isLogin ? "Don't have an account?" : "Already have an account?"} <br />
         <button onClick={toggleForm} className="toggle-button">
