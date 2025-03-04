@@ -31,7 +31,8 @@ function Client() {
   const renderView = () => {
     switch (activeView) {
       case "home":
-        return <HomeView />;
+        return <DemandsView />;
+        // return <HomeView />;
       case "profile":
         return <ProfileView />;
       case "match":

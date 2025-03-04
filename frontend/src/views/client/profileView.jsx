@@ -55,19 +55,25 @@ const ProfileView = () => {
     <div className="profileView">
       {userData ? (
         <div className="profileContainer">
+          <div className="proflieImageContainer">
           <div className="profileImage">
-            <img alt="Profile" />
-            <p className="profileLocation">location</p>
+            <h2 className="profileImagesUsername">
+              {userData.user.firstName.charAt(0).toUpperCase()}
+              {userData.user.lastName.charAt(0).toUpperCase()}
+            </h2>
+          </div>
+              <p className="profileLocation">{userData.user.location}</p>
           </div>
           <div className="profileUserData">
             {!isEditing ? (
               <>
-                <h1>
+                <h1 className="profileUsername">
                   {userData.user.firstName} {userData.user.lastName}
                 </h1>
                 <p>Email: {userData.user.email}</p>
                 <p>Organisation: {userData.user.organisation}</p>
                 <p>Role: {userData.user.role}</p>
+                <p>{userData.user.location}</p>
                 <div>
                   <button className="profileEditButton" onClick={() => setIsEditing(true)}>
                     Edit
@@ -112,6 +118,15 @@ const ProfileView = () => {
                     type="text"
                     name="organisation"
                     value={editData.organisation || ""}
+                    onChange={handleEditChange}
+                    required
+                  />
+                </div><div>
+                  <label>Location:</label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={editData.location || ""}
                     onChange={handleEditChange}
                     required
                   />
