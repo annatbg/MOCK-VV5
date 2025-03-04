@@ -1,0 +1,64 @@
+.match-group {
+    margin-bottom: 3rem;
+}
+
+.matches {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.card-stack {
+    display: flex;
+    flex-direction: row;
+    width: 30%;
+}
+
+.demand-card.primary-demand {
+  width: 90%;
+}
+
+.demand-card.stackable-card {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  margin-left: clamp(-78.6%, -70%, -61.8%);
+  z-index: 1;
+  height: 100%;
+  transform-style: preserve-3d;
+  overflow: visible;
+}
+
+.demand-card.stackable-card:first-child {
+  margin-left: 0;
+}
+
+.demand-card.stackable-card:last-child {
+  margin-right: auto;
+}
+
+.demand-card.stackable-card:hover {
+  transform: translate(5%, -10%);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.demand-card.stackable-card .demand-card-footer {
+  position: relative;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.demand-card.card-on-top {
+  box-shadow: 
+    0 8px 20px rgba(0, 0, 0, 0.12),
+    0 16px 36px rgba(0, 0, 0, 0.08);
+  z-index: 10 !important;
+  transform: translateY(10%);
+}
+
+.demand-card.card-on-top:hover {
+  transform: translateY(10%);
+}
