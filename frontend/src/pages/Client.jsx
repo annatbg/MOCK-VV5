@@ -9,12 +9,13 @@ import NotificationsView from "../views/client/notificationsView";
 import Sidebar from "../components/sidebar/Sidebar";
 import "./styles/ClientPage.css";
 
-
-
 function Client() {
   const user = useUser((state) => state.user);
   const navigate = useNavigate();
-  const [activeView, setActiveView] = useState("home");
+  const [activeView, setActiveView] = useState(() => {
+    // Get the stored view from localStorage or default to "home"
+    return localStorage.getItem("activeView") || "home";
+  });
 
   useEffect(() => {
     if (!user || user.role !== "client") {
@@ -22,6 +23,10 @@ function Client() {
     }
   }, [user, navigate]);
 
+  // Store activeView in localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("activeView", activeView);
+  }, [activeView]);
 
   const renderView = () => {
     switch (activeView) {
