@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { fetchMyDemands, deleteDemand } from "../../hooks/api/demandApi";
 import ListComponent from "./ListComponent";
 import DemandCard from "../demand/DemandCard";
@@ -7,11 +7,15 @@ const MyDemands = () => {
   const [demands, setDemands] = useState([]);
 
   const handleDelete = async (demandId) => {
-    try {
-      await deleteDemand(demandId);
-      setDemands(demands.filter((d) => d.demandId !== demandId)); // Update UI
-    } catch (error) {
-      console.error("Error deleting demand:", error);
+    if (window.confirm("Are you sure you want to delete this demand?")) {
+      try {
+        await deleteDemand(demandId);
+        setDemands(demands.filter((d) => d.demandId !== demandId)); 
+        alert("Demand deleted successfully");
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting demand:", error);
+      }
     }
   };
 
@@ -25,6 +29,8 @@ const MyDemands = () => {
           demand={demand.demand}
           category={demand.category}
           author={demand.author}
+          demandId={demand.demandId}
+          onDelete={() => handleDelete(demand.demandId)}
         />
       )}
     />

@@ -8,7 +8,8 @@ const DemandCard = ({
   title, 
   demand, 
   category, 
-  author, 
+  author,
+  demandId, // Add demandId prop
   className, 
   isStackable = false,
   isOnTop = false,
@@ -43,7 +44,7 @@ const DemandCard = ({
 
   const handleDelete = (e) => {
     e.stopPropagation(); // Prevent card click
-    onDelete();
+    onDelete(demandId); // Pass demandId to onDelete
   };
 
   const cardClasses = [
@@ -107,6 +108,7 @@ DemandCard.propTypes = {
   demand: PropTypes.string.isRequired,
   category: PropTypes.string.isRequired,
   author: PropTypes.string.isRequired,
+  demandId: PropTypes.string, // Add demandId to prop types
   className: PropTypes.string,
   isStackable: PropTypes.bool,
   isOnTop: PropTypes.bool,
