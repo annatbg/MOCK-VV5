@@ -60,7 +60,7 @@ const Sidebar = ({ activeView, setActiveView }) => {
         </li>
 
         <div className="sidebarContainer">
-          <div id="sidebarList">
+          {/* <div id="sidebarList">
         <li
           className={activeView === "home" ? "active" : ""}
           onClick={() => setActiveView("home")}
@@ -73,7 +73,7 @@ const Sidebar = ({ activeView, setActiveView }) => {
           </svg>
           <span className="sidebarTitle">Home</span>
         </li>
-          </div>
+          </div> */}
         <div id="sidebarList">
         <li
           className={activeView === "profile" ? "active" : ""}
