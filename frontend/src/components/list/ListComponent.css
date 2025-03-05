@@ -1,12 +1,12 @@
 .listContainer {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-  padding: 2rem;
+  /* align-items: center; */
   width: 100%;
 }
 
 .listHeader {
+  align-self: flex-start;
   text-align: left;
   font-size: 1.8rem;
   font-weight: 600;
@@ -14,7 +14,6 @@
   padding-bottom: 0.75rem;
   border-bottom: 3px dotted #e4e4e4;
 }
-
 
 .list {
   list-style-type: none;

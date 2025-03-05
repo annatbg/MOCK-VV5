@@ -1,25 +1,32 @@
 .match-group {
+  padding: 3em;
   margin-bottom: 3rem;
+  border: dashed 2px #171515;
+  border-radius: 8px;
   width: 100%;
+  max-width: 1000px;
 }
 
-.primary-section {
+/* .primary-section {
   display: flex;
-  gap: 20px;
   flex-wrap: wrap;
-  margin-bottom: 20px;
-}
+} */
 
-.matches {
+/* .matches {
   display: flex;
   flex-direction: column;
-  width: 100%;
+} */
+
+
+.card-stack {
+  display: flex;
+  flex-direction: column-reverse;
 }
 
+
 /* Container for confirmed matches */
-.confirmed-matches {
+/* .confirmed-matches {
   flex: 1;
-  min-width: 300px;
   display: flex;
   flex-direction: column;
 }
@@ -29,25 +36,25 @@
   border-bottom: 1px solid #4f8c39;
   padding-bottom: 8px;
   margin-top: 0;
-}
+} */
 
 /* Confirmed matches stack */
-.confirmed-card-stack {
+/* .confirmed-card-stack {
   display: flex;
   position: relative;
   overflow-x: visible;
   margin-top: 10px;
-}
+} */
 
 /* Style for confirmed match cards */
-.confirmed-match-item {
-  margin-left: calc(-50% + 40px); /* Less overlap for confirmed matches */
+/* .confirmed-match-item {
+  margin-left: calc(-50% + 40px);
   width: 85%;
-}
+} */
 
-.confirmed-match-item:first-child {
+/* .confirmed-match-item:first-child {
   margin-left: 0;
-}
+} */
 
 /* Additional header styling */
 .matches h4 {
@@ -55,16 +62,6 @@
   color: #2196f3;
   border-bottom: 1px solid #2196f3;
   padding-bottom: 8px;
-}
-
-/* Card stack */
-.card-stack {
-  display: flex;
-  flex-direction: row;
-  width: 90%;
-  position: relative;
-  overflow-x: visible;
-  padding: 20px 0;
 }
 
 /* No matches message */
@@ -76,15 +73,4 @@
   background-color: #f5f5f5;
   border-radius: 8px;
   margin-top: 20px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 992px) {
-  .primary-section {
-    flex-direction: column;
-  }
-  
-  .confirmed-matches {
-    width: 100%;
-  }
 }
