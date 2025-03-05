@@ -9,7 +9,7 @@ const DemandCard = ({
   demand, 
   category, 
   author,
-  demandId, // Add demandId prop
+  demandId,
   className, 
   isStackable = false,
   isOnTop = false,
@@ -33,18 +33,18 @@ const DemandCard = ({
   };
   
   const toggleExpand = (e) => {
-    e.stopPropagation(); // Prevent firing the card's onClick handler
+    e.stopPropagation();
     setIsExpanded(!isExpanded);
   };
 
   const handleEdit = (e) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
     onEdit();
   };
 
   const handleDelete = (e) => {
-    e.stopPropagation(); // Prevent card click
-    onDelete(demandId); // Pass demandId to onDelete
+    e.stopPropagation();
+    onDelete(demandId);
   };
 
   const cardClasses = [

@@ -1,16 +1,10 @@
-/* .cardContainer{
-  max-width: 900px;
-  min-width: 250px;
-  margin: 12px;
-} */
-
 .demand-card {
   display: flex;
   flex-direction: column;
+  width: 100%;
   max-width: 900px;
-  min-width: 300px;
-  min-height: 200px;
-  padding: 0.8em 7%;
+  min-width: 250px;
+  padding: 0.8rem;
   border-radius: 12px;
   background: linear-gradient(145deg, #ffffff, #f5f5f7);
   box-shadow: 
@@ -24,15 +18,16 @@
   transition: all 0.3s ease-in-out;
 }
 
-/* Different colors for my demands vs other demands */
+/* Left edge, different colors for my demands vs other demands */
 .demand-card.my-demand::before {
   content: "";
   position: absolute;
   top: -1px;
   left: -1px;
   width: 6%;
+  min-width: 2rem;
   height: calc(100% + 2px);
-  background: linear-gradient(to bottom, #4f8c39, #1a2f17); /* Green for my demands */
+  background: linear-gradient(to bottom, #4f8c39, #1a2f17);
   border-radius: 12px 0 0 12px;
 }
 
@@ -42,6 +37,7 @@
   top: -1px;
   left: -2px;
   width: calc(6% + 1px);
+  min-width: 2rem;
   height: calc(100% + 2px);
   background: linear-gradient(
     to bottom,
@@ -59,15 +55,15 @@
   animation: shimmerBorder 3s infinite alternate;
 }
 
-/* Blue color scheme for other people's demands - adjusted to be deeper */
 .demand-card.other-demand::before {
   content: "";
   position: absolute;
   top: -1px;
   left: -1px;
   width: 6%;
+  min-width: 2rem;
   height: calc(100% + 2px);
-  background: linear-gradient(to bottom, #0d47a1, #062a5e); /* Deeper blue gradient */
+  background: linear-gradient(to bottom, #0d47a1, #062a5e);
   border-radius: 12px 0 0 12px;
 }
 
@@ -77,6 +73,7 @@
   top: -1px;
   left: -2px;
   width: calc(6% + 1px);
+  min-width: 2rem;
   height: calc(100% + 2px);
   background: linear-gradient(
     to bottom,
@@ -88,7 +85,7 @@
     #1565c0 70%,
     #0d47a1 85%,
     #01325c 100%
-  ); /* Deeper blue shimmer gradient */
+  );
   border-radius: 13px 1px 1px 13px;
   z-index: -1;
   animation: shimmerBorderBlue 3s infinite alternate;
@@ -112,15 +109,6 @@
   }
 }
 
-/* Remove the default styles that we're replacing with conditional ones */
-.demand-card::before {
-  content: none; /* Override base style */
-}
-
-.demand-card::after {
-  content: none; /* Override base style */
-}
-
 .demand-card:hover {
   transform: translateY(-3%);
   box-shadow: 
@@ -128,18 +116,14 @@
     0 10px 24px rgba(0, 0, 0, 0.06);
 }
 
-/* Fix the demand card header layout to prevent overlap */
 .demand-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5em;
   border-bottom: 1px dashed rgba(79, 140, 57, 0.5);
-  margin-bottom: 5px;
-  min-height: 40px;
-  width: 100%;
+  width: 90%;
+  margin-left: 3rem;
   position: relative;
-  z-index: 5;
   background: inherit;
   border-radius: 12px 12px 0 0;
 }
@@ -148,25 +132,17 @@
 .title-category-wrapper {
   display: flex;
   align-items: center;
-  flex: 1;
-  min-width: 0; /* Allow proper flexbox shrinking */
-  overflow: hidden;
 }
 
-/* Fix title overflow */
 .demand-card h3 {
-  margin: 0;
-  margin-right: 10px; /* Space between title and category */
+  margin: 0.5em 1em 0.5em 1em;
   color: #1d1d1f;
   font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: -0.01em;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Make category tag more compact */
 .demand-card .category {
   background-color: rgba(79, 140, 57, 0.15);
   color: #4f8c39;
@@ -178,37 +154,22 @@
   flex-shrink: 0;
 }
 
-/* Fix description container to not overlap */
 .demand-card .descriptionContainer {
   padding: 0.5em;
   border: 1px dashed rgba(79, 140, 57, 0.3);
   border-radius: 8px;
-  margin: 0.5em 0;
+  margin: 0.5em;
+  margin-left: 8%;
   display: flex;
-  min-width: 100%;
+  width: 80%;
   flex: 1;
   position: relative;
   z-index: 1;
-  overflow-y: auto; /* Allow scrolling for long descriptions */
-  max-height: 200px; /* Limit height for very long descriptions */
-  transition: opacity 0.2s ease, height 0.3s ease;
+  overflow-y: auto;
+  min-height: 100px;
+  max-height: 300px;
 }
 
-/* Ensure match actions are positioned correctly */
-.match-actions-container {
-  padding: 0;
-  margin-bottom: 0.5em;
-}
-
-.match-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-/* Add specific styling for the action buttons container */
 .action-buttons-container {
   display: flex;
   justify-content: flex-end;
@@ -216,73 +177,10 @@
   width: 100%;
 }
 
-/* Order elements in header for better wrapping */
-.demand-card-header h3 {
-  order: 1;
-}
-
-.demand-card-header .category {
-  order: 2;
-}
-
-/* Add clear spacing after any wrapped elements */
-.demand-card-header:after {
-  content: "";
-  flex-basis: 100%;
-  height: 0;
-  order: 4;
-}
-
-/* Match the primary demand styling */
-.demand-card.primary-demand .demand-card-header {
-  padding-bottom: 10px;
-  border-bottom-width: 2px;
-}
-
-.demand-card.primary-demand h3 {
-  font-size: 1.8rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  .demand-card-header {
-    padding: 0.5em;
-  }
-  
-  .demand-card h3 {
-    font-size: 1.3rem;
-    flex-basis: 100%; /* Take full width on very small screens */
-  }
-  
-  .demand-card .category {
-    margin-top: 4px;
-  }
-  
-  .match-actions {
-    margin-top: 8px;
-  }
-}
-
-@media (max-width: 500px) {
-  .demand-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .title-category-wrapper {
-    margin-bottom: 6px;
-  }
-  
-  .status-badge {
-    align-self: flex-end;
-  }
-}
-
 .demand-card-footer {
   display: flex;
   width: 100%;
   margin-top: auto;
-  transition: opacity 0.2s ease, height 0.3s ease;
 }
 
 .demand-card .author {
@@ -295,172 +193,54 @@
   white-space: nowrap;
 }
 
-/* Match actions and status styling */
-.match-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-right: 10px;
-}
-
-.match-action-button {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.match-action-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-.confirm-button {
-  background-color: #4f8c39;
-  color: white;
-}
-
-.reject-button {
-  background-color: #c62828;
-  color: white;
-}
-
-.cancel-button {
-  background-color: #f57f17;
-  color: white;
-}
-
-.undo-button {
-  background-color: #2196f3;
-  color: white;
-}
-
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: white;
-  margin-left: 10px;
-  flex-shrink: 0; /* Prevent badge from shrinking */
-}
-
-.new-badge {
-  background-color: #2196f3;
-}
-
-.confirmedByMe-badge {
-  background-color: #ff9800;
-}
-
-.confirmedByThem-badge {
-  background-color: #4caf50;
-  animation: pulse 2s infinite;
-}
-
-.matched-badge {
-  background-color: #4f8c39;
-}
-
-.rejectedByMe-badge {
-  background-color: #c62828;
-  text-decoration: line-through;
-}
-
-/* Card status styles */
-.confirmed-by-me-card {
-  border-left: 4px solid #ff9800;
-}
-
-.confirmed-by-them-card {
-  border-left: 4px solid #4caf50;
-}
-
-.matched-card {
-  border-left: 4px solid #4f8c39;
-}
-
-.rejected-card {
-  opacity: 0.7;
-  border-left: 4px solid #c62828;
-}
-
-@keyframes pulse {
-  0% { opacity: 0.8; }
-  50% { opacity: 1; }
-  100% { opacity: 0.8; }
-}
-
-/* Expand/collapse styling */
 .demand-card.collapsed {
   min-height: unset;
   height: auto;
-  padding-bottom: 0.5em; /* Add some bottom padding in collapsed state */
 }
 
-/* Position the toggle button in the colored side bar at the top */
 .expand-toggle-button {
   position: absolute;
-  top: 1.2em; /* Position near the top instead of center */
-  left: 2%;
-  transform: none; /* Remove vertical centering */
+  top: 0;
+  left: 0;
+  transform: none;
   background: transparent;
   border: none;
   padding: 0;
-  width: 2.5%;
-  height: 20px;
+  width: 6%;
+  min-width: 2rem;
+  height: 100%;
   cursor: pointer;
   z-index: 10;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
 /* Chevron icon */
 .chevron-icon {
-  width: 10px;
-  height: 10px;
+  width: 0.8rem;
+  height: 0.8rem;
   border-right: 2px solid rgba(255, 255, 255, 0.9);
   border-bottom: 2px solid rgba(255, 255, 255, 0.9);
   transition: transform 0.3s ease;
+  align-self: start;
+  margin-top: 1em;
 }
 
-/* Rotate chevron based on expanded state */
 .expanded .chevron-icon {
-  transform: rotate(225deg); /* Pointing up when expanded */
+  transform: rotate(225deg);
 }
 
 .collapsed .chevron-icon {
-  transform: rotate(45deg); /* Pointing down when collapsed */
+  transform: rotate(45deg);
 }
 
 /* Adjust hover effect for collapsed cards */
 .demand-card.collapsed:hover {
-  transform: translateY(-1%); /* Less dramatic hover effect when collapsed */
+  transform: translateY(-1%);
 }
 
 /* When in collapsed state, give the header a bottom margin */
 .demand-card.collapsed .demand-card-header {
   margin-bottom: 0;
   border-bottom: none;
-}
-
-/* Adjust for primary demand cards that are shown expanded by default */
-
-
-/* Additional responsive adjustments for expand/collapse */
-@media (max-width: 768px) {
-  .expand-toggle-button {
-    left: 3%; /* Move toggle button a bit right on mobile */
-    width: 4%; /* Make it slightly larger for touch targets */
-  }
-  
-  .chevron-icon {
-    width: 8px; /* Smaller chevron on mobile */
-    height: 8px;
-  }
 }

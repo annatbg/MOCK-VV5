@@ -2,6 +2,7 @@
   display: flex;
   gap: 8px;
   margin-right: 10px;
+  transition: opacity 0.2s ease;
 }
 
 .demand-action-button {
@@ -21,23 +22,15 @@
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
+.demand-action-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
 .edit-button {
-  background-color: #2196f3;
+  background-color: #0d47a1; 
 }
 
 .delete-button {
-  background-color: #c62828;
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  .demand-action-buttons {
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 8px;
-  }
-  
-  .demand-action-button {
-    width: 100%;
-  }
+  background-color: #b71c1c;
 }
