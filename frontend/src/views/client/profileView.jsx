@@ -73,7 +73,6 @@ const ProfileView = () => {
                 <p>Email: {userData.user.email}</p>
                 <p>Organisation: {userData.user.organisation}</p>
                 <p>Role: {userData.user.role}</p>
-                <p>{userData.user.location}</p>
                 <div>
                   <button className="profileEditButton" onClick={() => setIsEditing(true)}>
                     Edit
@@ -83,7 +82,7 @@ const ProfileView = () => {
             ) : (
               <form onSubmit={handleEditSubmit}>
                 <div>
-                  <label>First Name:</label>
+                  <label>First Name: </label>
                   <input
                     type="text"
                     name="firstName"
@@ -93,7 +92,7 @@ const ProfileView = () => {
                   />
                 </div>
                 <div>
-                  <label>Last Name:</label>
+                  <label>Last Name: </label>
                   <input
                     type="text"
                     name="lastName"
@@ -132,7 +131,7 @@ const ProfileView = () => {
                   />
                 </div>
                 <div>
-                  <label>Password (lämna tom för att behålla nuvarande):</label>
+                  <label>Password:</label>
                   <input
                     type="password"
                     name="password"
