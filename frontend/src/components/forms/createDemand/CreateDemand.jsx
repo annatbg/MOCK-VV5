@@ -20,6 +20,8 @@ const CreateDemand = () => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
+ 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -70,7 +72,7 @@ const CreateDemand = () => {
           <label htmlFor="title" className="demandForm-label">
             Rubrik:
           </label>
-          <input
+          <textarea
             type="text"
             id="title"
             value={formData.title}
@@ -80,10 +82,10 @@ const CreateDemand = () => {
             disabled={loading}
           />
 
-          <label htmlFor="demand" className="demandForm-label-behov">
+          <label htmlFor="demand" className="demandForm-label">
             Behov:
           </label>
-          <input
+          <textarea
             type="text"
             id="demand"
             value={formData.demand}
@@ -96,7 +98,8 @@ const CreateDemand = () => {
           <label htmlFor="category" className="demandForm-label">
             Kategori:
           </label>
-          <input
+         
+          <select
             type="text"
             id="category"
             value={formData.category}
@@ -104,13 +107,22 @@ const CreateDemand = () => {
             placeholder="Vilken kategori tillhör ditt behov"
             className="demandForm-input"
             disabled={loading}
-          />
+          >
+            <option value="">Välj en Kategori</option>
+            <option value="Health">Health</option>
+            <option value="Technology">Technology</option>
+            <option value="Finance">Finance</option>
+            <option value="Environment">Environment</option>
+            <option value="Education">Education</option>
+          </select>
 
           {error && <p className="demandForm-error">{error}</p>}
           {successMessage && (
             <p className="demandForm-success">{successMessage}</p>
           )}
 
+          
+        <div className="demandForm-button-container">
           <button
             type="submit"
             className="demandForm-button"
@@ -118,9 +130,10 @@ const CreateDemand = () => {
           >
             {loading ? "Submitting..." : "Skapa behov"}
           </button>
+          </div>
+          
         </form>
       )}    
-
       </div>
     </>
   );
