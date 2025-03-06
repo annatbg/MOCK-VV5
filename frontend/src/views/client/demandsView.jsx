@@ -7,7 +7,7 @@ import "./styles/DemandsView.css";
 const DemandsView = () => {
   return (
     <div className="demandViewContainer">
-      <h1 className="demandViewTitle">Demand View</h1>
+      <h1 className="demandViewTitle">Demands</h1>
       <CreateDemandForm />
       <MyDemands />
       <AllDemands />

@@ -1,12 +1,12 @@
 html {
-  background-color: #F8DAC7;
+  background-color: #ede0d4;
 
 }
 .clientContainer {
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: #a5a58d;
+  background-color: #ede0d4;
 
 }
 
