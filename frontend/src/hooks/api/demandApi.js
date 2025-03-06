@@ -28,26 +28,39 @@ const createDemand = async (formData) => {
 };
 
 const fetchMyDemands = async () => {
-  // const user = useUser.getState().user;
   const token = useUser.getState().token;
 
-  const response = await fetch(`${API_URL}/demand`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  try {
+    const response = await fetch(`${API_URL}/demand`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch demands");
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("No demands found.");
+      }
+      throw new Error(`Failed to fetch demands (status: ${response.status})`);
+    }
+
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length === 0) {
+      throw new Error("You have no demands.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("[fetchMyDemands] Error:", error.message);
+    throw error;
   }
-
-  return response.json();
 };
 
 const fetchAllDemands = async () => {
-  console.log("Fetching from:", `${API_URL}/demands/all`); // Logga URL
+  console.log("Fetching from:", `${API_URL}/demands/all`);
 
   try {
     const response = await fetch(`${API_URL}/demands/all`, {
@@ -57,15 +70,24 @@ const fetchAllDemands = async () => {
       },
     });
 
-    console.log("Response status:", response.status); // Logga status
+    console.log("Response status:", response.status);
 
     if (!response.ok) {
-      throw new Error("Failed to fetch demands");
+      if (response.status === 404) {
+        throw new Error("No demands available.");
+      }
+      throw new Error(`Failed to fetch demands (status: ${response.status})`);
     }
 
-    return response.json();
+    const data = await response.json();
+
+    if (Array.isArray(data) && data.length === 0) {
+      throw new Error("There are currently no demands available.");
+    }
+
+    return data;
   } catch (error) {
-    console.error("Fetch error:", error.message);
+    console.error("[fetchAllDemands] Fetch error:", error.message);
     throw error;
   }
 };
@@ -110,7 +132,10 @@ const fetchDemandsByIds = async (ids) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("[fetchDemandsByIds] Request URL:", `${API_URL}/demand/ids?${queryParam}`);
+    console.log(
+      "[fetchDemandsByIds] Request URL:",
+      `${API_URL}/demand/ids?${queryParam}`
+    );
     if (!response.ok) {
       throw new Error("Failed to fetch demand(s)");
     }
@@ -118,14 +143,18 @@ const fetchDemandsByIds = async (ids) => {
     console.log("[fetchDemandsByIds] Response:", result);
     return result;
   } catch (error) {
-    throw new Error(`An error occurred while fetching demand(s): ${error.message}`);
+    throw new Error(
+      `An error occurred while fetching demand(s): ${error.message}`
+    );
   }
 };
 
 // Match status management functions
 export const updateMatchStatus = async (demandId, matchId, status) => {
   try {
-    console.log(`[demandApi] Updating match status: ${demandId}, ${matchId}, ${status}`);
+    console.log(
+      `[demandApi] Updating match status: ${demandId}, ${matchId}, ${status}`
+    );
     const token = useUser.getState().token;
 
     // Updated URL to use the new endpoint that's more semantically accurate
@@ -146,7 +175,10 @@ export const updateMatchStatus = async (demandId, matchId, status) => {
     console.log(`[demandApi] Match status updated: ${status}`, result);
     return result;
   } catch (error) {
-    console.error(`[demandApi] Error updating match status to ${status}:`, error);
+    console.error(
+      `[demandApi] Error updating match status to ${status}:`,
+      error
+    );
     throw error;
   }
 };
@@ -164,4 +196,10 @@ export const undoRejection = async (demandId, matchId) => {
 };
 
 // Export all functions
-export { createDemand, fetchMyDemands, fetchAllDemands, deleteDemand, fetchDemandsByIds };
+export {
+  createDemand,
+  fetchMyDemands,
+  fetchAllDemands,
+  deleteDemand,
+  fetchDemandsByIds,
+};

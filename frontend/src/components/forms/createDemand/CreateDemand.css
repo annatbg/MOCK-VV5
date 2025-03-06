@@ -13,6 +13,9 @@
 .demandForm-label {
   font-weight: 700;
   font-size: 1.2rem;
+  gap: 3px;
+  width: 100%;
+  margin: 5px 30px;
 }
 
 .demandForm-input {
