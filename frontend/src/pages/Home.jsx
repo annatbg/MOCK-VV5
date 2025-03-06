@@ -74,10 +74,9 @@ function Home() {
     <div className="home-container">
       <h1>{isLogin ? "Login" : "Signup"}</h1>
       {isLogin ? (
-        <form onSubmit={handleLogin}>
+        <form className="home-form-container" onSubmit={handleLogin}>
           <div className="home-form-group">
-            <label htmlFor="email">email:</label>
-            <br />
+            <label htmlFor="email">Email:</label>
             <input
               type="text"
               id="email"
@@ -90,7 +89,6 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="password">Password:</label>
-            <br />
             <input
               type="password"
               id="password"
@@ -101,15 +99,15 @@ function Home() {
               onChange={handleChange}
             />
           </div>
-          <button type="submit" className="submit-button">
+          <button type="submit" className="home-button">
             Login
           </button>
         </form>
       ) : (
-        <form onSubmit={handleSignup}>
+        <form className="home-create-container" onSubmit={handleSignup}>
           <div className="home-form-group">
-            <label htmlFor="email">email:</label>
-            <br />
+            <label htmlFor="email">Email:</label>
+
             <input
               type="text"
               id="email"
@@ -122,7 +120,7 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="password">Password:</label>
-            <br />
+
             <input
               type="password"
               id="password"
@@ -135,7 +133,7 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="organisation">Organisation:</label>
-            <br />
+
             <input
               type="text"
               id="organisation"
@@ -148,7 +146,7 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="firstName">First Name:</label>
-            <br />
+
             <input
               type="text"
               id="firstName"
@@ -161,7 +159,7 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="lastName">Last Name:</label>
-            <br />
+
             <input
               type="text"
               id="lastName"
@@ -174,7 +172,7 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="location">Location:</label>
-            <br />
+
             <input
               type="text"
               id="location"
@@ -185,18 +183,20 @@ function Home() {
               onChange={handleChange}
             />
           </div>
-          <button type="submit" className="submit-button">
+          <button type="submit" className="home-button">
             Signup
           </button>
         </form>
       )}
       {message && <p className="home-success-message">{message}</p>}
-      <p className="toggle-message">
+      <div className="home-signup-button-container">
+      <p className="account-message">
         {isLogin ? "Don't have an account?" : "Already have an account?"} <br />
-        <button onClick={toggleForm} className="toggle-button">
+      </p>
+        <button onClick={toggleForm} className="home-button">
           {isLogin ? "Sign up" : "Log in"}
         </button>
-      </p>
+      </div>
     </div>
   );
 }

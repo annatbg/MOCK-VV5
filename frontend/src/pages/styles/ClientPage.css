@@ -1,6 +1,15 @@
 
+html {
+  background-color: #ede0d4;
+}
+
+
 .clientContainer {
   background-color: #f0f4f0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #ede0d4;
 }
 
 /* added */

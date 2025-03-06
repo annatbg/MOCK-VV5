@@ -139,8 +139,8 @@ const ProfileView = () => {
                     onChange={handleEditChange}
                   />
                 </div>
-                <button type="submit">Save</button>
-                <button type="button" onClick={() => setIsEditing(false)}>
+                <button className="profileButton" type="submit">Save</button>
+                <button className="profileButton" type="button" onClick={() => setIsEditing(false)}>
                   Cancel
                 </button>
               </form>
@@ -151,7 +151,7 @@ const ProfileView = () => {
         <p>Loading...</p>
       )}
 
-      {message && <p className="success-message">{message}</p>}
+      {message && <p className="successMessage">{message}</p>}
 
       <div className="profileDescription">
         Beskriv företaget
