@@ -1,17 +1,11 @@
-html {
-  background-color: #F8DAC7;
 
-}
 .clientContainer {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
   background-color: #a5a58d;
-
 }
 
 /* added */
 .contentPage {
   display: flex;
-
+  flex-direction: row;
+  height: 100vh;
 }
