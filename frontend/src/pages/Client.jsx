@@ -5,7 +5,6 @@ import HomeView from "../views/client/homeView";
 import DemandsView from "../views/client/demandsView";
 import MatchView from "../views/client/matchView";
 import ProfileView from "../views/client/profileView";
-import NotificationsView from "../views/client/notificationsView";
 import Sidebar from "../components/sidebar/Sidebar";
 import "./styles/ClientPage.css";
 
