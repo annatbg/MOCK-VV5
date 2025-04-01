@@ -1,16 +1,36 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { fetchMyDemands, deleteDemand } from "../../hooks/api/demandApi";
 import ListComponent from "./ListComponent";
 import DemandCard from "../demand/DemandCard";
 
-const MyDemands = () => {
-  const [demands, setDemands] = useState([]);
+interface Demand {
+  title: string;
+  demand: string;
+  category: string;
+  author: string;
+  demandId: string;
+}
 
-  const handleDelete = async (demandId) => {
+const MyDemands: React.FC = () => {
+  const [demands, setDemands] = useState<Demand[]>([]);
+
+  useEffect(() => {
+    const fetchDemands = async () => {
+      try {
+        const response = await fetchMyDemands();
+        setDemands(response.data);
+      } catch (error) {
+        console.error("Error fetching demands:", error);
+      }
+    };
+    fetchDemands();
+  }, []);
+
+  const handleDelete = async (demandId: string) => {
     if (window.confirm("Are you sure you want to delete this demand?")) {
       try {
         await deleteDemand(demandId);
-        setDemands(demands.filter((d) => d.demandId !== demandId)); 
+        setDemands((prevDemands) => prevDemands.filter((d) => d.demandId !== demandId)); 
         alert("Demand deleted successfully");
         window.location.reload();
       } catch (error) {
@@ -23,7 +43,7 @@ const MyDemands = () => {
     <ListComponent
       fetchFunction={fetchMyDemands}
       title="My demands"
-      renderItem={(demand) => (
+      renderItem={(demand: Demand) => (
         <DemandCard
           title={demand.title}
           demand={demand.demand}

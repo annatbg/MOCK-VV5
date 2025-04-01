@@ -3,7 +3,12 @@ import "./Sidebar.css";
 import { useNavigate } from "react-router-dom";
 import useUser from "../../store/useUser";
 
-const Sidebar = ({ activeView, setActiveView }) => {
+type SidebarProps = {
+  activeView: string;
+  setActiveView: (view: string) => void;
+};
+
+const Sidebar: React.FC<SidebarProps> = ({ activeView, setActiveView }) => {
   const user = useUser((state) => state.user);
   const logout = useUser((state) => state.logout);  
   const navigate = useNavigate();

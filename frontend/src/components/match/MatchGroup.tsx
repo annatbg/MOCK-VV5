@@ -1,22 +1,46 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import DemandCard from '../demand/DemandCard';
 import MatchCard from './MatchCard';
 import './MatchGroup.css';
 
-const MatchGroup = ({ 
+interface MatchData {
+  demandId: string;
+  title?: string;
+  demand?: string;
+  category?: string;
+  author?: string;
+  status: 'new' | 'confirmedByMe' | 'confirmedByThem' | 'matched' | 'rejectedByMe';
+}
+
+interface Demand {
+  demandId: string;
+  title: string;
+  demand: string;
+  category: string;
+  author: string;
+}
+
+interface MatchGroupProps {
+  demand: Demand;
+  matches: MatchData[];
+  onConfirmMatch: (demandId: string, matchId: string) => void;
+  onRejectMatch: (demandId: string, matchId: string) => void;
+  onCancelAction: (demandId: string, matchId: string, status: string) => void;
+  onDeleteDemand?: () => void;
+}
+
+const MatchGroup: React.FC<MatchGroupProps> = ({ 
   demand, 
   matches, 
   onConfirmMatch, 
   onRejectMatch, 
   onCancelAction,
-  onDeleteDemand // Add this prop
+  onDeleteDemand
 }) => {
-  const [activeMatchIndex, setActiveMatchIndex] = useState(-1);
-  const [activeConfirmedIndex, setActiveConfirmedIndex] = useState(-1);
+  const [activeMatchIndex, setActiveMatchIndex] = useState<number>(-1);
+  const [activeConfirmedIndex, setActiveConfirmedIndex] = useState<number>(-1);
   const demandId = demand.demandId;
 
-  // Separate confirmed and other matches
   const confirmedMatches = matches.filter(match => match.status === 'matched');
   const otherMatches = matches.filter(match => match.status !== 'matched');
 
@@ -28,13 +52,12 @@ const MatchGroup = ({
           demand={demand.demand}
           category={demand.category}
           author={demand.author}
-          demandId={demand.demandId} // Pass demandId
-          onDelete={onDeleteDemand} // Pass the delete handler
+          demandId={demand.demandId}
+          onDelete={onDeleteDemand}
           className="primary-demand"
-          initialExpanded={true} // Primary demand is expanded by default
+          initialExpanded={true}
         />
         
-        {/* Confirmed matches displayed horizontally next to primary demand */}
         {confirmedMatches.length > 0 && (
           <div className="confirmed-matches">
             <h4>Active Collaborations:</h4>
@@ -47,7 +70,7 @@ const MatchGroup = ({
                   isStackable={true}
                   isOnTop={activeConfirmedIndex === index}
                   onSelect={() => setActiveConfirmedIndex(index)}
-                  initialExpanded={false} // Collapsed by default
+                  initialExpanded={false}
                 />
               ))}
             </div>
@@ -55,7 +78,6 @@ const MatchGroup = ({
         )}
       </div>
       
-      {/* Other matches displayed below */}
       {otherMatches.length > 0 && (
         <div className="matches">
           <h4>Potential Matches:</h4>
@@ -71,7 +93,7 @@ const MatchGroup = ({
                 onConfirm={() => onConfirmMatch(demandId, match.demandId)}
                 onReject={() => onRejectMatch(demandId, match.demandId)}
                 onCancel={() => onCancelAction(demandId, match.demandId, match.status)}
-                initialExpanded={false} // Collapsed by default
+                initialExpanded={false}
               />
             ))}
           </div>
@@ -83,30 +105,6 @@ const MatchGroup = ({
       )}
     </div>
   );
-};
-
-MatchGroup.propTypes = {
-  demand: PropTypes.shape({
-    demandId: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    demand: PropTypes.string.isRequired,
-    category: PropTypes.string.isRequired,
-    author: PropTypes.string.isRequired,
-  }).isRequired,
-  matches: PropTypes.arrayOf(
-    PropTypes.shape({
-      demandId: PropTypes.string.isRequired,
-      title: PropTypes.string,
-      demand: PropTypes.string,
-      category: PropTypes.string,
-      author: PropTypes.string,
-      status: PropTypes.string.isRequired
-    })
-  ).isRequired,
-  onConfirmMatch: PropTypes.func.isRequired,
-  onRejectMatch: PropTypes.func.isRequired,
-  onCancelAction: PropTypes.func.isRequired,
-  onDeleteDemand: PropTypes.func // Add this to propTypes
 };
 
 export default MatchGroup;

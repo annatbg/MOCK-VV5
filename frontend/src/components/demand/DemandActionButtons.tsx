@@ -2,7 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import './DemandActionButtons.css';
 
-const DemandActionButtons = ({ onEdit, onDelete }) => {
+type DemandActionButtonsProps = {
+  onEdit: () => void;
+  onDelete: () => void;
+};
+
+
+const DemandActionButtons = ({ onEdit, onDelete }: DemandActionButtonsProps)  => {
   return (
     <div className="demand-action-buttons">
       <button 

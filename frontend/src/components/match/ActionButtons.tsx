@@ -1,8 +1,14 @@
 import React from "react";
-import PropTypes from "prop-types";
 import "./MatchStyles.css";
 
-const ActionButtons = ({ status, onConfirm, onReject, onCancel }) => {
+type ActionButtonsProps = {
+  status?: "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
+  onConfirm?: () => void;
+  onReject?: () => void;
+  onCancel?: () => void;
+};
+
+const ActionButtons: React.FC<ActionButtonsProps> = ({ status, onConfirm, onReject, onCancel }) => {
   if (!status) return null;
 
   return (
@@ -64,13 +70,6 @@ const ActionButtons = ({ status, onConfirm, onReject, onCancel }) => {
       </div>
     </div>
   );
-};
-
-ActionButtons.propTypes = {
-  status: PropTypes.oneOf(['new', 'confirmedByMe', 'confirmedByThem', 'matched', 'rejectedByMe']),
-  onConfirm: PropTypes.func,
-  onReject: PropTypes.func,
-  onCancel: PropTypes.func
 };
 
 export default ActionButtons;

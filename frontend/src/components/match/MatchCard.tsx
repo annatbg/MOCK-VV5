@@ -1,11 +1,31 @@
 import React from "react";
-import PropTypes from "prop-types";
 import DemandCard from "../demand/DemandCard";
 import StatusBadge from "./StatusBadge";
 import ActionButtons from "./ActionButtons";
 import "./MatchCard.css";
 
-const MatchCard = ({
+interface MatchData {
+  demandId: string;
+  title?: string;
+  demand?: string;
+  category?: string;
+  author?: string;
+  status: "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
+}
+
+interface MatchCardProps {
+  matchData: MatchData;
+  isStackable?: boolean;
+  isOnTop?: boolean;
+  onSelect?: () => void;
+  onConfirm?: () => void;
+  onReject?: () => void;
+  onCancel?: () => void;
+  className?: string;
+  initialExpanded?: boolean;
+}
+
+const MatchCard: React.FC<MatchCardProps> = ({
   matchData,
   isStackable = false,
   isOnTop = false,
@@ -14,19 +34,19 @@ const MatchCard = ({
   onReject,
   onCancel,
   className = "",
-  initialExpanded = false // Default to collapsed
+  initialExpanded = false,
 }) => {
-  // Extract all relevant demand data
   const { title, demand, category, author, status, demandId } = matchData;
 
-  // Classes specific to match status
   const matchClasses = [
     className,
     status === "confirmedByMe" ? "confirmed-by-me-match" : "",
     status === "confirmedByThem" ? "confirmed-by-them-match" : "",
     status === "matched" ? "matched-match" : "",
-    status === "rejectedByMe" ? "rejected-match" : ""
-  ].filter(Boolean).join(" ");
+    status === "rejectedByMe" ? "rejected-match" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <DemandCard
@@ -50,25 +70,6 @@ const MatchCard = ({
       initialExpanded={initialExpanded}
     />
   );
-};
-
-MatchCard.propTypes = {
-  matchData: PropTypes.shape({
-    demandId: PropTypes.string.isRequired,
-    title: PropTypes.string,
-    demand: PropTypes.string,
-    category: PropTypes.string,
-    author: PropTypes.string,
-    status: PropTypes.oneOf(['new', 'confirmedByMe', 'confirmedByThem', 'matched', 'rejectedByMe']).isRequired
-  }).isRequired,
-  isStackable: PropTypes.bool,
-  isOnTop: PropTypes.bool,
-  onSelect: PropTypes.func,
-  onConfirm: PropTypes.func,
-  onReject: PropTypes.func,
-  onCancel: PropTypes.func,
-  className: PropTypes.string,
-  initialExpanded: PropTypes.bool
 };
 
 export default MatchCard;
