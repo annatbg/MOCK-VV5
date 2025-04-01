@@ -1,7 +1,8 @@
 import useUser from "../../store/useUser";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
-const createDemand = async (formData) => {
+const createDemand = async (formData: { formData: any }) => {
   try {
     const token = useUser.getState().token;
 
@@ -22,7 +23,7 @@ const createDemand = async (formData) => {
     }
   } catch (error) {
     throw new Error(
-      `An error occurred while creating demand: ${error.message}`
+      `An error occurred while creating demand: ${(error as Error).message}`
     );
   }
 };
@@ -54,7 +55,7 @@ const fetchMyDemands = async () => {
 
     return data;
   } catch (error) {
-    console.error("[fetchMyDemands] Error:", error.message);
+    console.error("[fetchMyDemands] Error:", (error as Error).message);
     throw error;
   }
 };
@@ -87,12 +88,12 @@ const fetchAllDemands = async () => {
 
     return data;
   } catch (error) {
-    console.error("[fetchAllDemands] Fetch error:", error.message);
+    console.error("[fetchAllDemands] Fetch error:", (error as Error).message);
     throw error;
   }
 };
 
-const deleteDemand = async (demandId) => {
+const deleteDemand = async (demandId: string) => {
   try {
     const token = useUser.getState().token;
 
@@ -112,19 +113,18 @@ const deleteDemand = async (demandId) => {
     }
   } catch (error) {
     throw new Error(
-      `An error occurred while deleting demand: ${error.message}`
+      `An error occurred while deleting demand: ${(error as Error).message}`
     );
   }
 };
 
-const fetchDemandsByIds = async (ids) => {
+const fetchDemandsByIds = async (ids: string | string[]) => {
   try {
     const token = useUser.getState().token;
-    // Använd "ids" query-param om det är en array
     const queryParam = Array.isArray(ids)
       ? `ids=${ids.join(",")}`
       : `ids=${ids}`;
-    // Viktigt: anropa endpointen /demand/ids
+
     const response = await fetch(`${API_URL}/demand/ids?${queryParam}`, {
       method: "GET",
       headers: {
@@ -132,32 +132,38 @@ const fetchDemandsByIds = async (ids) => {
         Authorization: `Bearer ${token}`,
       },
     });
+
     console.log(
       "[fetchDemandsByIds] Request URL:",
       `${API_URL}/demand/ids?${queryParam}`
     );
+
     if (!response.ok) {
       throw new Error("Failed to fetch demand(s)");
     }
+
     const result = await response.json();
     console.log("[fetchDemandsByIds] Response:", result);
     return result;
   } catch (error) {
     throw new Error(
-      `An error occurred while fetching demand(s): ${error.message}`
+      `An error occurred while fetching demand(s): ${(error as Error).message}`
     );
   }
 };
 
 // Match status management functions
-export const updateMatchStatus = async (demandId, matchId, status) => {
+export const updateMatchStatus = async (
+  demandId: string,
+  matchId: string,
+  status: string
+) => {
   try {
     console.log(
       `[demandApi] Updating match status: ${demandId}, ${matchId}, ${status}`
     );
     const token = useUser.getState().token;
 
-    // Updated URL to use the new endpoint that's more semantically accurate
     const response = await fetch(`${API_URL}/demand/matches/${demandId}`, {
       method: "PUT",
       headers: {
@@ -183,15 +189,15 @@ export const updateMatchStatus = async (demandId, matchId, status) => {
   }
 };
 
-export const confirmMatch = async (demandId, matchId) => {
+export const confirmMatch = async (demandId: string, matchId: string) => {
   return updateMatchStatus(demandId, matchId, "confirmedByMe");
 };
 
-export const rejectMatch = async (demandId, matchId) => {
+export const rejectMatch = async (demandId: string, matchId: string) => {
   return updateMatchStatus(demandId, matchId, "rejectedByMe");
 };
 
-export const undoRejection = async (demandId, matchId) => {
+export const undoRejection = async (demandId: string, matchId: string) => {
   return updateMatchStatus(demandId, matchId, "new");
 };
 

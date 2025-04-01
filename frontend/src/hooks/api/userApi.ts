@@ -1,16 +1,39 @@
 import useUser from "../../store/useUser";
-const API_URL = import.meta.env.VITE_API_URL;
 
-const fetchUserData = async (user, endpoint) => {
+const API_URL: string = import.meta.env.VITE_API_URL;
+
+// Define types
+type User = {
+  email: string;
+};
+
+type UserDataResponse = {
+  id: string;
+  email: string;
+  name?: string;
+  [key: string]: any; // Allows additional user fields
+};
+
+type UpdateUserData = {
+  name?: string;
+  email?: string;
+  password?: string;
+  [key: string]: any;
+};
+
+// Fetch user data
+const fetchUserData = async (user: User, endpoint: string): Promise<UserDataResponse> => {
   try {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: user.email }),
     });
+
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
+
     return await response.json();
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -18,13 +41,14 @@ const fetchUserData = async (user, endpoint) => {
   }
 };
 
-const updateUser = async (updateData) => {
+// Update user
+const updateUser = async (updateData: UpdateUserData): Promise<UserDataResponse> => {
   try {
     const token = useUser.getState().token;
     console.log("updateUser: Token:", token);
     console.log("updateUser: Update data:", updateData);
 
-    const response = await fetch(API_URL + "/user/edit", {
+    const response = await fetch(`${API_URL}/user/edit`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -32,9 +56,10 @@ const updateUser = async (updateData) => {
       },
       body: JSON.stringify(updateData),
     });
+
     console.log("updateUser: Response status:", response.status);
 
-    const result = await response.json();
+    const result: UserDataResponse = await response.json();
     console.log("updateUser: Response result:", result);
 
     if (!response.ok) {
@@ -43,7 +68,7 @@ const updateUser = async (updateData) => {
     return result;
   } catch (error) {
     console.error("updateUser: Error:", error);
-    throw new Error("An error occurred while updating profile: " + error.message);
+    throw new Error(`An error occurred while updating profile: ${(error as Error).message}`);
   }
 };
 

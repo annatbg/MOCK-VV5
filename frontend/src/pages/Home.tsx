@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, signupUser } from "../hooks/api/authApi";
 import useUser from "../store/useUser";
 import "./styles/Home.css";
+import { User } from "../store/useUser"; 
 
-function Home() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
+interface FormData {
+  email: string;
+  password: string;
+  organisation: string;
+  firstName: string;
+  lastName: string;
+  location: string;
+}
+
+const Home: React.FC = () => {
+  const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
     organisation: "",
@@ -14,23 +24,23 @@ function Home() {
     lastName: "",
     location: "",
   });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
   const navigate = useNavigate();
   const { login } = useUser();
 
-  const handleRedirect = (role) => {
-    if (role == "admin") {
+  const handleRedirect = (role: string): void => {
+    if (role === "admin") {
       navigate("/user/admin");
-    } else if (role == "coach") {
+    } else if (role === "coach") {
       navigate("/user/coach");
-    } else if (role == "developer") {
+    } else if (role === "developer") {
       navigate("/user/developer");
     } else {
       navigate("/user/client");
     }
   };
 
-  const toggleForm = () => {
+  const toggleForm = (): void => {
     setIsLogin(!isLogin);
     setFormData({
       email: "",
@@ -43,29 +53,41 @@ function Home() {
     setMessage("");
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
       const result = await loginUser(formData.email, formData.password);
       console.log("result", result);
-      login(result.user, result.token);
-      handleRedirect(result.user.role);
-    } catch (error) {
+      
+
+      const { role, ...rest } = result.user;
+      const fixedRole: string =
+        typeof role === "function" ? (role as (arg: any) => string)("") : role;
+      
+
+      const userData: User = {
+        ...rest,
+        role: fixedRole,
+      };
+
+      login(userData, result.token);
+      handleRedirect(fixedRole);
+    } catch (error: any) {
       alert(error.message || "An error occurred while logging in.");
     }
   };
 
-  const handleSignup = async (e) => {
+  const handleSignup = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
       const result = await signupUser(formData);
       setMessage("User created!");
-    } catch (error) {
+    } catch (error: any) {
       alert(error.message || "An error occurred while signing up.");
     }
   };
@@ -107,7 +129,6 @@ function Home() {
         <form className="home-create-container" onSubmit={handleSignup}>
           <div className="home-form-group">
             <label htmlFor="email">Email:</label>
-
             <input
               type="text"
               id="email"
@@ -120,7 +141,6 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="password">Password:</label>
-
             <input
               type="password"
               id="password"
@@ -133,7 +153,6 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="organisation">Organisation:</label>
-
             <input
               type="text"
               id="organisation"
@@ -146,7 +165,6 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="firstName">First Name:</label>
-
             <input
               type="text"
               id="firstName"
@@ -159,7 +177,6 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="lastName">Last Name:</label>
-
             <input
               type="text"
               id="lastName"
@@ -172,7 +189,6 @@ function Home() {
           </div>
           <div className="home-form-group">
             <label htmlFor="location">Location:</label>
-
             <input
               type="text"
               id="location"
@@ -190,15 +206,15 @@ function Home() {
       )}
       {message && <p className="home-success-message">{message}</p>}
       <div className="home-signup-button-container">
-      <p className="account-message">
-        {isLogin ? "Don't have an account?" : "Already have an account?"} <br />
-      </p>
+        <p className="account-message">
+          {isLogin ? "Don't have an account?" : "Already have an account?"} <br />
+        </p>
         <button onClick={toggleForm} className="home-button">
           {isLogin ? "Sign up" : "Log in"}
         </button>
       </div>
     </div>
   );
-}
+};
 
 export default Home;

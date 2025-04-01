@@ -1,10 +1,26 @@
 import React, { useState } from "react";
-import PropTypes from "prop-types";
 import "./DemandCard.css";
 import useUser from "../../store/useUser";
 import DemandActionButtons from "./DemandActionButtons";
 
-const DemandCard = ({ 
+interface DemandCardProps {
+  title: string;
+  demand: string;
+  category: string;
+  author: string;
+  demandId?: string;
+  className?: string;
+  isStackable?: boolean;
+  isOnTop?: boolean;
+  onSelect?: () => void;
+  headerExtras?: React.ReactNode;
+  belowHeader?: React.ReactNode; // We'll rename this to actionButtons for clarity
+  initialExpanded?: boolean;
+  onEdit?: () => void;
+  onDelete?: (demandId?: string) => void;
+}
+
+const DemandCard: React.FC<DemandCardProps> = ({ 
   title, 
   demand, 
   category, 
@@ -15,7 +31,7 @@ const DemandCard = ({
   isOnTop = false,
   onSelect = () => {},
   headerExtras,
-  belowHeader, // We'll rename this to actionButtons for clarity
+  belowHeader,
   initialExpanded = false,
   onEdit = () => {},
   onDelete = () => {}
@@ -26,23 +42,23 @@ const DemandCard = ({
   const { user } = useUser();
   const isMine = user?.email === author;
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (isStackable) {
       onSelect();
     }
   };
   
-  const toggleExpand = (e) => {
+  const toggleExpand = (e: React.MouseEvent): void => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
   };
 
-  const handleEdit = (e) => {
+  const handleEdit = (e: React.MouseEvent): void => {
     e.stopPropagation();
     onEdit();
   };
 
-  const handleDelete = (e) => {
+  const handleDelete = (e: React.MouseEvent): void => {
     e.stopPropagation();
     onDelete(demandId);
   };
@@ -88,8 +104,8 @@ const DemandCard = ({
           <div className="action-buttons-container">
             {isMine ? (
               <DemandActionButtons 
-                onEdit={handleEdit}
-                onDelete={handleDelete}
+                onEdit={() => onEdit()}
+                onDelete={() => onDelete(demandId)}
               />
             ) : belowHeader}
           </div>
@@ -101,23 +117,6 @@ const DemandCard = ({
       )}
     </div>
   );
-};
-
-DemandCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  demand: PropTypes.string.isRequired,
-  category: PropTypes.string.isRequired,
-  author: PropTypes.string.isRequired,
-  demandId: PropTypes.string, // Add demandId to prop types
-  className: PropTypes.string,
-  isStackable: PropTypes.bool,
-  isOnTop: PropTypes.bool,
-  onSelect: PropTypes.func,
-  headerExtras: PropTypes.node,
-  belowHeader: PropTypes.node,
-  initialExpanded: PropTypes.bool,
-  onEdit: PropTypes.func,
-  onDelete: PropTypes.func
 };
 
 export default DemandCard;

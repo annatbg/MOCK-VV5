@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useUser from "../store/useUser";
 import HomeView from "../views/client/homeView";
 import DemandsView from "../views/client/demandsView";
 import MatchView from "../views/client/matchView";
 import ProfileView from "../views/client/profileView";
-import NotificationsView from "../views/client/notificationsView";
 import Sidebar from "../components/sidebar/Sidebar";
 import "./styles/ClientPage.css";
 
@@ -40,7 +39,7 @@ function Client() {
       case "demands":
         return <DemandsView />;
       case "notifications":
-        return <NotificationsView />;  
+        return "";  
       default:
         return <HomeView />;
     }

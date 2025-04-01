@@ -2,9 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useEffect } from "react";
 import Home from "./pages/Home";
 import Client from "./pages/Client";
-import Coach from "./pages/Coach";
-import Developer from "./pages/Developer";
-import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import useUser from "./store/useUser";
 
@@ -29,9 +26,6 @@ function App() {
         <Route path="/" element={!user ? <Home /> : 
           <Navigate to={`/user/${user.role}`} replace />} />
         <Route path="/user/client" element={<Client />} />
-        <Route path="/user/coach" element={<Coach />} />
-        <Route path="/user/developer" element={<Developer />} />
-        <Route path="/user/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
