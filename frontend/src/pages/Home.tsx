@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser, signupUser } from "../hooks/api/authApi";
 import useUser from "../store/useUser";
 import "./styles/Home.css";
-import { User } from "../store/useUser"; 
+import { User } from "../store/useUser";
 
 interface FormData {
   email: string;
@@ -63,12 +63,10 @@ const Home: React.FC = () => {
     try {
       const result = await loginUser(formData.email, formData.password);
       console.log("result", result);
-      
 
       const { role, ...rest } = result.user;
       const fixedRole: string =
         typeof role === "function" ? (role as (arg: any) => string)("") : role;
-      
 
       const userData: User = {
         ...rest,
@@ -85,8 +83,11 @@ const Home: React.FC = () => {
   const handleSignup = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
-      const result = await signupUser(formData);
+      await signupUser(formData);
       setMessage("User created!");
+      setTimeout(() => {
+        setIsLogin(true);
+      }, 1500);
     } catch (error: any) {
       alert(error.message || "An error occurred while signing up.");
     }
@@ -207,7 +208,8 @@ const Home: React.FC = () => {
       {message && <p className="home-success-message">{message}</p>}
       <div className="home-signup-button-container">
         <p className="account-message">
-          {isLogin ? "Don't have an account?" : "Already have an account?"} <br />
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+          <br />
         </p>
         <button onClick={toggleForm} className="home-button">
           {isLogin ? "Sign up" : "Log in"}
