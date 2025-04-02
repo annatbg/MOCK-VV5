@@ -1,68 +1,82 @@
-import React, { useEffect, useState } from "react";
-import useUser from "../../store/useUser";
+import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
+import useUser, { User as StoreUser } from "../../store/useUser";
 import { fetchUserData, updateUser } from "../../hooks/api/userApi";
 import "./styles/ProfileView.css";
-const API_URL = import.meta.env.VITE_API_URL;
 
-const ProfileView = () => {
-  const [userData, setUserData] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editData, setEditData] = useState({});
-  const [message, setMessage] = useState("");
+const API_URL = import.meta.env.VITE_API_URL as string;
+
+// API response from fetchUserData is expected to have a user property.
+interface ProfileData {
+  user: StoreUser;
+}
+
+// API response from updateUser is expected to have both user and token.
+interface UpdateUserResponse {
+  user: StoreUser;
+  token: string;
+}
+
+const ProfileView: React.FC = () => {
+  const [userData, setUserData] = useState<ProfileData | null>(null);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [editData, setEditData] = useState<Partial<StoreUser>>({});
+  const [message, setMessage] = useState<string>("");
+
   const user = useUser((state) => state.user);
   const setUser = useUser((state) => state.login);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const data = await fetchUserData(user, `${API_URL}/user/fetch`);
+        if (!user) return;
+        const data = (await fetchUserData(user, `${API_URL}/user/fetch`)) as unknown as ProfileData;
         console.log("Fetched user data:", data);
         setUserData(data);
         setEditData(data.user);
       } catch (error) {
-        console.error("Error fetching data in ProfileUser:", error);
+        console.error("Error fetching data in ProfileView:", error);
       }
     };
 
-    if (user) fetchData();
+    if (user) {
+      fetchData();
+    }
   }, [user]);
 
-  const handleEditChange = (e) => {
+  const handleEditChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditData({ ...editData, [name]: value });
+    setEditData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEditSubmit = async (e) => {
+  const handleEditSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("editData before update:", editData);
     try {
-      const result = await updateUser(editData);
+      const result = (await updateUser(editData)) as unknown as UpdateUserResponse;
       console.log("Profile updated result:", result);
       setUserData({ user: result.user });
-      setUser(result.user, result.token );
+      setUser(result.user, result.token);
       console.log("Updated state:", useUser.getState());
       setMessage("Profile updated successfully!");
       setIsEditing(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error in handleEditSubmit:", error);
       setMessage(error.message);
     }
   };
-  
-  
 
   return (
     <div className="profileView">
       {userData ? (
         <div className="profileContainer">
           <div className="proflieImageContainer">
-          <div className="profileImage">
-            <h2 className="profileImagesUsername">
-              {userData.user.firstName.charAt(0).toUpperCase()}
-              {userData.user.lastName.charAt(0).toUpperCase()}
-            </h2>
-          </div>
-              <p className="profileLocation">{userData.user.location}</p>
+            <div className="profileImage">
+              <h2 className="profileImagesUsername">
+                {userData.user.firstName?.charAt(0).toUpperCase()}
+                {userData.user.lastName?.charAt(0).toUpperCase()}
+              </h2>
+            </div>
+            <p className="profileLocation">{userData.user.location}</p>
           </div>
           <div className="profileUserData">
             {!isEditing ? (
@@ -120,7 +134,8 @@ const ProfileView = () => {
                     onChange={handleEditChange}
                     required
                   />
-                </div><div>
+                </div>
+                <div>
                   <label>Location:</label>
                   <input
                     type="text"
@@ -139,7 +154,9 @@ const ProfileView = () => {
                     onChange={handleEditChange}
                   />
                 </div>
-                <button className="profileButton" type="submit">Save</button>
+                <button className="profileButton" type="submit">
+                  Save
+                </button>
                 <button className="profileButton" type="button" onClick={() => setIsEditing(false)}>
                   Cancel
                 </button>
