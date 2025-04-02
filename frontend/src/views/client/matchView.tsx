@@ -5,17 +5,44 @@ import {
   confirmMatch,
   rejectMatch,
   undoRejection,
-  deleteDemand // Import this function if it exists
+  deleteDemand 
 } from "../../hooks/api/demandApi";
 import ListComponent from "../../components/list/ListComponent";
 import MatchGroup from "../../components/match/MatchGroup";
 import "./styles/MatchView.css";
 
-const MatchView = () => {
-  const [updatedMatches, setUpdatedMatches] = useState({});
-  const [matchStats, setMatchStats] = useState({ total: 0, withConfirmed: 0 });
 
-  const fetchMatchData = useCallback(async () => {
+interface Match {
+  id?: string; 
+  demandId: string;
+  status: string;
+}
+
+interface Demand {
+  demandId: string;
+  matches: (Match | string)[];
+}
+
+interface UpdatedMatches {
+  [demandId: string]: {
+    matches: Match[];
+  };
+}
+
+interface MatchStats {
+  total: number;
+  withConfirmed: number;
+}
+
+interface FetchResponse {
+  data: any[];
+}
+
+const MatchView: React.FC = () => {
+  const [updatedMatches, setUpdatedMatches] = useState<UpdatedMatches>({});
+  const [matchStats, setMatchStats] = useState<MatchStats>({ total: 0, withConfirmed: 0 });
+
+  const fetchMatchData = useCallback(async (): Promise<FetchResponse> => {
     console.log("[MatchView] Start fetching my demands");
     try {
       const myDemandsResponse = await fetchMyDemands();
@@ -23,8 +50,8 @@ const MatchView = () => {
         return { data: [] };
       }
       
-      const myDemands = myDemandsResponse.data || [];
-      const items = [];
+      const myDemands: Demand[] = myDemandsResponse.data || [];
+      const items: any[] = [];
       let demandsWithMatches = 0;
       let demandsWithConfirmed = 0;
       
@@ -34,15 +61,16 @@ const MatchView = () => {
             continue;
           }
           
-          // Extract match IDs and statuses
-          const matchIdsToFetch = [];
-          const matchStatusMap = {};
+          const matchIdsToFetch: string[] = [];
+          const matchStatusMap: Record<string, string> = {};
           let hasMatchedStatus = false;
           
           demand.matches.forEach(match => {
-            const matchId = typeof match === 'object' ? match.id : match;
+ 
+            const matchId = typeof match === 'object' ? match.id || "" : match;
             const status = typeof match === 'object' ? match.status : 'new';
             
+            if (!matchId) return;
             matchIdsToFetch.push(matchId);
             matchStatusMap[matchId] = status;
             
@@ -76,28 +104,26 @@ const MatchView = () => {
             ? matchesResponse.data 
             : [matchesResponse.data];
           
-          // Attach status to each match object
+
           const matchesWithStatus = matches
-            .filter(match => match && match.demandId)
-            .map(match => ({
+            .filter((match: any) => match && match.demandId)
+            .map((match: any) => ({
               ...match,
               status: matchStatusMap[match.demandId] || 'new'
             }));
           
-          if (matchesWithStatus.length > 0) {
-            items.push({ 
-              demand, 
-              matches: matchesWithStatus,
-              // Apply any local state updates we've made
-              ...(updatedMatches[demand.demandId] || {})
-            });
-          }
+            if (matchesWithStatus.length > 0) {
+              items.push({ 
+                demand,
+                ...(updatedMatches[demand.demandId] || {}),
+                matches: matchesWithStatus
+              });
+            }
         } catch (err) {
           console.error(`[MatchView] Error processing demand:`, err);
         }
       }
       
-      // Update stats for the title
       setMatchStats({
         total: demandsWithMatches,
         withConfirmed: demandsWithConfirmed
@@ -111,18 +137,18 @@ const MatchView = () => {
     }
   }, [updatedMatches]);
 
-  const handleConfirm = async (demandId, matchId) => {
+  const handleConfirm = async (demandId: string, matchId: string) => {
     try {
       await confirmMatch(demandId, matchId);
-      // Optimistically update UI
+
       setUpdatedMatches(prev => {
         const updatedState = { ...prev };
         if (!updatedState[demandId]) {
           updatedState[demandId] = { matches: [] };
         }
-        // Find and update the match status
+
         const matchIndex = updatedState[demandId]?.matches?.findIndex?.(m => m.demandId === matchId);
-        if (matchIndex >= 0) {
+        if (matchIndex !== undefined && matchIndex >= 0) {
           updatedState[demandId].matches[matchIndex].status = 'confirmedByMe';
         }
         return updatedState;
@@ -132,18 +158,18 @@ const MatchView = () => {
     }
   };
 
-  const handleReject = async (demandId, matchId) => {
+  const handleReject = async (demandId: string, matchId: string) => {
     try {
       await rejectMatch(demandId, matchId);
-      // Optimistically update UI
+
       setUpdatedMatches(prev => {
         const updatedState = { ...prev };
         if (!updatedState[demandId]) {
           updatedState[demandId] = { matches: [] };
         }
-        // Find and update the match status
+
         const matchIndex = updatedState[demandId]?.matches?.findIndex?.(m => m.demandId === matchId);
-        if (matchIndex >= 0) {
+        if (matchIndex !== undefined && matchIndex >= 0) {
           updatedState[demandId].matches[matchIndex].status = 'rejectedByMe';
         }
         return updatedState;
@@ -153,10 +179,10 @@ const MatchView = () => {
     }
   };
 
-  const handleCancel = async (demandId, matchId, currentStatus) => {
+  const handleCancel = async (demandId: string, matchId: string, currentStatus?: string) => {
     try {
       await undoRejection(demandId, matchId);
-      // Optimistically update UI
+
       setUpdatedMatches(prev => {
         const updatedState = { ...prev };
         if (!updatedState[demandId]) {
@@ -164,7 +190,7 @@ const MatchView = () => {
         }
         // Find and update the match status
         const matchIndex = updatedState[demandId]?.matches?.findIndex?.(m => m.demandId === matchId);
-        if (matchIndex >= 0) {
+        if (matchIndex !== undefined && matchIndex >= 0) {
           updatedState[demandId].matches[matchIndex].status = 'new';
         }
         return updatedState;
@@ -174,29 +200,31 @@ const MatchView = () => {
     }
   };
 
-  const handleDeleteDemand = async (demandId) => {
+
+  const getDeleteHandler = (demandId: string) => {
+    return () => {
+      handleDeleteDemand(demandId);
+    };
+  };
+
+  const handleDeleteDemand = async (demandId: string) => {
     try {
-      // Call your API to delete the demand
       await deleteDemand(demandId);
       
-      // Optimistically update the UI - remove this demand from state
+
       setUpdatedMatches(prev => {
         const newState = { ...prev };
         delete newState[demandId];
         return newState;
       });
       
-      // Force refresh the list to reflect changes
-      // If your ListComponent has a refresh method exposed via ref, you could call it here
-      // Otherwise, use some other state to trigger a refetch
-      
     } catch (error) {
       console.error("Failed to delete demand:", error);
     }
   };
 
-  // Create a dynamic title based on match stats
-  const getDynamicTitle = () => {
+
+  const getDynamicTitle = (): string => {
     if (matchStats.total === 0) {
       return "You have no demands with possible matches";
     }
@@ -212,7 +240,7 @@ const MatchView = () => {
     return `You have ${matchStats.total} demand${matchStats.total > 1 ? 's' : ''} with possible matches and ${matchStats.withConfirmed} with active collaborations`;
   };
 
-  const renderMatchGroup = (item) => {
+  const renderMatchGroup = (item: any) => {
     return (
       <MatchGroup
         demand={item.demand}
@@ -220,7 +248,7 @@ const MatchView = () => {
         onConfirmMatch={handleConfirm}
         onRejectMatch={handleReject}
         onCancelAction={handleCancel}
-        onDeleteDemand={handleDeleteDemand} // Pass the delete handler
+        onDeleteDemand={getDeleteHandler(item.demand.demandId)}
       />
     );
   };
@@ -231,7 +259,7 @@ const MatchView = () => {
         fetchFunction={fetchMatchData}
         title={getDynamicTitle()}
         renderItem={renderMatchGroup}
-        refreshOnMount={true}
+
       />
     </div>
   );
