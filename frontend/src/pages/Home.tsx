@@ -2,8 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, signupUser } from "../hooks/api/authApi";
 import useUser from "../store/useUser";
-import "./styles/Home.css";
-import { User } from "../store/useUser"; 
+import { User } from "../store/useUser";
 
 interface FormData {
   email: string;
@@ -29,15 +28,10 @@ const Home: React.FC = () => {
   const { login } = useUser();
 
   const handleRedirect = (role: string): void => {
-    if (role === "admin") {
-      navigate("/user/admin");
-    } else if (role === "coach") {
-      navigate("/user/coach");
-    } else if (role === "developer") {
-      navigate("/user/developer");
-    } else {
-      navigate("/user/client");
-    }
+    if (role === "admin") navigate("/user/admin");
+    else if (role === "coach") navigate("/user/coach");
+    else if (role === "developer") navigate("/user/developer");
+    else navigate("/user/client");
   };
 
   const toggleForm = (): void => {
@@ -62,19 +56,10 @@ const Home: React.FC = () => {
     e.preventDefault();
     try {
       const result = await loginUser(formData.email, formData.password);
-      console.log("result", result);
-      
-
       const { role, ...rest } = result.user;
       const fixedRole: string =
         typeof role === "function" ? (role as (arg: any) => string)("") : role;
-      
-
-      const userData: User = {
-        ...rest,
-        role: fixedRole,
-      };
-
+      const userData: User = { ...rest, role: fixedRole };
       login(userData, result.token);
       handleRedirect(fixedRole);
     } catch (error: any) {
@@ -85,7 +70,7 @@ const Home: React.FC = () => {
   const handleSignup = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
-      const result = await signupUser(formData);
+      await signupUser(formData);
       setMessage("User created!");
     } catch (error: any) {
       alert(error.message || "An error occurred while signing up.");
@@ -93,123 +78,81 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-container">
-      <h1>{isLogin ? "Login" : "Signup"}</h1>
+    <div className="flex flex-col items-center mt-[15%] h-full w-full">
+      <h1 className="text-xl font-bold mb-4">{isLogin ? "Login" : "Signup"}</h1>
       {isLogin ? (
-        <form className="home-form-container" onSubmit={handleLogin}>
-          <div className="home-form-group">
+        <form className="flex flex-col items-center" onSubmit={handleLogin}>
+          <div className="flex flex-col m-2">
             <label htmlFor="email">Email:</label>
             <input
               type="text"
               id="email"
               name="email"
               required
-              className="input-field"
+              className="w-full h-6 border border-gray-300 rounded"
               value={formData.email}
               onChange={handleChange}
             />
           </div>
-          <div className="home-form-group">
+          <div className="flex flex-col m-2">
             <label htmlFor="password">Password:</label>
             <input
               type="password"
               id="password"
               name="password"
               required
-              className="input-field"
+              className="w-full h-6 border border-gray-300 rounded"
               value={formData.password}
               onChange={handleChange}
             />
           </div>
-          <button type="submit" className="home-button">
+          <button
+            type="submit"
+            className="bg-gray-800 text-white mt-2 rounded px-3 py-1 w-[75px] h-[25px]"
+          >
             Login
           </button>
         </form>
       ) : (
-        <form className="home-create-container" onSubmit={handleSignup}>
-          <div className="home-form-group">
-            <label htmlFor="email">Email:</label>
-            <input
-              type="text"
-              id="email"
-              name="email"
-              required
-              className="input-field"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="input-field"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="organisation">Organisation:</label>
-            <input
-              type="text"
-              id="organisation"
-              name="organisation"
-              required
-              className="input-field"
-              value={formData.organisation}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="firstName">First Name:</label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              required
-              className="input-field"
-              value={formData.firstName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="lastName">Last Name:</label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              required
-              className="input-field"
-              value={formData.lastName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="location">Location:</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              required
-              className="input-field"
-              value={formData.location}
-              onChange={handleChange}
-            />
-          </div>
-          <button type="submit" className="home-button">
+        <form className="flex flex-col items-center justify-center" onSubmit={handleSignup}>
+          {[
+            { id: "email", label: "Email" },
+            { id: "password", label: "Password", type: "password" },
+            { id: "organisation", label: "Organisation" },
+            { id: "firstName", label: "First Name" },
+            { id: "lastName", label: "Last Name" },
+            { id: "location", label: "Location" },
+          ].map(({ id, label, type }) => (
+            <div key={id} className="flex flex-col m-2">
+              <label htmlFor={id}>{label}:</label>
+              <input
+                type={type || "text"}
+                id={id}
+                name={id}
+                required
+                className="w-full h-6 border border-gray-300 rounded"
+                value={(formData as any)[id]}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
+          <button
+            type="submit"
+            className="bg-gray-800 text-white mt-2 rounded px-3 py-1 w-[75px] h-[25px]"
+          >
             Signup
           </button>
         </form>
       )}
-      {message && <p className="home-success-message">{message}</p>}
-      <div className="home-signup-button-container">
-        <p className="account-message">
-          {isLogin ? "Don't have an account?" : "Already have an account?"} <br />
+      {message && <p className="text-green-600 mt-2">{message}</p>}
+      <div className="flex flex-col items-center mt-4">
+        <p className="m-2">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
         </p>
-        <button onClick={toggleForm} className="home-button">
+        <button
+          onClick={toggleForm}
+          className="bg-gray-800 text-white mt-2 rounded px-3 py-1 w-[75px] h-[25px]"
+        >
           {isLogin ? "Sign up" : "Log in"}
         </button>
       </div>

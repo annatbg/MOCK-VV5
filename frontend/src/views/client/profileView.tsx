@@ -1,16 +1,13 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import useUser, { User as StoreUser } from "../../store/useUser";
 import { fetchUserData, updateUser } from "../../hooks/api/userApi";
-import "./styles/ProfileView.css";
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 
-// API response from fetchUserData is expected to have a user property.
 interface ProfileData {
   user: StoreUser;
 }
 
-// API response from updateUser is expected to have both user and token.
 interface UpdateUserResponse {
   user: StoreUser;
   token: string;
@@ -27,10 +24,9 @@ const ProfileView: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!user) return;
       try {
-        if (!user) return;
         const data = (await fetchUserData(user, `${API_URL}/user/fetch`)) as unknown as ProfileData;
-        console.log("Fetched user data:", data);
         setUserData(data);
         setEditData(data.user);
       } catch (error) {
@@ -38,9 +34,7 @@ const ProfileView: React.FC = () => {
       }
     };
 
-    if (user) {
-      fetchData();
-    }
+    fetchData();
   }, [user]);
 
   const handleEditChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -50,116 +44,79 @@ const ProfileView: React.FC = () => {
 
   const handleEditSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("editData before update:", editData);
     try {
       const result = (await updateUser(editData)) as unknown as UpdateUserResponse;
-      console.log("Profile updated result:", result);
       setUserData({ user: result.user });
       setUser(result.user, result.token);
-      console.log("Updated state:", useUser.getState());
       setMessage("Profile updated successfully!");
       setIsEditing(false);
     } catch (error: any) {
-      console.error("Error in handleEditSubmit:", error);
       setMessage(error.message);
     }
   };
 
   return (
-    <div className="profileView">
+    <div className="flex flex-col items-center px-5 py-6 w-full my-6">
       {userData ? (
-        <div className="profileContainer">
-          <div className="proflieImageContainer">
-            <div className="profileImage">
-              <h2 className="profileImagesUsername">
-                {userData.user.firstName?.charAt(0).toUpperCase()}
-                {userData.user.lastName?.charAt(0).toUpperCase()}
-              </h2>
+        <div className="flex flex-col md:flex-row w-full bg-[whitesmoke] rounded-lg p-6 mb-6">
+          <div className="ml-6 mt-6 text-center">
+            <div className="w-[140px] h-[140px] rounded-full border-2 border-black flex items-center justify-center text-4xl font-bold mb-2">
+              {userData.user.firstName?.charAt(0).toUpperCase()}
+              {userData.user.lastName?.charAt(0).toUpperCase()}
             </div>
-            <p className="profileLocation">{userData.user.location}</p>
+            <p className="capitalize">{userData.user.location}</p>
           </div>
-          <div className="profileUserData">
+
+          <div className="pl-16 mt-6 w-full">
             {!isEditing ? (
               <>
-                <h1 className="profileUsername">
+                <h1 className="text-2xl font-semibold capitalize mb-2">
                   {userData.user.firstName} {userData.user.lastName}
                 </h1>
-                <p>Email: {userData.user.email}</p>
-                <p>Organisation: {userData.user.organisation}</p>
-                <p>Role: {userData.user.role}</p>
-                <div>
-                  <button className="profileEditButton" onClick={() => setIsEditing(true)}>
-                    Edit
-                  </button>
-                </div>
+                <p className="capitalize">Email: {userData.user.email}</p>
+                <p className="capitalize">Organisation: {userData.user.organisation}</p>
+                <p className="capitalize">Role: {userData.user.role}</p>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="mt-4 px-4 py-2 bg-gray-800 text-white rounded"
+                >
+                  Edit
+                </button>
               </>
             ) : (
-              <form onSubmit={handleEditSubmit}>
-                <div>
-                  <label>First Name: </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={editData.firstName || ""}
-                    onChange={handleEditChange}
-                    required
-                  />
+              <form onSubmit={handleEditSubmit} className="flex flex-col text-lg gap-3">
+                {[
+                  { label: "First Name", name: "firstName", type: "text" },
+                  { label: "Last Name", name: "lastName", type: "text" },
+                  { label: "Email", name: "email", type: "email" },
+                  { label: "Organisation", name: "organisation", type: "text" },
+                  { label: "Location", name: "location", type: "text" },
+                  { label: "Password", name: "password", type: "password" },
+                ].map(({ label, name, type }) => (
+                  <div key={name}>
+                    <label className="block mb-1">{label}:</label>
+                    <input
+                      type={type}
+                      name={name}
+                      value={(editData as any)[name] || ""}
+                      onChange={handleEditChange}
+                      required={name !== "password"}
+                      className="w-full border border-gray-300 rounded px-2 py-1"
+                    />
+                  </div>
+                ))}
+                <div className="flex gap-3 mt-4">
+                  <button type="submit" className="bg-gray-800 text-white px-4 py-2 rounded">
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="bg-gray-800 text-white px-4 py-2 rounded"
+                  >
+                    Cancel
+                  </button>
                 </div>
-                <div>
-                  <label>Last Name: </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={editData.lastName || ""}
-                    onChange={handleEditChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label>Email:</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={editData.email || ""}
-                    onChange={handleEditChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label>Organisation:</label>
-                  <input
-                    type="text"
-                    name="organisation"
-                    value={editData.organisation || ""}
-                    onChange={handleEditChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label>Location:</label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={editData.location || ""}
-                    onChange={handleEditChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label>Password:</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={editData.password || ""}
-                    onChange={handleEditChange}
-                  />
-                </div>
-                <button className="profileButton" type="submit">
-                  Save
-                </button>
-                <button className="profileButton" type="button" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </button>
               </form>
             )}
           </div>
@@ -168,15 +125,15 @@ const ProfileView: React.FC = () => {
         <p>Loading...</p>
       )}
 
-      {message && <p className="successMessage">{message}</p>}
+      {message && <p className="text-green-600 mb-4">{message}</p>}
 
-      <div className="profileDescription">
-        Beskriv företaget
-        <div>
+      <div className="flex flex-col items-center bg-[whitesmoke] rounded-lg p-6 w-full">
+        <h2 className="text-lg font-semibold mb-2">Beskriv företaget</h2>
+        <p className="text-center">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis aliquam dolorem hic quod
           exercitationem id dolore? Ex, quas. In recusandae eveniet expedita molestiae, qui suscipit
           veritatis animi sit perspiciatis ducimus.
-        </div>
+        </p>
       </div>
     </div>
   );

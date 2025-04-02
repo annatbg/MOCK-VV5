@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import DemandCard from '../demand/DemandCard';
-import MatchCard from './MatchCard';
-import './MatchGroup.css';
+import React, { useState } from "react";
+import DemandCard from "../demand/DemandCard";
+import MatchCard from "./MatchCard";
 
 interface MatchData {
   demandId: string;
@@ -9,7 +8,7 @@ interface MatchData {
   demand?: string;
   category?: string;
   author?: string;
-  status: 'new' | 'confirmedByMe' | 'confirmedByThem' | 'matched' | 'rejectedByMe';
+  status: "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
 }
 
 interface Demand {
@@ -29,24 +28,24 @@ interface MatchGroupProps {
   onDeleteDemand?: () => void;
 }
 
-const MatchGroup: React.FC<MatchGroupProps> = ({ 
-  demand, 
-  matches, 
-  onConfirmMatch, 
-  onRejectMatch, 
+const MatchGroup: React.FC<MatchGroupProps> = ({
+  demand,
+  matches,
+  onConfirmMatch,
+  onRejectMatch,
   onCancelAction,
-  onDeleteDemand
+  onDeleteDemand,
 }) => {
   const [activeMatchIndex, setActiveMatchIndex] = useState<number>(-1);
   const [activeConfirmedIndex, setActiveConfirmedIndex] = useState<number>(-1);
   const demandId = demand.demandId;
 
-  const confirmedMatches = matches.filter(match => match.status === 'matched');
-  const otherMatches = matches.filter(match => match.status !== 'matched');
+  const confirmedMatches = matches.filter((match) => match.status === "matched");
+  const otherMatches = matches.filter((match) => match.status !== "matched");
 
   return (
-    <div className="match-group">
-      <div className="primary-section">
+    <div className="w-full max-w-5xl p-12 mb-12 border-2 border-dashed border-neutral-900 rounded-lg">
+      <div className="flex flex-col">
         <DemandCard
           title={demand.title}
           demand={demand.demand}
@@ -54,19 +53,21 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
           author={demand.author}
           demandId={demand.demandId}
           onDelete={onDeleteDemand}
-          className="primary-demand"
+          className="mb-4"
           initialExpanded={true}
         />
-        
+
         {confirmedMatches.length > 0 && (
-          <div className="confirmed-matches">
-            <h4>Active Collaborations:</h4>
-            <div className="confirmed-card-stack">
+          <div className="flex flex-col mt-4">
+            <h4 className="text-green-700 border-b border-green-700 pb-2 mt-0 text-lg font-semibold">
+              Active Collaborations:
+            </h4>
+            <div className="flex relative mt-2">
               {confirmedMatches.map((match, index) => (
                 <MatchCard
                   key={`confirmed-${match.demandId}`}
                   matchData={match}
-                  className="confirmed-match-item"
+                  className={`ml-[-50%] first:ml-0 w-[85%]`}
                   isStackable={true}
                   isOnTop={activeConfirmedIndex === index}
                   onSelect={() => setActiveConfirmedIndex(index)}
@@ -77,16 +78,18 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
           </div>
         )}
       </div>
-      
+
       {otherMatches.length > 0 && (
-        <div className="matches">
-          <h4>Potential Matches:</h4>
-          <div className="card-stack">
+        <div className="flex flex-col mt-8">
+          <h4 className="text-blue-600 border-b border-blue-600 pb-2 text-lg font-semibold">
+            Potential Matches:
+          </h4>
+          <div className="flex flex-col-reverse">
             {otherMatches.map((match, index) => (
               <MatchCard
                 key={`other-${match.demandId}`}
                 matchData={match}
-                className="match-item"
+                className="my-2"
                 isStackable={true}
                 isOnTop={activeMatchIndex === index}
                 onSelect={() => setActiveMatchIndex(index)}
@@ -101,7 +104,9 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
       )}
 
       {otherMatches.length === 0 && confirmedMatches.length === 0 && (
-        <p className="no-matches-message">No matches found for this demand.</p>
+        <p className="mt-8 p-5 text-center italic text-neutral-600 bg-neutral-100 rounded-md">
+          No matches found for this demand.
+        </p>
       )}
     </div>
   );

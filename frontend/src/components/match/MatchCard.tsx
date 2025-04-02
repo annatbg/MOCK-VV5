@@ -2,7 +2,6 @@ import React from "react";
 import DemandCard from "../demand/DemandCard";
 import StatusBadge from "./StatusBadge";
 import ActionButtons from "./ActionButtons";
-import "./MatchCard.css";
 
 interface MatchData {
   demandId: string;
@@ -40,10 +39,10 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
   const matchClasses = [
     className,
-    status === "confirmedByMe" ? "confirmed-by-me-match" : "",
-    status === "confirmedByThem" ? "confirmed-by-them-match" : "",
-    status === "matched" ? "matched-match" : "",
-    status === "rejectedByMe" ? "rejected-match" : "",
+    status === "confirmedByMe" ? "border-l-4 border-green-600" : "",
+    status === "confirmedByThem" ? "border-l-4 border-blue-600" : "",
+    status === "matched" ? "border-l-4 border-purple-600" : "",
+    status === "rejectedByMe" ? "border-l-4 border-red-600" : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -62,9 +61,9 @@ const MatchCard: React.FC<MatchCardProps> = ({
       belowHeader={
         <ActionButtons
           status={status}
-          onConfirm={status === "matched" ? undefined : onConfirm}
-          onReject={status === "matched" ? undefined : onReject}
-          onCancel={status === "matched" ? undefined : onCancel}
+          onConfirm={status === "matched" ? undefined : () => onConfirm?.()}
+          onReject={status === "matched" ? undefined : () => onReject?.()}
+          onCancel={status === "matched" ? undefined : () => onCancel?.()}
         />
       }
       initialExpanded={initialExpanded}

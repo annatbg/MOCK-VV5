@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 
+//TODO: KNAPP ÅTERANVÄNDS TILL ALLT (ANVÄNDS INTE)
+
 type ButtonProps = {
   onClick: () => void;
   label: string;

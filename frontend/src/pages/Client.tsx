@@ -6,13 +6,11 @@ import DemandsView from "../views/client/demandsView";
 import MatchView from "../views/client/matchView";
 import ProfileView from "../views/client/profileView";
 import Sidebar from "../components/sidebar/Sidebar";
-import "./styles/ClientPage.css";
 
 function Client() {
   const user = useUser((state) => state.user);
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState(() => {
-    // Get the stored view from localStorage or default to "home"
     return localStorage.getItem("activeView") || "home";
   });
 
@@ -22,7 +20,6 @@ function Client() {
     }
   }, [user, navigate]);
 
-  // Store activeView in localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("activeView", activeView);
   }, [activeView]);
@@ -31,7 +28,6 @@ function Client() {
     switch (activeView) {
       case "home":
         return <DemandsView />;
-        // return <HomeView />;
       case "profile":
         return <ProfileView />;
       case "match":
@@ -39,7 +35,7 @@ function Client() {
       case "demands":
         return <DemandsView />;
       case "notifications":
-        return "";  
+        return "";
       default:
         return <HomeView />;
     }
@@ -48,11 +44,11 @@ function Client() {
   return (
     <>
       {user && (
-        <div className="clientContainer">
-          <div className="contentPage">
+        <div className="flex flex-col w-full bg-[#ede0d4]">
+          <div className="flex flex-row h-screen">
             <Sidebar setActiveView={setActiveView} activeView={activeView} />
             {renderView()}
-          </div>        
+          </div>
         </div>
       )}
     </>

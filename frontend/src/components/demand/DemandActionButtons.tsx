@@ -1,39 +1,33 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import './DemandActionButtons.css';
 
 type DemandActionButtonsProps = {
   onEdit: () => void;
   onDelete: () => void;
 };
 
-
-const DemandActionButtons = ({ onEdit, onDelete }: DemandActionButtonsProps)  => {
+const DemandActionButtons = ({ onEdit, onDelete }: DemandActionButtonsProps) => {
   return (
-    <div className="demand-action-buttons">
-      <button 
-        className="demand-action-button edit-button"
+    <div className="flex gap-2 mr-2 transition-opacity duration-200 ease-in-out">
+      <button
+        type="button"
         onClick={onEdit}
         aria-label="Edit demand"
         title="Edit demand"
+        className="px-3 py-1.5 rounded font-semibold text-sm cursor-pointer text-white bg-blue-900 shadow hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md transition-all duration-200 ease-in-out"
       >
         Edit
       </button>
-      <button 
-        className="demand-action-button delete-button"
+      <button
+        type="button"
         onClick={onDelete}
         aria-label="Delete demand"
         title="Delete demand"
+        className="px-3 py-1.5 rounded font-semibold text-sm cursor-pointer text-white bg-red-800 shadow hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md transition-all duration-200 ease-in-out"
       >
         Delete
       </button>
     </div>
   );
-};
-
-DemandActionButtons.propTypes = {
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired
 };
 
 export default DemandActionButtons;

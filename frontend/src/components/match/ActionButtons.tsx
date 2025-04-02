@@ -1,5 +1,6 @@
 import React from "react";
-import "./MatchStyles.css";
+
+//TODO: MOVE TO BUTTON COMP PLEASE
 
 type ActionButtonsProps = {
   status?: "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
