@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import useUser from "../../store/useUser";
 import DemandActionButtons from "./DemandActionButtons";
 
@@ -19,67 +19,67 @@ interface DemandCardProps {
   onDelete?: (demandId?: string) => void;
 }
 
-const DemandCard: React.FC<DemandCardProps> = ({
+const DemandCard = ({
   title,
   demand,
   category,
   author,
   demandId,
-  className,
+  className = "",
   isStackable = false,
   isOnTop = false,
-  onSelect = () => {},
+  onSelect,
   headerExtras,
   belowHeader,
   initialExpanded = false,
-  onEdit = () => {},
-  onDelete = () => {}
-}) => {
+  onEdit,
+  onDelete,
+}: DemandCardProps) => {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
   const { user } = useUser();
   const isMine = user?.email === author;
 
   const handleClick = () => {
-    if (isStackable) onSelect();
+    if (isStackable && onSelect) onSelect();
   };
 
   const toggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsExpanded(!isExpanded);
+    setIsExpanded(prev => !prev);
   };
 
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onEdit();
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete(demandId);
-  };
-
-  const demandColor = isMine ?
-    "before:bg-gradient-to-b before:from-green-700 before:to-green-900 after:bg-gradient-to-b after:from-yellow-100 after:to-yellow-800" :
-    "before:bg-gradient-to-b before:from-blue-900 before:to-blue-800 after:bg-gradient-to-b after:from-blue-200 after:to-blue-950";
+  const wrapperClasses = [
+    "relative flex flex-col w-full max-w-[900px] min-w-[250px] p-3 rounded-xl border border-black/10  bg-white transition-all duration-300",
+    className,
+    isStackable && "cursor-pointer",
+    isOnTop ? "z-10" : "z-0",
+    isMine ? "before:absolute before:inset-y-0 before:left-0 before:w-[6%] before:min-w-[2rem] before:rounded-l-xl before:bg-lightGreen" : 
+             "before:absolute before:inset-y-0 before:left-0 before:w-[6%] before:min-w-[2rem] before:rounded-l-xl before:bg-blue-600",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div
-      className={`relative flex flex-col w-full max-w-[900px] min-w-[250px] p-3 rounded-xl bg-gradient-to-br from-white to-zinc-100 border border-black/10 shadow-md transition-all duration-300 ease-in-out ${className} ${isStackable ? "cursor-pointer" : ""} ${isOnTop ? "z-10" : "z-0"} ${isExpanded ? "translate-y-[-3%] shadow-lg" : "hover:translate-y-[-1%] hover:shadow-md"} ${isMine ? "before:absolute before:top-[-1px] before:left-[-1px] before:w-[6%] before:min-w-[2rem] before:h-[calc(100%+2px)] before:rounded-l-xl after:absolute after:top-[-1px] after:left-[-2px] after:w-[calc(6%+1px)] after:min-w-[2rem] after:h-[calc(100%+2px)] after:rounded-l-xl after:z-[-1]" : ""} ${demandColor}`}
-      onClick={handleClick}
-    >
+    <div className={wrapperClasses} onClick={handleClick}>
       <button
         onClick={toggleExpand}
         aria-label={isExpanded ? "Collapse" : "Expand"}
         title={isExpanded ? "Collapse" : "Expand"}
         className="absolute top-0 left-0 w-[6%] min-w-[2rem] h-full flex justify-center items-start pt-4 z-10 bg-transparent border-none"
       >
-        <div className={`w-3 h-3 border-r-2 border-b-2 border-white transform transition-transform ${isExpanded ? "rotate-[225deg]" : "rotate-45"}`} />
+        <div
+          className={`w-3 h-3 border-r-2 border-b-2 border-white transform transition-transform ${
+            isExpanded ? "rotate-[225deg]" : "rotate-45"
+          }`}
+        />
       </button>
 
-      <div className="flex justify-between items-center w-[90%] ml-12 border-b border-dashed border-green-700/50 rounded-t-xl">
+      <div className="flex justify-between items-center w-[90%] ml-12  border-green-700/50 rounded-t-xl">
         <div className="flex items-center">
           <h3 className="mx-4 my-2 text-xl font-semibold text-zinc-900 whitespace-nowrap">{title}</h3>
-          <span className="bg-green-700/15 text-green-700 px-2 py-1 rounded text-sm font-semibold whitespace-nowrap">{category}</span>
+          <span className="bg-green-700/15 text-green-700 px-2 py-1 rounded text-sm font-semibold whitespace-nowrap">
+            {category}
+          </span>
         </div>
         {headerExtras}
       </div>
@@ -92,8 +92,10 @@ const DemandCard: React.FC<DemandCardProps> = ({
 
           <div className="flex justify-end w-full my-2">
             {isMine ? (
-              <DemandActionButtons onEdit={() => onEdit()} onDelete={() => onDelete(demandId)} />
-            ) : belowHeader}
+              <DemandActionButtons onEdit={() => onEdit?.()} onDelete={() => onDelete?.(demandId)} />
+            ) : (
+              belowHeader
+            )}
           </div>
 
           <div className="flex w-full mt-auto">

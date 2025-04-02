@@ -78,7 +78,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mt-[15%] h-full w-full">
+    <div className="flex flex-col items-center justify-center h-screen w-full bg-[#ede0d4]">
       <h1 className="text-xl font-bold mb-4">{isLogin ? "Login" : "Signup"}</h1>
       {isLogin ? (
         <form className="flex flex-col items-center" onSubmit={handleLogin}>

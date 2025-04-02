@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DemandCard from "../demand/DemandCard";
 import MatchCard from "./MatchCard";
 
@@ -28,23 +28,23 @@ interface MatchGroupProps {
   onDeleteDemand?: () => void;
 }
 
-const MatchGroup: React.FC<MatchGroupProps> = ({
+const MatchGroup = ({
   demand,
   matches,
   onConfirmMatch,
   onRejectMatch,
   onCancelAction,
   onDeleteDemand,
-}) => {
-  const [activeMatchIndex, setActiveMatchIndex] = useState<number>(-1);
-  const [activeConfirmedIndex, setActiveConfirmedIndex] = useState<number>(-1);
+}: MatchGroupProps) => {
+  const [activeMatchIndex, setActiveMatchIndex] = useState(-1);
+  const [activeConfirmedIndex, setActiveConfirmedIndex] = useState(-1);
   const demandId = demand.demandId;
 
-  const confirmedMatches = matches.filter((match) => match.status === "matched");
-  const otherMatches = matches.filter((match) => match.status !== "matched");
+  const confirmedMatches = matches.filter((m) => m.status === "matched");
+  const otherMatches = matches.filter((m) => m.status !== "matched");
 
   return (
-    <div className="w-full max-w-5xl p-12 mb-12 border-2 border-dashed border-neutral-900 rounded-lg">
+    <div className="w-full p-12 mb-12 border border-neutral-900 rounded-lg">
       <div className="flex flex-col">
         <DemandCard
           title={demand.title}
@@ -54,21 +54,21 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
           demandId={demand.demandId}
           onDelete={onDeleteDemand}
           className="mb-4"
-          initialExpanded={true}
+          initialExpanded
         />
 
         {confirmedMatches.length > 0 && (
           <div className="flex flex-col mt-4">
-            <h4 className="text-green-700 border-b border-green-700 pb-2 mt-0 text-lg font-semibold">
+            <h4 className="text-green-700 border-b border-green-700 pb-2 text-lg font-semibold">
               Active Collaborations:
             </h4>
             <div className="flex relative mt-2">
               {confirmedMatches.map((match, index) => (
                 <MatchCard
-                  key={`confirmed-${match.demandId}`}
+                  key={`confirmed-${match.demandId}-${index}`}
                   matchData={match}
-                  className={`ml-[-50%] first:ml-0 w-[85%]`}
-                  isStackable={true}
+                  className="ml-[-50%] first:ml-0 w-[85%]"
+                  isStackable
                   isOnTop={activeConfirmedIndex === index}
                   onSelect={() => setActiveConfirmedIndex(index)}
                   initialExpanded={false}
@@ -87,10 +87,10 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
           <div className="flex flex-col-reverse">
             {otherMatches.map((match, index) => (
               <MatchCard
-                key={`other-${match.demandId}`}
+                key={`other-${match.demandId}-${index}`}
                 matchData={match}
                 className="my-2"
-                isStackable={true}
+                isStackable
                 isOnTop={activeMatchIndex === index}
                 onSelect={() => setActiveMatchIndex(index)}
                 onConfirm={() => onConfirmMatch(demandId, match.demandId)}
@@ -103,7 +103,7 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
         </div>
       )}
 
-      {otherMatches.length === 0 && confirmedMatches.length === 0 && (
+      {confirmedMatches.length === 0 && otherMatches.length === 0 && (
         <p className="mt-8 p-5 text-center italic text-neutral-600 bg-neutral-100 rounded-md">
           No matches found for this demand.
         </p>

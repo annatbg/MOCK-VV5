@@ -1,4 +1,3 @@
-import React from "react";
 import DemandCard from "../demand/DemandCard";
 import StatusBadge from "./StatusBadge";
 import ActionButtons from "./ActionButtons";
@@ -24,25 +23,25 @@ interface MatchCardProps {
   initialExpanded?: boolean;
 }
 
-const MatchCard: React.FC<MatchCardProps> = ({
+const MatchCard = ({
   matchData,
   isStackable = false,
   isOnTop = false,
-  onSelect = () => {},
+  onSelect,
   onConfirm,
   onReject,
   onCancel,
   className = "",
   initialExpanded = false,
-}) => {
-  const { title, demand, category, author, status, demandId } = matchData;
+}: MatchCardProps) => {
+  const { title, demand, category, author, status } = matchData;
 
   const matchClasses = [
     className,
-    status === "confirmedByMe" ? "border-l-4 border-green-600" : "",
-    status === "confirmedByThem" ? "border-l-4 border-blue-600" : "",
-    status === "matched" ? "border-l-4 border-purple-600" : "",
-    status === "rejectedByMe" ? "border-l-4 border-red-600" : "",
+    status === "confirmedByMe" && "border-l-4 border-green-600",
+    status === "confirmedByThem" && "border-l-4 border-blue-600",
+    status === "matched" && "border-l-4 border-purple-600",
+    status === "rejectedByMe" && "border-l-4 border-red-600",
   ]
     .filter(Boolean)
     .join(" ");
@@ -57,16 +56,16 @@ const MatchCard: React.FC<MatchCardProps> = ({
       isStackable={isStackable}
       isOnTop={isOnTop}
       onSelect={onSelect}
+      initialExpanded={initialExpanded}
       headerExtras={<StatusBadge status={status} />}
       belowHeader={
         <ActionButtons
           status={status}
-          onConfirm={status === "matched" ? undefined : () => onConfirm?.()}
-          onReject={status === "matched" ? undefined : () => onReject?.()}
-          onCancel={status === "matched" ? undefined : () => onCancel?.()}
+          onConfirm={onConfirm}
+          onReject={onReject}
+          onCancel={onCancel}
         />
       }
-      initialExpanded={initialExpanded}
     />
   );
 };

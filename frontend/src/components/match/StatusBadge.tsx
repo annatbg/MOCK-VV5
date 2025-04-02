@@ -1,5 +1,3 @@
-import React from "react";
-
 type Status = "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
 
 type StatusBadgeProps = {
@@ -14,31 +12,22 @@ const statusStyles: Record<Status, string> = {
   rejectedByMe: "bg-red-700 line-through",
 };
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
-  if (!status) return null;
+const statusText: Record<Status, string> = {
+  new: "New Match",
+  confirmedByMe: "Interest Sent",
+  confirmedByThem: "Company Interested",
+  matched: "Matched",
+  rejectedByMe: "Rejected",
+};
 
-  const getStatusText = (): string => {
-    switch (status) {
-      case "new":
-        return "New Match";
-      case "confirmedByMe":
-        return "Interest Sent";
-      case "confirmedByThem":
-        return "Company Interested";
-      case "matched":
-        return "Matched";
-      case "rejectedByMe":
-        return "Rejected";
-      default:
-        return "";
-    }
-  };
+const StatusBadge = ({ status }: StatusBadgeProps) => {
+  if (!status) return null;
 
   return (
     <span
       className={`ml-2 px-2 py-1 rounded text-white text-sm font-semibold shrink-0 ${statusStyles[status]}`}
     >
-      {getStatusText()}
+      {statusText[status]}
     </span>
   );
 };

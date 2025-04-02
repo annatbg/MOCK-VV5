@@ -1,9 +1,7 @@
-import React from "react";
 import { fetchAllDemands } from "../../hooks/api/demandApi";
 import ListComponent from "./ListComponent";
 import DemandCard from "../demand/DemandCard";
 
-// Define the type for a demand object
 interface Demand {
   title: string;
   demand: string;
@@ -11,7 +9,7 @@ interface Demand {
   author: string;
 }
 
-const AllDemands: React.FC = () => {
+const AllDemands = () => {
   return (
     <ListComponent
       fetchFunction={fetchAllDemands}
@@ -29,4 +27,3 @@ const AllDemands: React.FC = () => {
 };
 
 export default AllDemands;
-

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import { useState } from "react";
 import { fetchMyDemands, deleteDemand } from "../../hooks/api/demandApi";
 import ListComponent from "./ListComponent";
 import DemandCard from "../demand/DemandCard";
@@ -11,37 +11,29 @@ interface Demand {
   demandId: string;
 }
 
-const MyDemands: React.FC = () => {
+const MyDemands = () => {
   const [demands, setDemands] = useState<Demand[]>([]);
 
-  useEffect(() => {
-    const fetchDemands = async () => {
-      try {
-        const response = await fetchMyDemands();
-        setDemands(response.data);
-      } catch (error) {
-        console.error("Error fetching demands:", error);
-      }
-    };
-    fetchDemands();
-  }, []);
-
   const handleDelete = async (demandId: string) => {
-    if (window.confirm("Are you sure you want to delete this demand?")) {
-      try {
-        await deleteDemand(demandId);
-        setDemands((prevDemands) => prevDemands.filter((d) => d.demandId !== demandId)); 
-        alert("Demand deleted successfully");
-        window.location.reload();
-      } catch (error) {
-        console.error("Error deleting demand:", error);
-      }
+    const confirmed = window.confirm("Are you sure you want to delete this demand?");
+    if (!confirmed) return;
+
+    try {
+      await deleteDemand(demandId);
+      setDemands((prev) => prev.filter((d) => d.demandId !== demandId));
+      alert("Demand deleted successfully");
+    } catch (err) {
+      console.error("Error deleting demand:", err);
     }
   };
 
   return (
     <ListComponent
-      fetchFunction={fetchMyDemands}
+      fetchFunction={async () => {
+        const response = await fetchMyDemands();
+        setDemands(response.data);
+        return { data: demands };
+      }}
       title="My demands"
       renderItem={(demand: Demand) => (
         <DemandCard

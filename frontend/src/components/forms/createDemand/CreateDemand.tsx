@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { createDemand } from "../../../hooks/api/demandApi";
 import useUser from "../../../store/useUser";
 
@@ -8,27 +8,27 @@ interface FormData {
   category: string;
 }
 
-const CreateDemand: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    title: "",
-    demand: "",
-    category: "",
-  });
+const CreateDemand = () => {
+  const [formData, setFormData] = useState<FormData>({ title: "", demand: "", category: "" });
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const user = useUser((state) => state.user);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.title.trim() || !formData.demand.trim() || !formData.category.trim()) {
+    const { title, demand, category } = formData;
+
+    if (!title.trim() || !demand.trim() || !category.trim()) {
       setError("All fields are required.");
       setSuccessMessage(null);
       return;
@@ -48,8 +48,8 @@ const CreateDemand: React.FC = () => {
       await createDemand({ formData });
       setFormData({ title: "", demand: "", category: "" });
       setSuccessMessage("Demand created successfully!");
-    } catch (error: any) {
-      setError(error.message || "An error occurred while creating the demand.");
+    } catch (err: any) {
+      setError(err?.message || "An error occurred while creating the demand.");
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,6 @@ const CreateDemand: React.FC = () => {
 
   return (
     <>
-      {/* Form Toggle Button */}
       <h3
         className="cursor-pointer text-2xl font-semibold mt-4 flex items-center"
         onClick={() => setIsFormOpen(!isFormOpen)}
@@ -69,7 +68,6 @@ const CreateDemand: React.FC = () => {
       {isFormOpen && (
         <div className="flex flex-col w-full">
           <form onSubmit={handleSubmit} className="flex flex-col gap-2 w-[95%] max-w-lg mx-auto mt-4">
-            {/* Title Input */}
             <label htmlFor="title" className="font-bold text-lg">Rubrik:</label>
             <textarea
               id="title"
@@ -80,7 +78,6 @@ const CreateDemand: React.FC = () => {
               disabled={loading}
             />
 
-            {/* Demand Input */}
             <label htmlFor="demand" className="font-bold text-lg">Behov:</label>
             <textarea
               id="demand"
@@ -91,7 +88,6 @@ const CreateDemand: React.FC = () => {
               disabled={loading}
             />
 
-            {/* Category Select */}
             <label htmlFor="category" className="font-bold text-lg">Kategori:</label>
             <select
               id="category"
@@ -108,11 +104,9 @@ const CreateDemand: React.FC = () => {
               <option value="Education">Education</option>
             </select>
 
-            {/* Error & Success Messages */}
             {error && <p className="text-red-600 text-sm">{error}</p>}
             {successMessage && <p className="text-green-600 text-sm text-center">{successMessage}</p>}
 
-            {/* Submit Button */}
             <div className="flex justify-center mt-2">
               <button
                 type="submit"

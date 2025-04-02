@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 type ListComponentProps<T> = {
   fetchFunction: () => Promise<{ data: T[] }>;
@@ -13,8 +13,8 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
   useEffect(() => {
     const getItems = async () => {
       try {
-        const data = await fetchFunction();
-        setItems(data.data);
+        const { data } = await fetchFunction();
+        setItems(data);
       } catch (err) {
         setError((err as Error).message);
       }
@@ -23,20 +23,18 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
     getItems();
   }, [fetchFunction]);
 
-  if (error) return <p className="text-red-600">Error: {error}</p>;
+  if (error) {
+    return <p className="text-red-600">Error: {error}</p>;
+  }
 
   return (
     <div className="flex flex-col w-full">
-      {/* Header */}
-      <h2 className="self-start text-left text-2xl font-semibold tracking-tight pb-3">
-        {title}
-      </h2>
+      <h2 className="self-start text-left text-2xl font-semibold tracking-tight pb-3">{title}</h2>
 
-      {/* List */}
       <ul className="list-none flex flex-col gap-4 p-0">
         {items.length > 0 ? (
           items.map((item, index) => (
-            <li key={(item as any).demand?.demandId || `item-${index}`} className="border-b border-gray-200 pb-2">
+            <li key={`item-${index}`} className="border-b border-gray-200 pb-2">
               {renderItem(item)}
             </li>
           ))
