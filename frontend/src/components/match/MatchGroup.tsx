@@ -44,7 +44,7 @@ const MatchGroup = ({
   const otherMatches = matches.filter((m) => m.status !== "matched");
 
   return (
-    <div className="w-full p-12 mb-12 border border-neutral-900 rounded-lg">
+    <div className="w-full  mb-12 border border-slate-900 rounded-md">
       <div className="flex flex-col">
         <DemandCard
           title={demand.title}
@@ -53,7 +53,6 @@ const MatchGroup = ({
           author={demand.author}
           demandId={demand.demandId}
           onDelete={onDeleteDemand}
-          className="mb-4"
           initialExpanded
         />
 
@@ -67,7 +66,6 @@ const MatchGroup = ({
                 <MatchCard
                   key={`confirmed-${match.demandId}-${index}`}
                   matchData={match}
-                  className="ml-[-50%] first:ml-0 w-[85%]"
                   isStackable
                   isOnTop={activeConfirmedIndex === index}
                   onSelect={() => setActiveConfirmedIndex(index)}
@@ -84,12 +82,11 @@ const MatchGroup = ({
           <h4 className="text-blue-600 border-b border-blue-600 pb-2 text-lg font-semibold">
             Potential Matches:
           </h4>
-          <div className="flex flex-col-reverse">
+          <div className="flex flex-col-reverse gap-2">
             {otherMatches.map((match, index) => (
               <MatchCard
                 key={`other-${match.demandId}-${index}`}
                 matchData={match}
-                className="my-2"
                 isStackable
                 isOnTop={activeMatchIndex === index}
                 onSelect={() => setActiveMatchIndex(index)}

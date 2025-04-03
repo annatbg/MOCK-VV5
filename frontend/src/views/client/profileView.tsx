@@ -28,12 +28,16 @@ const ProfileView: React.FC = () => {
       try {
         const data = (await fetchUserData(user, `${API_URL}/user/fetch`)) as unknown as ProfileData;
         setUserData(data);
-        setEditData(data.user);
+  
+
+        const { password, ...userWithoutPassword } = data.user;
+        setEditData(userWithoutPassword);
+  
       } catch (error) {
         console.error("Error fetching data in ProfileView:", error);
       }
     };
-
+  
     fetchData();
   }, [user]);
 
@@ -56,7 +60,7 @@ const ProfileView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center px-5 py-6 w-full my-6">
+    <div className="flex flex-col items-center p-6 w-full ">
       {userData ? (
         <div className="flex flex-col md:flex-row w-full bg-[whitesmoke] rounded-lg p-6 mb-6">
           <div className="ml-6 mt-6 text-center">

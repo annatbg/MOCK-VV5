@@ -67,7 +67,7 @@ const CreateDemand = () => {
 
       {isFormOpen && (
         <div className="flex flex-col w-full">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-2 w-[95%] max-w-lg mx-auto mt-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2 w-[95%] max-w-lg  mt-4">
             <label htmlFor="title" className="font-bold text-lg">Rubrik:</label>
             <textarea
               id="title"

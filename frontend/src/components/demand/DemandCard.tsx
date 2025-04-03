@@ -43,7 +43,7 @@ const DemandCard = ({
 
   return (
     <div
-      className={`relative flex flex-col w-full max-w-[full] min-w-[250px] py-3 rounded-md border border-black/10 bg-white transition-all overflow-hidden duration-300 ${className}`}
+      className={`relative flex flex-col w-full max-w-[full] min-w-[250px] py-3 rounded-md border border-slate-100  bg-white transition-all overflow-hidden duration-300 ${className}`}
     >
       {/* Toggle button with up/down icons */}
       <button

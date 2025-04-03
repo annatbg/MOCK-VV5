@@ -254,7 +254,7 @@ const MatchView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full overflow-y-auto p-8">
+    <div className="flex flex-col items-center w-full overflow-y-auto p-6">
       <ListComponent
         fetchFunction={fetchMatchData}
         title={getDynamicTitle()}
