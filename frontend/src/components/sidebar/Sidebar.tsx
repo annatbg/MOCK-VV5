@@ -32,28 +32,30 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
       <div className="flex justify-center items-center ">
       <img src={logo} alt="Logo" className=" w-full  " />
     </div>
-        {navItems.map(({ label, icon }) => (
-          <button
-            key={label}
-            onClick={() => setActiveView(label)}
-            className={`w-full h-12 flex items-center justify-center rounded-xl transition-transform hover:bg-lightGreen ${
-              activeView === label ? "bg-lightGreen" : "bg-darkGreen"
-            }`}
-          >
-            {icon}
-          </button>
-        ))}
+    {navItems.map(({ label, icon }) => (
+  <button
+    key={label}
+    onClick={() => setActiveView(label)}
+    className={`w-full h-12 flex flex-col items-center justify-center rounded-xl transition-transform hover:bg-lightGreen ${
+      activeView === label ? "bg-lightGreen" : "bg-darkGreen"
+    }`}
+  >
+    {icon}
+    <span className="text-sm capitalize">{label}</span> {/* Now it shows the correct label */}
+  </button>
+))}
       </div>
 
       {/* Logout */}
       <div className="flex flex-col justify-center">
         <button
           onClick={handleLogout}
-          className="w-full h-12 flex items-center justify-center rounded-xl  hover:bg-red-700 transition-transform transform hover:scale-105"
+          className=" flex-col w-full h-12 flex items-center justify-center rounded-xl  hover:bg-red-700 transition-transform transform hover:scale-105"
         >
           <LogOut size={22} />
+          <span className="text-sm capitalize">log out</span>
         </button>
-
+ 
       </div>
     </aside>
   );

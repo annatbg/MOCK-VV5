@@ -6,6 +6,7 @@ import DemandsView from "../views/client/demandsView";
 import MatchView from "../views/client/matchView";
 import ProfileView from "../views/client/profileView";
 import Sidebar from "../components/sidebar/Sidebar";
+import bgImg from '../assets/Varmland_landscapeV2.svg'
 
 function Client() {
   const user = useUser((state) => state.user);
@@ -44,8 +45,18 @@ function Client() {
   return (
     <>
       {user && (
-        <div className="flex flex-col w-full bg-[#ede0d4]">
-          <div className="flex flex-row h-screen">
+        <div className="relative flex flex-col w-full bg-[#ede0d4]">
+          {/* Background image */}
+          <div
+            className="absolute inset-0 bg-no-repeat bg-bottom"
+            style={
+              { backgroundImage: `url(${bgImg})`,
+              backgroundSize: "contain", 
+              backgroundPosition: "bottom right",
+            }}
+          />
+  
+          <div className="relative flex flex-row h-screen">
             <Sidebar setActiveView={setActiveView} activeView={activeView} />
             {renderView()}
           </div>

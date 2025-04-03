@@ -34,7 +34,7 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
       <ul className="list-none flex flex-col gap-4 p-0">
         {items.length > 0 ? (
           items.map((item, index) => (
-            <li key={`item-${index}`} className="border-b border-gray-200 pb-2">
+            <li key={`item-${index}`} className="border-b border-slate-500 pb-2">
               {renderItem(item)}
             </li>
           ))
