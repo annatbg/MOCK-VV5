@@ -2,8 +2,10 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, signupUser } from "../hooks/api/authApi";
 import useUser from "../store/useUser";
-import "./styles/Home.css";
+
 import { User } from "../store/useUser";
+import logo from '../assets/Group 2 (2).svg'
+
 
 interface FormData {
   email: string;
@@ -29,15 +31,10 @@ const Home: React.FC = () => {
   const { login } = useUser();
 
   const handleRedirect = (role: string): void => {
-    if (role === "admin") {
-      navigate("/user/admin");
-    } else if (role === "coach") {
-      navigate("/user/coach");
-    } else if (role === "developer") {
-      navigate("/user/developer");
-    } else {
-      navigate("/user/client");
-    }
+    if (role === "admin") navigate("/user/admin");
+    else if (role === "coach") navigate("/user/coach");
+    else if (role === "developer") navigate("/user/developer");
+    else navigate("/user/client");
   };
 
   const toggleForm = (): void => {
@@ -62,16 +59,11 @@ const Home: React.FC = () => {
     e.preventDefault();
     try {
       const result = await loginUser(formData.email, formData.password);
-      console.log("result", result);
 
       const { role, ...rest } = result.user;
       const fixedRole: string =
         typeof role === "function" ? (role as (arg: any) => string)("") : role;
-
-      const userData: User = {
-        ...rest,
-        role: fixedRole,
-      };
+      const userData: User = { ...rest, role: fixedRole };
 
       login(userData, result.token);
       handleRedirect(fixedRole);
@@ -93,129 +85,119 @@ const Home: React.FC = () => {
     }
   };
 
-  return (
-    <div className="home-container">
-      <h1>{isLogin ? "Login" : "Signup"}</h1>
+  return (  
+  <main className="grid grid-cols-1 lg:grid-cols-2 justify-center items-center h-screen w-full bg-[#ede0d4]">
+    <img src={logo} alt="Logo" className="fixed top-4 left-4" />
+    
+    {/* Left Column - Login/Signup Form */}
+    <div className="flex flex-col items-center justify-center bg-darkGreen text-white w-full h-full ">
+      <h1 className="text-xl font-bold mb-4">{isLogin ? "Log In" : "Sign Up"}</h1>
+
       {isLogin ? (
-        <form className="home-form-container" onSubmit={handleLogin}>
-          <div className="home-form-group">
+        <form className="flex flex-col items-center w-full" onSubmit={handleLogin}>
+          <div className="flex flex-col m-2 w-1/2">
             <label htmlFor="email">Email:</label>
             <input
               type="text"
               id="email"
               name="email"
               required
-              className="input-field"
+              placeholder="Enter your email"
+              className="w-full h-10 border border-gray-300 rounded px-2 text-black"
               value={formData.email}
               onChange={handleChange}
             />
           </div>
-          <div className="home-form-group">
+
+          <div className="flex flex-col m-2 w-1/2">
             <label htmlFor="password">Password:</label>
             <input
               type="password"
               id="password"
               name="password"
               required
-              className="input-field"
+              placeholder="Enter your password"
+              className="w-full h-10 border border-gray-300 rounded px-2 text-black"
               value={formData.password}
               onChange={handleChange}
             />
           </div>
-          <button type="submit" className="home-button">
-            Login
+
+          <button
+            type="submit"
+            className="bg-gray-800 text-white px-4 py-2 rounded-md mt-4"
+          >
+            Log in
           </button>
         </form>
       ) : (
-        <form className="home-create-container" onSubmit={handleSignup}>
-          <div className="home-form-group">
-            <label htmlFor="email">Email:</label>
-            <input
-              type="text"
-              id="email"
-              name="email"
-              required
-              className="input-field"
-              value={formData.email}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="password">Password:</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="input-field"
-              value={formData.password}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="organisation">Organisation:</label>
-            <input
-              type="text"
-              id="organisation"
-              name="organisation"
-              required
-              className="input-field"
-              value={formData.organisation}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="firstName">First Name:</label>
-            <input
-              type="text"
-              id="firstName"
-              name="firstName"
-              required
-              className="input-field"
-              value={formData.firstName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="lastName">Last Name:</label>
-            <input
-              type="text"
-              id="lastName"
-              name="lastName"
-              required
-              className="input-field"
-              value={formData.lastName}
-              onChange={handleChange}
-            />
-          </div>
-          <div className="home-form-group">
-            <label htmlFor="location">Location:</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              required
-              className="input-field"
-              value={formData.location}
-              onChange={handleChange}
-            />
-          </div>
-          <button type="submit" className="home-button">
-            Signup
+        <form className="flex flex-col items-center w-full" onSubmit={handleSignup}>
+          {[
+            { id: "email", label: "Email", placeholder: "Enter your email" },
+            { id: "password", label: "Password", type: "password", placeholder: "Enter your password" },
+            { id: "organisation", label: "Organisation", placeholder: "Enter your organisation" },
+            { id: "firstName", label: "First Name", placeholder: "Enter your first name" },
+            { id: "lastName", label: "Last Name", placeholder: "Enter your last name" },
+            { id: "location", label: "Location", placeholder: "Enter your location" },
+          ].map(({ id, label, type, placeholder }) => (
+            <div key={id} className="flex flex-col m-2 w-1/2">
+              <label htmlFor={id}>{label}:</label>
+              <input
+                type={type || "text"}
+                id={id}
+                name={id}
+                required
+                placeholder={placeholder}
+                className="w-full h-10 border border-gray-300 rounded px-2 text-black"
+                value={(formData as any)[id]}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
+
+          <button
+            type="submit"
+            className="bg-gray-800 text-white mt-4 rounded-md px-4 py-2"
+          >
+            Sign Up
           </button>
         </form>
       )}
-      {message && <p className="home-success-message">{message}</p>}
-      <div className="home-signup-button-container">
-        <p className="account-message">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <br />
+
+      {message && <p className="text-green-600 mt-2">{message}</p>}
+
+      <div className="flex flex-row items-center mt-4">
+        <p className="m-2">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
+
         </p>
-        <button onClick={toggleForm} className="home-button">
-          {isLogin ? "Sign up" : "Log in"}
+        <button
+          onClick={toggleForm}
+          className="underline"
+        >
+          {isLogin ? "Sign Up" : "Log In"}
         </button>
       </div>
     </div>
+
+    {/* Right Column - img-text */}
+    <div
+      className="relative flex items-center justify-center p-6 h-full bg-cover bg-center"
+      style={{
+        backgroundImage:
+          'url("https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+      }}
+    >
+      {/* Background Image Blur Overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+
+      <p className="text-center text-xl font-semibold text-white z-10 px-4 py-2 rounded-md">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus beatae
+        distinctio harum fugit modi dolore, ab quasi maxime esse sunt asperiores
+        sapiente unde incidunt velit, odit nulla. Pariatur, sed doloribus.
+      </p>
+    </div>
+  </main>
   );
 };
 

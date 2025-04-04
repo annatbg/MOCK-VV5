@@ -9,7 +9,7 @@ import {
 } from "../../hooks/api/demandApi";
 import ListComponent from "../../components/list/ListComponent";
 import MatchGroup from "../../components/match/MatchGroup";
-import "./styles/MatchView.css";
+
 
 
 interface Match {
@@ -254,15 +254,13 @@ const MatchView: React.FC = () => {
   };
 
   return (
-    <div className="match-view">
+    <div className="flex flex-col items-center w-full overflow-y-auto p-6">
       <ListComponent
         fetchFunction={fetchMatchData}
         title={getDynamicTitle()}
         renderItem={renderMatchGroup}
-
       />
     </div>
   );
 };
-
 export default MatchView;

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import "./DemandCard.css";
+import { useState } from "react";
 import useUser from "../../store/useUser";
 import DemandActionButtons from "./DemandActionButtons";
+import { ChevronUp, ChevronDown } from "lucide-react"; // Using up/down icons for toggle
 
 interface DemandCardProps {
   title: string;
@@ -10,111 +10,90 @@ interface DemandCardProps {
   author: string;
   demandId?: string;
   className?: string;
-  isStackable?: boolean;
-  isOnTop?: boolean;
-  onSelect?: () => void;
   headerExtras?: React.ReactNode;
-  belowHeader?: React.ReactNode; // We'll rename this to actionButtons for clarity
+  belowHeader?: React.ReactNode;
   initialExpanded?: boolean;
   onEdit?: () => void;
   onDelete?: (demandId?: string) => void;
 }
 
-const DemandCard: React.FC<DemandCardProps> = ({ 
-  title, 
-  demand, 
-  category, 
+const DemandCard = ({
+  title,
+  demand,
+  category,
   author,
   demandId,
-  className, 
-  isStackable = false,
-  isOnTop = false,
-  onSelect = () => {},
+  className = "",
   headerExtras,
   belowHeader,
   initialExpanded = false,
-  onEdit = () => {},
-  onDelete = () => {}
-}) => {
+  onEdit,
+  onDelete,
+}: DemandCardProps) => {
   const [isExpanded, setIsExpanded] = useState(initialExpanded);
-  
-  // Get current user and check if this card belongs to them
   const { user } = useUser();
   const isMine = user?.email === author;
 
-  const handleClick = (): void => {
-    if (isStackable) {
-      onSelect();
-    }
-  };
-  
-  const toggleExpand = (e: React.MouseEvent): void => {
+  const toggleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsExpanded(!isExpanded);
+    setIsExpanded((prev) => !prev);
   };
 
-  const handleEdit = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    onEdit();
-  };
-
-  const handleDelete = (e: React.MouseEvent): void => {
-    e.stopPropagation();
-    onDelete(demandId);
-  };
-
-  const cardClasses = [
-    "demand-card",
-    className || "",
-    isStackable ? "stackable-card" : "",
-    isOnTop ? "card-on-top" : "",
-    isMine ? "my-demand" : "other-demand",
-    isExpanded ? "expanded" : "collapsed"
-  ].filter(Boolean).join(" ");
+  const colorClass = isMine ? "bg-lightGreen" : "bg-blue-500";
 
   return (
-    <div className={cardClasses} onClick={handleClick}>
-      {/* Chevron toggle button at top */}
-      <button 
-        className="expand-toggle-button" 
+    <div
+      className={`relative flex flex-col w-full max-w-[full] min-w-[250px] py-3 rounded-md border border-slate-100  bg-white transition-all overflow-hidden duration-300 ${className}`}
+    >
+      {/* Toggle button with up/down icons */}
+      <button
         onClick={toggleExpand}
         aria-label={isExpanded ? "Collapse" : "Expand"}
         title={isExpanded ? "Collapse" : "Expand"}
+        className={`absolute top-0 left-0 w-12 h-full py-5 flex justify-center z-10 rounded-md rounded-r-none ${colorClass}`}
       >
-        <div className="chevron-icon"></div>
+        {isExpanded ? (
+          <ChevronUp size={30} className="text-white"  />
+        ) : (
+          <ChevronDown size={30} className="text-white" />
+        )}
       </button>
-      
-      <div className="demand-card-header">
-        <div className="title-category-wrapper">
-          <h3>{title}</h3>
-          <span className="category">{category}</span>
+
+      <div className="pl-10 pr-4">
+        <div className="flex justify-between items-center  rounded-t-xl">
+          <div className="flex items-center">
+            <h3 className="mx-4 my-2 text-xl font-semibold text-zinc-900 whitespace-nowrap">
+              {title}
+            </h3>
+            <span className="ml-2 rounded-md px-1 bg-green-100 text-green-700 text-sm font-semibold whitespace-nowrap">
+              {category}
+            </span>
+          </div>
+          {headerExtras}
         </div>
-        
-        {headerExtras}
+
+        {isExpanded && (
+          <>
+            <div className="ml-4 p-2 border border-dashed border-green-700/30 rounded-md  min-h-[100px] max-h-[300px] overflow-y-auto">
+              <p className="text-sm text-zinc-800">{demand}</p>
+            </div>
+
+            <div className="flex justify-end w-full my-2">
+              {isMine ? (
+                <DemandActionButtons onEdit={() => onEdit?.()} onDelete={() => onDelete?.(demandId)} />
+              ) : (
+                belowHeader
+              )}
+            </div>
+
+            <div className="flex w-full mt-auto">
+              <p className="ml-auto pt-2 text-sm text-zinc-500 border-t border-dashed border-green-700/50 whitespace-nowrap">
+                Skapad av: {author}
+              </p>
+            </div>
+          </>
+        )}
       </div>
-      
-      {/* Only show these parts when expanded */}
-      {isExpanded && (
-        <>
-          <div className="descriptionContainer">
-            <p className="description">{demand}</p>
-          </div>
-          
-          {/* Action buttons container that shows either passed buttons or own-demand buttons */}
-          <div className="action-buttons-container">
-            {isMine ? (
-              <DemandActionButtons 
-                onEdit={() => onEdit()}
-                onDelete={() => onDelete(demandId)}
-              />
-            ) : belowHeader}
-          </div>
-          
-          <div className="demand-card-footer">
-            <p className="author">Skapad av: {author}</p>
-          </div>
-        </>
-      )}
     </div>
   );
 };

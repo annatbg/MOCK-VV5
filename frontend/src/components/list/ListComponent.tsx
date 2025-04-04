@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import "./ListComponent.css";
+import { useState, useEffect } from "react";
 
 type ListComponentProps<T> = {
   fetchFunction: () => Promise<{ data: T[] }>;
@@ -14,8 +13,8 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
   useEffect(() => {
     const getItems = async () => {
       try {
-        const data = await fetchFunction();
-        setItems(data.data);
+        const { data } = await fetchFunction();
+        setItems(data);
       } catch (err) {
         setError((err as Error).message);
       }
@@ -24,20 +23,23 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
     getItems();
   }, [fetchFunction]);
 
-  if (error) return <p style={{ color: "red" }}>Error: {error}</p>;
+  if (error) {
+    return <p className="text-red-600">Error: {error}</p>;
+  }
 
   return (
-    <div className="listContainer">
-      <h2 className="listHeader">{title}</h2>
-      <ul className="list">
+    <div className="flex flex-col w-full">
+      <h2 className="self-start text-left text-2xl font-semibold tracking-tight pb-3">{title}</h2>
+
+      <ul className="list-none flex flex-col gap-4 p-0">
         {items.length > 0 ? (
           items.map((item, index) => (
-            <li className="listItem" key={(item as any).demand?.demandId || `item-${index}`}>
+            <li key={`item-${index}`}>
               {renderItem(item)}
             </li>
           ))
         ) : (
-          <p>Inga resultat hittades.</p>
+          <p className="text-gray-500">Inga resultat hittades.</p>
         )}
       </ul>
     </div>

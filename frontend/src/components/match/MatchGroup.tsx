@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import DemandCard from '../demand/DemandCard';
-import MatchCard from './MatchCard';
-import './MatchGroup.css';
+import { useState } from "react";
+import DemandCard from "../demand/DemandCard";
+import MatchCard from "./MatchCard";
 
 interface MatchData {
   demandId: string;
@@ -9,7 +8,7 @@ interface MatchData {
   demand?: string;
   category?: string;
   author?: string;
-  status: 'new' | 'confirmedByMe' | 'confirmedByThem' | 'matched' | 'rejectedByMe';
+  status: "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
 }
 
 interface Demand {
@@ -29,24 +28,24 @@ interface MatchGroupProps {
   onDeleteDemand?: () => void;
 }
 
-const MatchGroup: React.FC<MatchGroupProps> = ({ 
-  demand, 
-  matches, 
-  onConfirmMatch, 
-  onRejectMatch, 
+const MatchGroup = ({
+  demand,
+  matches,
+  onConfirmMatch,
+  onRejectMatch,
   onCancelAction,
-  onDeleteDemand
-}) => {
-  const [activeMatchIndex, setActiveMatchIndex] = useState<number>(-1);
-  const [activeConfirmedIndex, setActiveConfirmedIndex] = useState<number>(-1);
+  onDeleteDemand,
+}: MatchGroupProps) => {
+  const [activeMatchIndex, setActiveMatchIndex] = useState(-1);
+  const [activeConfirmedIndex, setActiveConfirmedIndex] = useState(-1);
   const demandId = demand.demandId;
 
-  const confirmedMatches = matches.filter(match => match.status === 'matched');
-  const otherMatches = matches.filter(match => match.status !== 'matched');
+  const confirmedMatches = matches.filter((m) => m.status === "matched");
+  const otherMatches = matches.filter((m) => m.status !== "matched");
 
   return (
-    <div className="match-group">
-      <div className="primary-section">
+    <div className="w-full  mb-12 border border-slate-900 rounded-md">
+      <div className="flex flex-col">
         <DemandCard
           title={demand.title}
           demand={demand.demand}
@@ -54,20 +53,20 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
           author={demand.author}
           demandId={demand.demandId}
           onDelete={onDeleteDemand}
-          className="primary-demand"
-          initialExpanded={true}
+          initialExpanded
         />
-        
+
         {confirmedMatches.length > 0 && (
-          <div className="confirmed-matches">
-            <h4>Active Collaborations:</h4>
-            <div className="confirmed-card-stack">
+          <div className="flex flex-col mt-4">
+            <h4 className="text-green-700 border-b border-green-700 pb-2 text-lg font-semibold">
+              Active Collaborations:
+            </h4>
+            <div className="flex relative mt-2">
               {confirmedMatches.map((match, index) => (
                 <MatchCard
-                  key={`confirmed-${match.demandId}`}
+                  key={`confirmed-${match.demandId}-${index}`}
                   matchData={match}
-                  className="confirmed-match-item"
-                  isStackable={true}
+                  isStackable
                   isOnTop={activeConfirmedIndex === index}
                   onSelect={() => setActiveConfirmedIndex(index)}
                   initialExpanded={false}
@@ -77,17 +76,18 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
           </div>
         )}
       </div>
-      
+
       {otherMatches.length > 0 && (
-        <div className="matches">
-          <h4>Potential Matches:</h4>
-          <div className="card-stack">
+        <div className="flex flex-col mt-8">
+          <h4 className="text-blue-600 border-b border-blue-600 pb-2 text-lg font-semibold">
+            Potential Matches:
+          </h4>
+          <div className="flex flex-col-reverse gap-2">
             {otherMatches.map((match, index) => (
               <MatchCard
-                key={`other-${match.demandId}`}
+                key={`other-${match.demandId}-${index}`}
                 matchData={match}
-                className="match-item"
-                isStackable={true}
+                isStackable
                 isOnTop={activeMatchIndex === index}
                 onSelect={() => setActiveMatchIndex(index)}
                 onConfirm={() => onConfirmMatch(demandId, match.demandId)}
@@ -100,8 +100,10 @@ const MatchGroup: React.FC<MatchGroupProps> = ({
         </div>
       )}
 
-      {otherMatches.length === 0 && confirmedMatches.length === 0 && (
-        <p className="no-matches-message">No matches found for this demand.</p>
+      {confirmedMatches.length === 0 && otherMatches.length === 0 && (
+        <p className="mt-8 p-5 text-center italic text-neutral-600 bg-neutral-100 rounded-md">
+          No matches found for this demand.
+        </p>
       )}
     </div>
   );

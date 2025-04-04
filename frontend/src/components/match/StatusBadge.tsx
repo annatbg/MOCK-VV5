@@ -1,31 +1,35 @@
-import React from "react";
-import "./MatchStyles.css";
+type Status = "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
 
 type StatusBadgeProps = {
-  status?: "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
+  status?: Status;
 };
 
-const StatusBadge: React.FC<StatusBadgeProps> = ({ status }) => {
+const statusStyles: Record<Status, string> = {
+  new: "bg-blue-500",
+  confirmedByMe: "bg-orange-500",
+  confirmedByThem: "bg-green-600 animate-pulse",
+  matched: "bg-green-700",
+  rejectedByMe: "bg-red-700 line-through",
+};
+
+const statusText: Record<Status, string> = {
+  new: "New Match",
+  confirmedByMe: "Interest Sent",
+  confirmedByThem: "Company Interested",
+  matched: "Matched",
+  rejectedByMe: "Rejected",
+};
+
+const StatusBadge = ({ status }: StatusBadgeProps) => {
   if (!status) return null;
 
-  const getStatusText = (): string => {
-    switch (status) {
-      case "new":
-        return "New Match";
-      case "confirmedByMe":
-        return "Interest Sent";
-      case "confirmedByThem":
-        return "Company Interested";
-      case "matched":
-        return "Matched";
-      case "rejectedByMe":
-        return "Rejected";
-      default:
-        return "";
-    }
-  };
-
-  return <span className={`status-badge ${status}-badge`}>{getStatusText()}</span>;
+  return (
+    <span
+      className={`ml-2 px-2 py-1 rounded text-white text-sm font-semibold shrink-0 ${statusStyles[status]}`}
+    >
+      {statusText[status]}
+    </span>
+  );
 };
 
 export default StatusBadge;

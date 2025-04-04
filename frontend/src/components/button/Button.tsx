@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 
+//TODO: KNAPP ÅTERANVÄNDS TILL ALLT (ANVÄNDS INTE)
+
 type ButtonProps = {
   onClick: () => void;
   label: string;
@@ -34,3 +36,44 @@ Button.propTypes = {
 };
 
 export default Button;
+
+
+/*
+
+import { FC } from "react";
+
+type ButtonProps = {
+  onClick: () => void;
+  label: string;
+  variant?: "primary" | "danger" | "success" | "secondary";
+  disabled?: boolean;
+};
+
+const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
+  primary: "bg-blue-500 hover:bg-blue-600",
+  danger: "bg-red-500 hover:bg-red-600",
+  success: "bg-green-500 hover:bg-green-600",
+  secondary: "bg-gray-500 hover:bg-gray-600",
+};
+
+const Button: FC<ButtonProps> = ({
+  onClick,
+  label,
+  variant = "primary",
+  disabled = false,
+}) => {
+  const baseClasses = "text-white px-4 py-2 rounded-md transition";
+  const disabledClasses = disabled ? " opacity-50 cursor-not-allowed" : "";
+  const finalClass = `${baseClasses} ${variantClasses[variant]}${disabledClasses}`;
+
+  return (
+    <button type="button" onClick={onClick} disabled={disabled} className={finalClass}>
+      {label}
+    </button>
+  );
+};
+
+export default Button;
+
+
+*/ 

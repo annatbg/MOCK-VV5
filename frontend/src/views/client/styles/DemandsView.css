@@ -1,8 +1,0 @@
-.demandViewContainer {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    overflow-y: auto;
-    padding-left: 2.5rem;
-    font-size: 22px;
-}
