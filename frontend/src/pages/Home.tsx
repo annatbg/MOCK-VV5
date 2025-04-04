@@ -2,8 +2,10 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, signupUser } from "../hooks/api/authApi";
 import useUser from "../store/useUser";
+
 import { User } from "../store/useUser";
 import logo from '../assets/Group 2 (2).svg'
+
 
 interface FormData {
   email: string;
@@ -57,10 +59,12 @@ const Home: React.FC = () => {
     e.preventDefault();
     try {
       const result = await loginUser(formData.email, formData.password);
+
       const { role, ...rest } = result.user;
       const fixedRole: string =
         typeof role === "function" ? (role as (arg: any) => string)("") : role;
       const userData: User = { ...rest, role: fixedRole };
+
       login(userData, result.token);
       handleRedirect(fixedRole);
     } catch (error: any) {
@@ -73,6 +77,9 @@ const Home: React.FC = () => {
     try {
       await signupUser(formData);
       setMessage("User created!");
+      setTimeout(() => {
+        setIsLogin(true);
+      }, 1500);
     } catch (error: any) {
       alert(error.message || "An error occurred while signing up.");
     }
@@ -162,6 +169,7 @@ const Home: React.FC = () => {
       <div className="flex flex-row items-center mt-4">
         <p className="m-2">
           {isLogin ? "Don't have an account?" : "Already have an account?"}
+
         </p>
         <button
           onClick={toggleForm}
