@@ -1,8 +1,8 @@
-import { Home, List, Users, LogOut, Menu, X } from "lucide-react";
+import { Home, List, Users, LogOut, Menu, X, User2Icon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useUser from "../../store/useUser";
 import { useState, useEffect } from "react";
-import logo from "../../assets/Group 2 (1).svg";
+import logo from "../../assets/Group 2 (2).svg";
 
 interface SidebarProps {
   activeView: string;
@@ -34,9 +34,11 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
   };
 
   const navItems = [
-    { label: "profile", icon: <Home size={22} /> },
+    { label: "home", icon: <Home size={22} /> },
+    { label: "profile", icon: <User2Icon size={22} /> },
     { label: "demands", icon: <List size={22} /> },
     { label: "match", icon: <Users size={22} /> },
+
   ];
 
   const toggleMobileMenu = () => {
@@ -83,6 +85,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
 
       {/* Logout */}
       <div className="flex flex-col justify-center">
+        
         <button
           onClick={handleLogout}
           className="flex-col w-full h-12 flex items-center justify-center rounded-xl hover:bg-red-700 transition-transform transform hover:scale-105"
