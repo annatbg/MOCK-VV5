@@ -28,7 +28,9 @@ function Client() {
   const renderView = () => {
     switch (activeView) {
       case "home":
-        return <DemandsView />;
+        return (
+          <h1>Create a homepage here put it in pages.tsx</h1>
+        );
       case "profile":
         return <ProfileView />;
       case "match":
