@@ -16,7 +16,7 @@ interface FormData {
   location: string;
 }
 
-const Home: React.FC = () => {
+const Login: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [formData, setFormData] = useState<FormData>({
     email: "",
@@ -201,4 +201,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Login;

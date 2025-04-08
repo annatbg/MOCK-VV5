@@ -9,7 +9,11 @@ export default {
       colors: {
         // Backgrounds
         darkGreen: '#004337',
-        lightGreen: '#006660'
+        lightGreen: '#006660',
+
+        //Text
+        darkText: '#4A4A4A',
+        lightText: '#FFFFFF',
       },
     },
   },
