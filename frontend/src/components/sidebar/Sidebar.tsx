@@ -1,4 +1,4 @@
-import { Home, List, Users, LogOut, Menu, X, User2Icon } from "lucide-react";
+import { Home, List, Users, LogOut, Menu, X, User2Icon, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useUser from "../../store/useUser";
 import { useState, useEffect } from "react";
@@ -38,7 +38,7 @@ const Sidebar = ({ activeView, setActiveView }: SidebarProps) => {
     { label: "profile", icon: <User2Icon size={22} /> },
     { label: "demands", icon: <List size={22} /> },
     { label: "match", icon: <Users size={22} /> },
-
+    { label: "notifications", icon: <Bell size={22} /> },
   ];
 
   const toggleMobileMenu = () => {
