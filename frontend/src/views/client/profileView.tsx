@@ -28,16 +28,15 @@ const ProfileView: React.FC = () => {
       try {
         const data = (await fetchUserData(user, `${API_URL}/user/fetch`)) as unknown as ProfileData;
         setUserData(data);
-  
 
         const { password, ...userWithoutPassword } = data.user;
         setEditData(userWithoutPassword);
-  
+
       } catch (error) {
         console.error("Error fetching data in ProfileView:", error);
       }
     };
-  
+
     fetchData();
   }, [user]);
 
@@ -59,88 +58,94 @@ const ProfileView: React.FC = () => {
     }
   };
 
+  const capitalizeFirstLetter = (str: string) => {
+    return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+  };
+
   return (
-    <div className="flex flex-col items-center p-6 w-full ">
-      {userData ? (
-        <div className="flex flex-col md:flex-row w-full bg-[whitesmoke] rounded-lg p-6 mb-6">
-          <div className="ml-6 mt-6 text-center">
-            <div className="w-[140px] h-[140px] rounded-full border-2 border-black flex items-center justify-center text-4xl font-bold mb-2">
-              {userData.user.firstName?.charAt(0).toUpperCase()}
-              {userData.user.lastName?.charAt(0).toUpperCase()}
-            </div>
-            <p className="capitalize">{userData.user.location}</p>
+<div className="grid grid-cols-1 place-items-center p-10 w-full -mt-4 pt-1">
+  {userData ? (
+    <div className="w-full max-w-lg bg-lightGreen text-lightText rounded-xl p-6 shadow-lg grid grid-cols-1 gap-6">
+      {/* Profilbild */}
+      <div className="w-28 h-28 rounded-full border-4 border-lightText bg-lightText text-lightGreen flex items-center justify-center text-3xl font-bold mb-6 justify-self-center">
+        {userData.user.firstName?.charAt(0).toUpperCase()}
+        {userData.user.lastName?.charAt(0).toUpperCase()}
+      </div>
+
+      {/* Profilinformation */}
+      {!isEditing ? (
+        <div className="w-full">
+          <div className="space-y-3 text-center">
+            <h1 className="text-3xl font-bold mb-2">
+              {capitalizeFirstLetter(userData.user.firstName || '')}{" "}
+              {capitalizeFirstLetter(userData.user.lastName || '')}
+            </h1>
+            <p className="text-lg">Email: {capitalizeFirstLetter(userData.user.email || '')}</p>
+            <p className="text-lg">Organisation: {capitalizeFirstLetter(userData.user.organisation || '')}</p>
+            <p className="text-lg">Plats: {capitalizeFirstLetter(userData.user.location || '')}</p>
+            <p className="text-lg">Roll: {capitalizeFirstLetter(userData.user.role || '')}</p>
           </div>
 
-          <div className="pl-16 mt-6 w-full">
-            {!isEditing ? (
-              <>
-                <h1 className="text-2xl font-semibold capitalize mb-2">
-                  {userData.user.firstName} {userData.user.lastName}
-                </h1>
-                <p className="capitalize">Email: {userData.user.email}</p>
-                <p className="capitalize">Organisation: {userData.user.organisation}</p>
-                <p className="capitalize">Role: {userData.user.role}</p>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="mt-4 px-4 py-2 bg-gray-800 text-white rounded"
-                >
-                  Edit
-                </button>
-              </>
-            ) : (
-              <form onSubmit={handleEditSubmit} className="flex flex-col text-lg gap-3">
-                {[
-                  { label: "First Name", name: "firstName", type: "text" },
-                  { label: "Last Name", name: "lastName", type: "text" },
-                  { label: "Email", name: "email", type: "email" },
-                  { label: "Organisation", name: "organisation", type: "text" },
-                  { label: "Location", name: "location", type: "text" },
-                  { label: "Password", name: "password", type: "password" },
-                ].map(({ label, name, type }) => (
-                  <div key={name}>
-                    <label className="block mb-1">{label}:</label>
-                    <input
-                      type={type}
-                      name={name}
-                      value={(editData as any)[name] || ""}
-                      onChange={handleEditChange}
-                      required={name !== "password"}
-                      className="w-full border border-gray-300 rounded px-2 py-1"
-                    />
-                  </div>
-                ))}
-                <div className="flex gap-3 mt-4">
-                  <button type="submit" className="bg-gray-800 text-white px-4 py-2 rounded">
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsEditing(false)}
-                    className="bg-gray-800 text-white px-4 py-2 rounded"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            )}
+          {/* Edit-knapp */}
+          <div className="w-full flex justify-end mt-8">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="px-5 py-3 bg-lightText text-lightGreen font-semibold rounded-md hover:bg-darkGreen hover:text-lightText transition-all ease-in-out duration-200"
+            >
+              Edit
+            </button>
           </div>
         </div>
       ) : (
-        <p>Loading...</p>
+        <form onSubmit={handleEditSubmit} className="flex flex-col gap-1 w-full mt-4">
+          {[
+            { label: "Förnamn", name: "firstName", type: "text" },
+            { label: "Efternamn", name: "lastName", type: "text" },
+            { label: "Email", name: "email", type: "email" },
+            { label: "Organisation", name: "organisation", type: "text" },
+            { label: "Plats", name: "location", type: "text" },
+            { label: "Lösenord", name: "password", type: "password" },
+          ].map(({ label, name, type }) => (
+            <div key={name}>
+              <label className="block text-sm mb-2">{label}</label>
+              <input
+                type={type}
+                name={name}
+                value={(editData as any)[name] || ""}
+                onChange={handleEditChange}
+                required={name !== "password"}
+                className="w-full border-2 border-gray-300 rounded-md px-4 py-3 text-darkText focus:outline-none focus:ring-2 focus:ring-lightGreen transition-all ease-in-out duration-200"
+              />
+            </div>
+          ))}
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              type="submit"
+              className="bg-lightText text-lightGreen px-5 py-3 rounded-md hover:bg-darkGreen hover:text-lightText transition-all ease-in-out duration-200"
+            >
+              Spara
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="bg-lightText text-lightGreen px-5 py-3 rounded-md hover:bg-darkGreen hover:text-lightText transition-all ease-in-out duration-200"
+            >
+              Avbryt
+            </button>
+          </div>
+        </form>
       )}
-
-      {message && <p className="text-green-600 mb-4">{message}</p>}
-
-      <div className="flex flex-col items-center bg-[whitesmoke] rounded-lg p-6 w-full">
-        <h2 className="text-lg font-semibold mb-2">Beskriv företaget</h2>
-        <p className="text-center">
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Quis aliquam dolorem hic quod
-          exercitationem id dolore? Ex, quas. In recusandae eveniet expedita molestiae, qui suscipit
-          veritatis animi sit perspiciatis ducimus.
-        </p>
-      </div>
     </div>
+  ) : (
+    <p className="text-darkText">Laddar...</p>
+  )}
+
+  {message && <p className="text-green-500 mt-4 font-medium">{message}</p>}
+</div>
+
+
+
   );
-};
+;}  
 
 export default ProfileView;
