@@ -8,12 +8,81 @@ provider:
   region: ${env:AWS_REGION}
   iam:
     role: ${env:AWS_ROLE}
+  httpApi:
+    cors: true
 
 functions:
-  api:
-    handler: handler.handler
+  # Public (no auth)
+  signupUser:
+    handler: controllers/user/userController.signupUser
     events:
-      - httpApi: "*"
+      - httpApi:
+          path: /signup
+          method: post
+
+  loginUser:
+    handler: controllers/user/userController.loginUser
+    events:
+      - httpApi:
+          path: /login
+          method: post
+
+  fetchUser:
+    handler: controllers/user/userController.fetchUser
+    events:
+      - httpApi:
+          path: /user/fetch
+          method: post
+
+  # Protected (verify JWT manually)
+  editUser:
+    handler: controllers/user/userController.editUser
+    events:
+      - httpApi:
+          path: /user/edit
+          method: put
+
+  createDemand:
+    handler: controllers/demand/demandController.createDemand
+    events:
+      - httpApi:
+          path: /demand
+          method: post
+
+  fetchMyDemands:
+    handler: controllers/demand/demandController.fetchMyDemands
+    events:
+      - httpApi:
+          path: /demand
+          method: get
+
+  fetchAllDemands:
+    handler: controllers/demand/demandController.fetchAllDemands
+    events:
+      - httpApi:
+          path: /demands/all
+          method: get
+
+  fetchDemandsByIds:
+    handler: controllers/demand/demandController.fetchDemandsByIds
+    events:
+      - httpApi:
+          path: /demand/ids
+          method: get
+
+  updateDemandMatches:
+    handler: controllers/demand/demandController.updateDemandMatches
+    events:
+      - httpApi:
+          path: /demand/matches/{demandId}
+          method: put
+
+  deleteDemand:
+    handler: controllers/demand/demandController.deleteDemand
+    events:
+      - httpApi:
+          path: /demand/{demandId}
+          method: delete
 
 resources:
   Resources:
