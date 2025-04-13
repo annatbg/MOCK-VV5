@@ -3,10 +3,14 @@
 const API_URL: string = import.meta.env.VITE_API_URL;
 
 interface User {
-  role(role: any): unknown;
   id: string;
   email: string;
   name?: string;
+  organisation?: string;
+  firstName?: string;
+  lastName?: string;
+  location?: string;
+  role: string;
 }
 
 interface AuthResponse {
@@ -17,7 +21,11 @@ interface AuthResponse {
 interface SignupData {
   email: string;
   password: string;
-  name?: string;
+  organisation?: string;
+  firstName?: string;
+  lastName?: string;
+  location?: string;
+  name?: string; // 
 }
 
 const loginUser = async (email: string, password: string): Promise<AuthResponse> => {
@@ -27,6 +35,7 @@ const loginUser = async (email: string, password: string): Promise<AuthResponse>
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
+
     const result: AuthResponse = await response.json();
     if (response.ok) {
       return result;
@@ -45,6 +54,7 @@ const signupUser = async (formData: SignupData): Promise<AuthResponse> => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
+
     const result: AuthResponse = await response.json();
     if (response.ok) {
       return result;
