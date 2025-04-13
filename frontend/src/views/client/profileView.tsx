@@ -63,7 +63,7 @@ const ProfileView: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 place-items-center p-10 w-full -mt-4 pt-1">
+    <div className="grid grid-cols-1 place-items-center w-full p-6">
       {userData ? (
         <div className="w-full max-w-lg bg-lightGreen text-lightText rounded-xl p-6 shadow-lg grid grid-cols-1 gap-6">
 
@@ -100,7 +100,7 @@ const ProfileView: React.FC = () => {
               </div>
 
               {/* Edit button */}
-              <div className="w-full flex justify-end mt-8">
+              <div className="w-full flex justify-center mt-8">
                 <button
                   onClick={() => setIsEditing(true)}
                   className="px-5 py-3 bg-lightText text-lightGreen font-semibold rounded-md hover:bg-darkGreen hover:text-lightText transition-all ease-in-out duration-200"
