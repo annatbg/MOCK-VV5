@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createDemand } from "../../../hooks/api/demandApi";
 import useUser from "../../../store/useUser";
+import { useModal } from "../../modal/ModalContext"; 
 
 interface FormData {
   title: string;
@@ -16,6 +17,7 @@ const CreateDemand = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
 
   const user = useUser((state) => state.user);
+  const { showModal } = useModal();  
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -29,14 +31,14 @@ const CreateDemand = () => {
     const { title, demand, category } = formData;
 
     if (!title.trim() || !demand.trim() || !category.trim()) {
-      setError("All fields are required.");
       setSuccessMessage(null);
+      showModal("All fields are required.", "error");  
       return;
     }
 
     if (!user) {
-      setError("User not found. Please log in.");
       setSuccessMessage(null);
+      showModal("User not found. Please log in.", "error");  
       return;
     }
 
@@ -47,9 +49,9 @@ const CreateDemand = () => {
     try {
       await createDemand({ formData });
       setFormData({ title: "", demand: "", category: "" });
-      setSuccessMessage("Demand created successfully!");
+      showModal("Demand created successfully!", "success");  
     } catch (err: any) {
-      setError(err?.message || "An error occurred while creating the demand.");
+      showModal(err?.message || "An error occurred while creating the demand.", "error");  
     } finally {
       setLoading(false);
     }

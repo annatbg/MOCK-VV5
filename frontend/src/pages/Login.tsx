@@ -2,10 +2,9 @@ import React, { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser, signupUser } from "../hooks/api/authApi";
 import useUser from "../store/useUser";
-
 import { User } from "../store/useUser";
 import logo from '../assets/Group 2 (2).svg'
-
+import { useModal } from "../components/modal/ModalContext"; 
 
 interface FormData {
   email: string;
@@ -29,6 +28,7 @@ const Login: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const navigate = useNavigate();
   const { login } = useUser();
+  const { showModal } = useModal(); 
 
   const handleRedirect = (role: string): void => {
     if (role === "admin") navigate("/user/admin");
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
       login(userData, result.token);
       handleRedirect(fixedRole);
     } catch (error: any) {
-      alert(error.message || "An error occurred while logging in.");
+      showModal(error.message || "An error occurred while logging in.", "error");
     }
   };
 
@@ -76,12 +76,12 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       await signupUser(formData);
-      setMessage("User created!");
+      showModal("User created successfully!", "success");
       setTimeout(() => {
         setIsLogin(true);
       }, 1500);
     } catch (error: any) {
-      alert(error.message || "An error occurred while signing up.");
+      showModal(error.message || "An error occurred while signing up.", "error");
     }
   };
 

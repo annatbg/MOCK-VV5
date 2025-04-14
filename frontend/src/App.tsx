@@ -4,6 +4,9 @@ import Login from "./pages/Login";
 import Client from "./pages/Client";
 import NotFound from "./pages/NotFound";
 import useUser from "./store/useUser";
+import { ModalProvider, useModal } from "./components/modal/ModalContext";
+import Modal from "./components/modal/Modal"; 
+
 
 function App() {
   const user = useUser((state) => state.user);
@@ -21,14 +24,16 @@ function App() {
   }, [user]);
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={!user ? <Login /> : 
-          <Navigate to={`/user/${user.role}`} replace />} />
-        <Route path="/user/client" element={<Client />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+    <ModalProvider>
+      <Router>
+        <Modal /> {/* Placerar modalen i din app */}
+        <Routes>
+          <Route path="/" element={!user ? <Login /> : <Navigate to={`/user/${user.role}`} replace />} />
+          <Route path="/user/client" element={<Client />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+    </ModalProvider>
   );
 }
 
