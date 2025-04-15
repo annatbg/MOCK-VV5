@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useModal } from "../../components/modal/ModalContext"; 
 
 type ListComponentProps<T> = {
   fetchFunction: () => Promise<{ data: T[] }>;
@@ -10,7 +9,6 @@ type ListComponentProps<T> = {
 const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentProps<T>) => {
   const [items, setItems] = useState<T[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { showModal } = useModal();
 
   useEffect(() => {
     const getItems = async () => {
@@ -19,17 +17,12 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
         setItems(data);
       } catch (err) {
         setError((err as Error).message);
-        showModal(`Error: ${(err as Error).message}`, "error"); 
       }
     };
 
     getItems();
-  }, [fetchFunction, showModal]);
+  }, [fetchFunction]);
 
-  if (error) {
-    showModal(`Error: ${error}`, "error"); 
-    return <p className="text-red-600">Error: {error}</p>;
-  }
 
   return (
     <div className="flex flex-col w-full">

@@ -3,20 +3,20 @@ import { useModal } from "../modal/ModalContext";
 const Modal: React.FC = () => {
   const { isVisible, message, type, hideModal, onConfirm, onCancel } = useModal();
 
-  if (!isVisible) return null;  
+  if (!isVisible) return null; 
 
   const handleConfirm = () => {
-    if (onConfirm && typeof onConfirm === 'function') {
-      onConfirm();  
+    if (onConfirm && typeof onConfirm === "function") {
+      onConfirm(); 
     }
-    hideModal();  
+    hideModal(); 
   };
 
   const handleCancel = () => {
-    if (onCancel && typeof onCancel === 'function') {
-      onCancel();  
+    if (onCancel && typeof onCancel === "function") {
+      onCancel(); 
     }
-    hideModal();  
+    hideModal(); 
   };
 
   return (
@@ -28,15 +28,15 @@ const Modal: React.FC = () => {
         <p className="text-lg">{message}</p>
 
         {type === "confirm" && (
-          <div className="mt-4 flex justify-around">
+          <div className="mt-4 flex justify-center gap-4">
             <button
-              onClick={handleConfirm} 
+              onClick={handleConfirm}
               className="px-5 py-2 bg-lightGreen text-lightText rounded-md hover:bg-darkGreen transition"
             >
               Confirm
             </button>
             <button
-              onClick={handleCancel}  
+              onClick={handleCancel}
               className="px-5 py-2 bg-red-500 text-lightText rounded-md hover:bg-red-700 transition"
             >
               Cancel
@@ -46,7 +46,7 @@ const Modal: React.FC = () => {
 
         {(type === "success" || type === "error") && (
           <button
-            onClick={hideModal}  
+            onClick={hideModal}
             className="mt-4 px-5 py-2 bg-lightGreen text-lightText rounded-md hover:bg-darkGreen transition"
           >
             Close
