@@ -1,6 +1,7 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
 import useUser, { User as StoreUser } from "../../store/useUser";
 import { fetchUserData, updateUser } from "../../hooks/api/userApi";
+import { useModal } from "../../components/modal/ModalContext";
 
 const API_URL = import.meta.env.VITE_API_URL as string;
 
@@ -17,11 +18,11 @@ const ProfileView: React.FC = () => {
   const [userData, setUserData] = useState<ProfileData | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [editData, setEditData] = useState<Partial<StoreUser>>({});
-  const [message, setMessage] = useState<string>("");
 
   const user = useUser((state) => state.user);
   const setUser = useUser((state) => state.login);
 
+  const { showModal } = useModal(); 
   useEffect(() => {
     const fetchData = async () => {
       if (!user) return;
@@ -47,14 +48,27 @@ const ProfileView: React.FC = () => {
 
   const handleEditSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const { firstName, lastName, email, organisation, location, password } = editData;
+    if (!firstName || !lastName || !email || !organisation || !location) {
+      showModal("Please fill in all required fields.", "error");
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+    if (email && !emailRegex.test(email)) {
+      showModal("Invalid email address.", "error");
+      return;
+    }
+
     try {
       const result = (await updateUser(editData)) as unknown as UpdateUserResponse;
       setUserData({ user: result.user });
       setUser(result.user, result.token);
-      setMessage("Profile updated successfully!");
+      showModal("Profile updated successfully!", "success");
       setIsEditing(false);
     } catch (error: any) {
-      setMessage(error.message);
+      showModal(error.message, "error");
     }
   };
 
@@ -151,11 +165,8 @@ const ProfileView: React.FC = () => {
       ) : (
         <p className="text-darkText">Loading...</p>
       )}
-
-      {message && <p className="text-green-500 mt-4 font-medium">{message}</p>}
     </div>
-
   );
-;}  
+};
 
 export default ProfileView;

@@ -23,9 +23,6 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
     getItems();
   }, [fetchFunction]);
 
-  if (error) {
-    return <p className="text-red-600">Error: {error}</p>;
-  }
 
   return (
     <div className="flex flex-col w-full">
