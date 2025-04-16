@@ -9,6 +9,7 @@ const {
   GetCommand,
   DeleteCommand,
 } = require("@aws-sdk/lib-dynamodb");
+const { getUserFromToken } = require("../../services/utils/jwt");
 
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
 
@@ -21,52 +22,47 @@ const allowedCategories = [
 ];
 
 const createDemand = async (event) => {
+  const user = getUserFromToken(event);
+  const author = user?.username;
+
+  if (!author) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized" }),
+    };
+  }
+
+  const { title, demand, category } = JSON.parse(event.body);
+
+  if (!title || !demand || !category) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "All fields are required!" }),
+    };
+  }
+
+  if (!allowedCategories.includes(category)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: `Invalid category! Allowed categories: ${allowedCategories.join(
+          ", "
+        )}`,
+      }),
+    };
+  }
+
   try {
-    const author = event.requestContext?.authorizer?.username;
-    const { title, demand, category } = JSON.parse(event.body);
-
-    if (!author) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({ message: "Unauthorized" }),
-      };
-    }
-
-    if (!title || !demand || !category) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "All fields are required!" }),
-      };
-    }
-
-    if (!allowedCategories.includes(category)) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: `Invalid category! Allowed categories: ${allowedCategories.join(
-            ", "
-          )}`,
-        }),
-      };
-    }
-
-    let matchingDemands = [];
-    try {
-      const queryParams = {
-        TableName: DEMANDS_TABLE,
-        IndexName: "category-index",
-        KeyConditionExpression: "category = :category",
-        ExpressionAttributeValues: { ":category": category },
-      };
-      const { Items } = await db.send(new QueryCommand(queryParams));
-      matchingDemands = (Items || []).filter((item) => item.author !== author);
-    } catch (queryError) {
-      console.error("Error querying matching demands:", queryError);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ message: "Error querying matching demands" }),
-      };
-    }
+    const queryParams = {
+      TableName: DEMANDS_TABLE,
+      IndexName: "category-index",
+      KeyConditionExpression: "category = :category",
+      ExpressionAttributeValues: { ":category": category },
+    };
+    const { Items } = await db.send(new QueryCommand(queryParams));
+    const matchingDemands = (Items || []).filter(
+      (item) => item.author !== author
+    );
 
     const matchingDemandIds = matchingDemands.map((item) => item.demandId);
     const newDemandId = uuidv4();
@@ -80,17 +76,9 @@ const createDemand = async (event) => {
       matches: matchingDemandIds,
     };
 
-    try {
-      await db.send(
-        new PutCommand({ TableName: DEMANDS_TABLE, Item: newDemand })
-      );
-    } catch (putError) {
-      console.error("Error saving new demand:", putError);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ message: "Error saving new demand" }),
-      };
-    }
+    await db.send(
+      new PutCommand({ TableName: DEMANDS_TABLE, Item: newDemand })
+    );
 
     const updatePromises = matchingDemands.map(async (match) => {
       try {
@@ -105,8 +93,8 @@ const createDemand = async (event) => {
           },
         };
         await db.send(new UpdateCommand(updateParams));
-      } catch (updateError) {
-        console.error(`Error updating demand ${match.demandId}:`, updateError);
+      } catch (err) {
+        console.error(`Error updating demand ${match.demandId}:`, err);
       }
     });
     await Promise.all(updatePromises);
@@ -128,20 +116,17 @@ const createDemand = async (event) => {
 };
 
 const fetchMyDemands = async (event) => {
+  const user = getUserFromToken(event);
+  const author = user?.username;
+
+  if (!author) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized" }),
+    };
+  }
+
   try {
-    const author = event.requestContext?.authorizer?.username;
-
-    if (!author) {
-      console.error(
-        "User not authenticated, event.requestContext.authorizer:",
-        event.requestContext?.authorizer
-      );
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "User not authenticated" }),
-      };
-    }
-
     const params = {
       TableName: DEMANDS_TABLE,
       IndexName: "author-index",
@@ -154,7 +139,6 @@ const fetchMyDemands = async (event) => {
     const { Items } = await db.send(new QueryCommand(params));
 
     if (!Items || Items.length === 0) {
-      console.error(`No demands found for author: ${author}`);
       return {
         statusCode: 404,
         body: JSON.stringify({ message: "No demands found for this author." }),
@@ -170,7 +154,6 @@ const fetchMyDemands = async (event) => {
     };
   } catch (error) {
     console.error("Error fetching demands:", error);
-    console.error("Stack Trace:", error.stack);
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "Internal Server Error" }),
@@ -187,7 +170,6 @@ const fetchAllDemands = async () => {
     const { Items } = await db.send(new ScanCommand(params));
 
     if (!Items || Items.length === 0) {
-      console.error("No demands found in the database.");
       return {
         statusCode: 404,
         body: JSON.stringify({ message: "No demands found." }),
@@ -203,7 +185,6 @@ const fetchAllDemands = async () => {
     };
   } catch (error) {
     console.error("Error fetching all demands:", error);
-    console.error("Stack Trace:", error.stack);
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "Internal Server Error" }),
@@ -286,37 +267,31 @@ const fetchDemandsByIds = async (event) => {
 };
 
 const deleteDemand = async (event) => {
+  const user = getUserFromToken(event);
+  const author = user?.username;
+  const demandId = event.pathParameters?.demandId;
+
+  if (!author) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized" }),
+    };
+  }
+
+  if (!demandId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Demand ID is required" }),
+    };
+  }
+
   try {
-    const author = event.requestContext?.authorizer?.username;
-    const demandId = event.pathParameters?.demandId;
-
-    console.log("Incoming demandId:", demandId);
-
-    if (!author) {
-      console.error(
-        "User not authenticated, authorizer:",
-        event.requestContext?.authorizer
-      );
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "User not authenticated" }),
-      };
-    }
-
-    if (!demandId) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: "Demand ID is required" }),
-      };
-    }
-
     const getParams = {
       TableName: DEMANDS_TABLE,
       Key: { demandId },
     };
 
     const { Item } = await db.send(new GetCommand(getParams));
-    console.log("Fetched Item:", Item);
 
     if (!Item) {
       return {
@@ -336,8 +311,6 @@ const deleteDemand = async (event) => {
       TableName: DEMANDS_TABLE,
       Key: { demandId },
     };
-
-    console.log("Deleting Item:", Item);
 
     await db.send(new DeleteCommand(deleteParams));
 

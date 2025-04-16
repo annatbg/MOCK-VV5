@@ -7,4 +7,25 @@ const generateToken = (username) => {
   });
 };
 
-module.exports = { generateToken };
+const verifyToken = (token) => {
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (err) {
+    console.error("Token verification failed:", err);
+    return null;
+  }
+};
+
+const getUserFromToken = (event) => {
+  const authHeader =
+    event.headers?.Authorization || event.headers?.authorization;
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authHeader.split(" ")[1];
+  return verifyToken(token);
+};
+
+module.exports = { generateToken, verifyToken, getUserFromToken };
