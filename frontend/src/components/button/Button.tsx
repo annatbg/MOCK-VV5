@@ -7,19 +7,26 @@ type ButtonProps = {
   label: string;
   variant?: "primary" | "danger" | "success" | "secondary";
   disabled?: boolean;
+  className?: string; 
 };
 
-const Button = ({ onClick, label, variant = "primary", disabled = false }: ButtonProps) => {
+const Button = ({
+  onClick,
+  label,
+  variant = "primary",
+  disabled = false,
+  className = "", 
+}: ButtonProps) => {
   const buttonStyles = {
-    primary: "bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600",
-    danger: "bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600",
-    success: "bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600",
-    secondary: "bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600",
+    primary: "bg-lightGreen text-white hover:bg-lightGreenHover",
+    danger: "bg-red-500 text-white hover:bg-red-600",
+    success: "bg-green-500 text-white hover:bg-green-600",
+    secondary: "bg-gray-500 text-white hover:bg-gray-600",
   };
 
   return (
     <button
-      className={`${buttonStyles[variant]} ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+      className={`${buttonStyles[variant]} ${className} rounded-md ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       onClick={onClick}
       disabled={disabled}
     >
@@ -33,6 +40,7 @@ Button.propTypes = {
   label: PropTypes.string.isRequired,
   variant: PropTypes.oneOf(["primary", "danger", "success", "secondary"]),
   disabled: PropTypes.bool,
+  className: PropTypes.string, 
 };
 
 export default Button;

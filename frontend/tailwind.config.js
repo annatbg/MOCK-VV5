@@ -14,6 +14,9 @@ export default {
         //Text
         darkText: '#4A4A4A',
         lightText: '#FFFFFF',
+
+        // Hover
+        lightGreenHover: '#0a8079'
       },
     },
   },
