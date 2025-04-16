@@ -11,19 +11,15 @@ import Modal from "./components/modal/Modal";
 function App() {
   const user = useUser((state) => state.user);
 
-  // On app load, check if there's a stored token but no user
-  // This can happen if the app was refreshed
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token && !user) {
-      // You might want to verify the token with your backend here
-      // and retrieve fresh user data
       console.log("Token exists but user state is empty - should re-fetch user data");
-      // Ideally implement a function to fetch user data using the token
     }
   }, [user]);
 
   return (
+
     <ModalProvider>
       <Router>
         <Modal /> {/* Placerar modalen i din app */}
@@ -34,6 +30,7 @@ function App() {
         </Routes>
       </Router>
     </ModalProvider>
+
   );
 }
 
