@@ -32,7 +32,7 @@ function App() {
           <Route
             path="/"
             element={
-              !user ? <Login /> : <Navigate to={`/user/${user.role}`} replace />
+              !user ? <Login /> : <Navigate to={`/user/${user.role}/home`} replace />
             }
           />
 
