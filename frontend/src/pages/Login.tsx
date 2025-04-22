@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { loginUser, signupUser } from "../hooks/api/authApi";
 import useUser from "../store/useUser";
 import { User } from "../store/useUser";
-import logo from '../assets/Group 2 (2).svg'
+import logo from '../assets/Värmland.svg'
 import { useModal } from "../components/modal/ModalContext"; 
+import Sättersholmarna from '../assets/Sättersholmarna.jpg';
 
 interface FormData {
   email: string;
