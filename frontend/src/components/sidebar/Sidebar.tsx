@@ -2,7 +2,7 @@ import { Home, List, Users, LogOut, Menu, X, User2Icon, Bell } from "lucide-reac
 import { useNavigate } from "react-router-dom";
 import useUser from "../../store/useUser";
 import { useState, useEffect } from "react";
-import logo from "../../assets/Group 2 (2).svg";
+import logo from "../../assets/Värmland.svg";
 
 interface SidebarProps {
   activeView: string;
@@ -33,7 +33,6 @@ const Sidebar = ({ activeView }: SidebarProps) => {
 
   const navItems = [
     { label: "home", icon: <Home size={22} /> },
-    { label: "profile", icon: <User2Icon size={22} /> },
     { label: "demands", icon: <List size={22} /> },
     { label: "match", icon: <Users size={22} /> },
     { label: "notifications", icon: <Bell size={22} /> },
@@ -69,21 +68,28 @@ const Sidebar = ({ activeView }: SidebarProps) => {
               <button
                 key={label}
                 onClick={() => handleItemClick(label)}
-                className={`w-full h-12 flex flex-col items-center justify-center rounded-xl transition-transform hover:bg-lightGreen ${activeView === label ? "bg-lightGreen" : "bg-darkGreen"}`}
+                className={`w-full h-12 flex items-center justify-start rounded-xl px-4 transition-transform hover:bg-lightGreen ${activeView === label ? "bg-lightGreen" : "bg-darkGreen"}`}
               >
                 {icon}
-                <span className="text-sm capitalize">{label}</span>
+                <span className="ml-4 text-sm capitalize">{label}</span>
               </button>
             ))}
           </div>
           
-          <div className="flex flex-col justify-center mb-8">
+          <div className="flex flex-col justify-center mb-8 space-y-4">
+            <button
+              onClick={() => handleItemClick("profile")}
+              className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-lightGreen transition-transform transform hover:scale-105"
+            >
+              <User2Icon size={22} />
+              <span className="ml-4 text-sm capitalize">profile</span>
+            </button>
             <button
               onClick={handleLogout}
-              className="flex-col w-full h-12 flex items-center justify-center rounded-xl hover:bg-red-700 transition-transform"
+              className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-red-700 transition-transform transform hover:scale-105"
             >
               <LogOut size={22} />
-              <span className="text-sm capitalize">log out</span>
+              <span className="ml-4 text-sm capitalize">log out</span>
             </button>
           </div>
         </div>
@@ -108,22 +114,29 @@ const Sidebar = ({ activeView }: SidebarProps) => {
               <button
                 key={label}
                 onClick={() => handleItemClick(label)}
-                className={`w-full h-12 flex flex-col items-center justify-center rounded-xl transition-transform hover:bg-lightGreen ${activeView === label ? "bg-lightGreen" : "bg-darkGreen"}`}
+                className={`w-full h-12 flex items-center justify-start rounded-xl px-4 transition-transform hover:bg-lightGreen ${activeView === label ? "bg-lightGreen" : "bg-darkGreen"}`}
               >
                 {icon}
-                <span className="text-sm capitalize">{label}</span>
+                <span className="ml-4 text-sm capitalize">{label}</span>
               </button>
             ))}
           </div>
 
-          {/* Logout */}
-          <div className="flex flex-col justify-center">
+          {/* Profile and Logout */}
+          <div className="flex flex-col justify-center space-y-4">
+            <button
+              onClick={() => handleItemClick("profile")}
+              className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-lightGreen transition-transform transform hover:scale-105"
+            >
+              <User2Icon size={22} />
+              <span className="ml-4 text-sm capitalize">profile</span>
+            </button>
             <button
               onClick={handleLogout}
-              className="flex-col w-full h-12 flex items-center justify-center rounded-xl hover:bg-red-700 transition-transform transform hover:scale-105"
+              className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-red-700 transition-transform transform hover:scale-105"
             >
               <LogOut size={22} />
-              <span className="text-sm capitalize">log out</span>
+              <span className="ml-4 text-sm capitalize">log out</span>
             </button>
           </div>
         </aside>
