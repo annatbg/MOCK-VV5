@@ -15,7 +15,7 @@ const DemandActionButtons = ({ onEdit, onDelete }: DemandActionButtonsProps) => 
         title="Edit demand"
         className="px-3 py-1.5 rounded font-semibold text-sm cursor-pointer text-white bg-blue-900 shadow hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md transition-all duration-200 ease-in-out"
       >
-        Edit
+        Ändra
       </button>
       <button
         type="button"
@@ -24,7 +24,7 @@ const DemandActionButtons = ({ onEdit, onDelete }: DemandActionButtonsProps) => 
         title="Delete demand"
         className="px-3 py-1.5 rounded font-semibold text-sm cursor-pointer text-white bg-red-800 shadow hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md transition-all duration-200 ease-in-out"
       >
-        Delete
+        Ta Bort
       </button>
     </div>
   );

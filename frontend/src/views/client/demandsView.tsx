@@ -16,7 +16,7 @@ const DemandsView = () => {
       {/* Toggle Button */}
       <Button
         onClick={toggleForm}
-        label={showForm ? "Close form" : "Create demand"}
+        label={showForm ? "Stäng demand" : "Skapa demand"}
         variant={showForm ? "danger" : "primary"}
         className="w-40 h-12"
       />

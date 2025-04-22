@@ -13,11 +13,11 @@ const statusStyles: Record<Status, string> = {
 };
 
 const statusText: Record<Status, string> = {
-  new: "New Match",
-  confirmedByMe: "Interest Sent",
-  confirmedByThem: "Company Interested",
-  matched: "Matched",
-  rejectedByMe: "Rejected",
+  new: "Ny Match",
+  confirmedByMe: "Intresse skickat",
+  confirmedByThem: "Intresse bekräftat",
+  matched: "Matchat",
+  rejectedByMe: "Nekad",
 };
 
 const StatusBadge = ({ status }: StatusBadgeProps) => {

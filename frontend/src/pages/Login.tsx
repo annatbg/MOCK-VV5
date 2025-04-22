@@ -5,6 +5,7 @@ import useUser from "../store/useUser";
 import { User } from "../store/useUser";
 import logo from '../assets/Värmland2.svg'
 import { useModal } from "../components/modal/ModalContext"; 
+import img from '../assets/login-logo.png'
 
 interface FormData {
   email: string;
@@ -182,19 +183,28 @@ const Login: React.FC = () => {
 
     {/* Right Column - img-text */}
     <div
-      className="hidden lg:flex relative items-center justify-center p-6 h-full bg-cover bg-center"
-      style={{
-        backgroundImage:
-          'url("https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
-      }}
+    className="hidden lg:flex relative items-center justify-center p-6 h-full bg-cover bg-center"
+    style={{
+      backgroundImage: `url(${img})`
+    }}
+
+    // ----------------- //
+
+      // className="hidden lg:flex relative items-center justify-center p-6 h-full bg-cover bg-center"
+      // style={{
+      //   backgroundImage:
+      //     'url("https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")',
+      // }}
     >
+
+{/* // ----------------- // */}
+
+
       {/* Background Image Blur Overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
 
       <p className="text-center text-xl font-semibold text-white z-10 px-4 py-2 rounded-md">
-        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Minus beatae
-        distinctio harum fugit modi dolore, ab quasi maxime esse sunt asperiores
-        sapiente unde incidunt velit, odit nulla. Pariatur, sed doloribus.
+      Tillsammans gör vi skillnad – behovsmatchning gör det enkelt att hitta rätt stöd vid rätt tid.
       </p>
     </div>
   </main>

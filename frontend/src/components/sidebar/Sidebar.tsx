@@ -32,10 +32,10 @@ const Sidebar = ({ activeView }: SidebarProps) => {
   };
 
   const navItems = [
-    { label: "home", icon: <Home size={22} /> },
+    { label: "hem", icon: <Home size={22} /> },
     { label: "demands", icon: <List size={22} /> },
     { label: "match", icon: <Users size={22} /> },
-    { label: "notifications", icon: <Bell size={22} /> },
+    { label: "notiser", icon: <Bell size={22} /> },
   ];
 
   const handleItemClick = (label: string) => {
@@ -82,14 +82,14 @@ const Sidebar = ({ activeView }: SidebarProps) => {
               className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-lightGreen transition-transform transform hover:scale-105"
             >
               <User2Icon size={22} />
-              <span className="ml-4 text-sm capitalize">profile</span>
+              <span className="ml-4 text-sm capitalize">profil</span>
             </button>
             <button
               onClick={handleLogout}
               className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-red-700 transition-transform transform hover:scale-105"
             >
               <LogOut size={22} />
-              <span className="ml-4 text-sm capitalize">log out</span>
+              <span className="ml-4 text-sm capitalize">logga ut</span>
             </button>
           </div>
         </div>
@@ -129,14 +129,14 @@ const Sidebar = ({ activeView }: SidebarProps) => {
               className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-lightGreen transition-transform transform hover:scale-105"
             >
               <User2Icon size={22} />
-              <span className="ml-4 text-sm capitalize">profile</span>
+              <span className="ml-4 text-sm capitalize">profil</span>
             </button>
             <button
               onClick={handleLogout}
               className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-red-700 transition-transform transform hover:scale-105"
             >
               <LogOut size={22} />
-              <span className="ml-4 text-sm capitalize">log out</span>
+              <span className="ml-4 text-sm capitalize">logga ut</span>
             </button>
           </div>
         </aside>

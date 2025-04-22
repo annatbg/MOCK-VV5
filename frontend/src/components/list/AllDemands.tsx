@@ -13,7 +13,7 @@ const AllDemands = () => {
   return (
     <ListComponent
       fetchFunction={fetchAllDemands}
-      title="All demands"
+      title="Alla demands"
       renderItem={(demand: Demand) => (
         <DemandCard
           title={demand.title}

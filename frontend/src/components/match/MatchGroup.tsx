@@ -59,7 +59,7 @@ const MatchGroup = ({
         {confirmedMatches.length > 0 && (
           <div className="flex flex-col mt-4">
             <h4 className="text-green-700 border-b border-green-700 pb-2 text-lg font-semibold">
-              Active Collaborations:
+              Aktiva Sammarbeten:
             </h4>
             <div className="flex relative mt-2">
               {confirmedMatches.map((match, index) => (
@@ -80,7 +80,7 @@ const MatchGroup = ({
       {otherMatches.length > 0 && (
         <div className="flex flex-col mt-8">
           <h4 className="text-blue-600 border-b border-blue-600 pb-2 text-lg font-semibold">
-            Potential Matches:
+            Potential Match:
           </h4>
           <div className="flex flex-col-reverse gap-2">
             {otherMatches.map((match, index) => (
@@ -102,7 +102,7 @@ const MatchGroup = ({
 
       {confirmedMatches.length === 0 && otherMatches.length === 0 && (
         <p className="mt-8 p-5 text-center italic text-neutral-600 bg-neutral-100 rounded-md">
-          No matches found for this demand.
+          Inga matchningar hittades för denna förfrågan.
         </p>
       )}
     </div>

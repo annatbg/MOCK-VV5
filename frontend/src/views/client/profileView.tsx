@@ -106,10 +106,10 @@ const ProfileView: React.FC = () => {
                   <span className="font-semibold">Organisation:</span> {capitalizeFirstLetter(userData.user.organisation || '')}
                 </p>
                 <p className="text-lg">
-                  <span className="font-semibold">Location:</span> {capitalizeFirstLetter(userData.user.location || '')}
+                  <span className="font-semibold">Plats:</span> {capitalizeFirstLetter(userData.user.location || '')}
                 </p>
                 <p className="text-lg">
-                  <span className="font-semibold">Role:</span> {capitalizeFirstLetter(userData.user.role || '')}
+                  <span className="font-semibold">Roll:</span> {capitalizeFirstLetter(userData.user.role || '')}
                 </p>
               </div>
 
@@ -163,7 +163,7 @@ const ProfileView: React.FC = () => {
           )}
         </div>
       ) : (
-        <p className="text-darkText">Loading...</p>
+        <p className="text-darkText">Laddar...</p>
       )}
     </div>
   );
