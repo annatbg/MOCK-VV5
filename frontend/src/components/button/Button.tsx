@@ -1,13 +1,12 @@
 import PropTypes from "prop-types";
 
-//TODO: KNAPP ÅTERANVÄNDS TILL ALLT (ANVÄNDS INTE)
-
 type ButtonProps = {
-  onClick: () => void;
+  onClick?: () => void;  // Make onClick optional
   label: string;
   variant?: "primary" | "danger" | "success" | "secondary";
   disabled?: boolean;
-  className?: string; 
+  className?: string;
+  type?: "button" | "submit" | "reset";  // Add 'type' prop for form buttons
 };
 
 const Button = ({
@@ -15,7 +14,8 @@ const Button = ({
   label,
   variant = "primary",
   disabled = false,
-  className = "", 
+  className = "",
+  type = "button",  // Default is "button", can be overridden
 }: ButtonProps) => {
   const buttonStyles = {
     primary: "bg-lightGreen text-white hover:bg-lightGreenHover",
@@ -29,6 +29,7 @@ const Button = ({
       className={`${buttonStyles[variant]} ${className} rounded-md ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       onClick={onClick}
       disabled={disabled}
+      type={type}  // This allows setting the type of the button (submit, reset, etc.)
     >
       {label}
     </button>
@@ -36,11 +37,12 @@ const Button = ({
 };
 
 Button.propTypes = {
-  onClick: PropTypes.func.isRequired,
+  onClick: PropTypes.func,
   label: PropTypes.string.isRequired,
   variant: PropTypes.oneOf(["primary", "danger", "success", "secondary"]),
   disabled: PropTypes.bool,
-  className: PropTypes.string, 
+  className: PropTypes.string,
+  type: PropTypes.oneOf(["button", "submit", "reset"]),  // Ensure type prop is validated
 };
 
 export default Button;
