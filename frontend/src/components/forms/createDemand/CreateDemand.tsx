@@ -11,7 +11,11 @@ interface FormData {
   category: string;
 }
 
-const CreateDemand = () => {
+interface CreateDemandProps {
+  onClose?: () => void;
+}
+
+const CreateDemand = ({ onClose }: CreateDemandProps) => {
   const [formData, setFormData] = useState<FormData>({
     title: "",
     demand: "",
@@ -20,7 +24,6 @@ const CreateDemand = () => {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const user = useUser((state) => state.user);
   const { showModal } = useModal();
@@ -39,14 +42,12 @@ const CreateDemand = () => {
     const { title, demand, category } = formData;
 
     if (!title.trim() || !demand.trim() || !category.trim()) {
-      setSuccessMessage(null);
-      showModal("All fields are required.", "error");
+      showModal("Alla fält måste fyllas i.", "error");
       return;
     }
 
     if (!user) {
-      setSuccessMessage(null);
-      showModal("User not found. Please log in.", "error");
+      showModal("Användare saknas. Logga in igen.", "error");
       return;
     }
 
@@ -57,107 +58,100 @@ const CreateDemand = () => {
     try {
       await createDemand({ formData });
       setFormData({ title: "", demand: "", category: "" });
-      showModal("Demand created successfully!", "success");
+      showModal("Behov skapat!", "success");
+      onClose?.();
     } catch (err: any) {
-      showModal(
-        err?.message || "An error occurred while creating the demand.",
-        "error"
-      );
+      showModal(err?.message || "Något gick fel.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleForm = () => {
-    setIsFormOpen(!isFormOpen);
-  };
+return (
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className="bg-white rounded-md p-6 w-full border border-slate-200"
+  >
+    <h1 className="text-3xl pb-6">Skapa ett nytt behov</h1>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full ">
+      <div>
+        <label htmlFor="title" className="block font-semibold text-gray-800 mb-1">
+          Rubrik
+        </label>
+        <textarea
+          id="title"
+          value={formData.title}
+          onChange={handleChange}
+          placeholder="Skriv en rubrik"
+          className="w-full p-3 border rounded-xl text-base focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
+          disabled={loading}
+          rows={2}
+        />
+      </div>
 
-  return (
-    <div className="flex flex-col w-full">
-      {/* Use the Button component to toggle form visibility */}
+      <div>
+        <label htmlFor="demand" className="block font-semibold text-gray-800 mb-1">
+          Behov
+        </label>
+        <textarea
+          id="demand"
+          value={formData.demand}
+          onChange={handleChange}
+          placeholder="Beskriv ditt behov..."
+          className="w-full p-3 border rounded-xl text-base h-32 resize-none focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
+          disabled={loading}
+        />
+      </div>
 
-      <Button
-        onClick={toggleForm}
-        label={isFormOpen ? "Close form" : "Create demand"}
-        variant={isFormOpen ? "danger" : "primary"}
-        className={isFormOpen ? "w-24 h-16" : "w-32 h-16 "}
-      />
+      <div>
+        <label htmlFor="category" className="block font-semibold text-gray-800 mb-1">
+          Kategori
+        </label>
+        <select
+          id="category"
+          value={formData.category}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-xl text-base bg-white focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
+          disabled={loading}
+        >
+          <option value="">Välj en kategori</option>
+          <option value="Health">Hälsa</option>
+          <option value="Technology">Teknologi</option>
+          <option value="Finance">Ekonomi</option>
+          <option value="Environment">Miljö</option>
+          <option value="Education">Utbildning</option>
+        </select>
+      </div>
 
-      {/* Conditionally render the form */}
-      <motion.div
-        initial={{ opacity: 0, y: -50 }} // Start above and hidden
-        animate={{ opacity: isFormOpen ? 1 : 0, y: isFormOpen ? 0 : -50 }} // Slide in when open
-        transition={{ duration: 0.5 }} // Smooth transition duration
-        className="flex flex-col gap-2 w-[95%] max-w-lg mt-4"
-      >
-        {isFormOpen && (
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-2 w-[95%] max-w-lg mt-4"
-          >
-            <label htmlFor="title" className="font-bold text-lg">
-              Rubrik:
-            </label>
-            <textarea
-              id="title"
-              value={formData.title}
-              onChange={handleChange}
-              placeholder="Skriv en rubrik"
-              className="p-2 border border-gray-300 rounded-md text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200"
-              disabled={loading}
-            />
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {successMessage && (
+        <p className="text-green-600 text-sm text-center">{successMessage}</p>
+      )}
 
-            <label htmlFor="demand" className="font-bold text-lg">
-              Behov:
-            </label>
-            <textarea
-              id="demand"
-              value={formData.demand}
-              onChange={handleChange}
-              placeholder="Beskriv ditt behov..."
-              className="p-2 border border-gray-300 rounded-md text-lg h-28 overflow-y-auto focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200"
-              disabled={loading}
-            />
-
-            <label htmlFor="category" className="font-bold text-lg">
-              Kategori:
-            </label>
-            <select
-              id="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-md text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-200"
-              disabled={loading}
-            >
-              <option value="">Välj en Kategori</option>
-              <option value="Health">Health</option>
-              <option value="Technology">Technology</option>
-              <option value="Finance">Finance</option>
-              <option value="Environment">Environment</option>
-              <option value="Education">Education</option>
-            </select>
-
-            {error && <p className="text-red-600 text-sm">{error}</p>}
-            {successMessage && (
-              <p className="text-green-600 text-sm text-center">
-                {successMessage}
-              </p>
-            )}
-
-            <div className="flex justify-center mt-2">
-              <button
-                type="submit"
-                className="bg-gray-800 text-white text-lg px-6 py-2 rounded-md transition hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed"
-                disabled={loading}
-              >
-                {loading ? "Submitting..." : "Skapa behov"}
-              </button>
-            </div>
-          </form>
+      <div className="flex justify-end gap-3 mt-4">
+        {onClose && (
+          <Button
+            onClick={onClose}
+            label="Avbryt"
+            variant="secondary"
+            className="p-2"
+            disabled={loading}
+          />
         )}
-      </motion.div>
-    </div>
-  );
+        <Button
+          label={loading ? "Skickar..." : "Skapa behov"}
+          variant="primary"
+          className="p-2"
+          disabled={loading}
+          type="submit" // This ensures the form is submitted when clicked
+        />
+      </div>
+    </form>
+  </motion.div>
+);
+
 };
 
 export default CreateDemand;
