@@ -29,7 +29,7 @@ const MyDemands = () => {
     console.log("Opening confirmation modal for demand:", demandId);
 
     showModal(
-      "Are you sure you want to delete this demand?",
+      "Är du säker på att du vill radera denna demand?",
       "confirm",
       async () => {
         console.log("Confirmed deletion for demand:", demandId);
@@ -38,10 +38,10 @@ const MyDemands = () => {
           setDemands((prevDemands) =>
             prevDemands.filter((d) => d.demandId !== demandId)
           );
-          showModal("Demand deleted successfully", "success");
+          showModal("Demand Borttagen!", "success");
         } catch (err) {
           showModal(
-            `Error deleting demand: ${(err as Error).message}`,
+            `Error borttagning demand: ${(err as Error).message}`,
             "error"
           );
         }
@@ -59,7 +59,7 @@ const MyDemands = () => {
         setDemands(response.data);
         return { data: demands };
       }}
-      title="My demands"
+      title="Mina demands"
       renderItem={(demand: Demand) => (
         <DemandCard
           title={demand.title}

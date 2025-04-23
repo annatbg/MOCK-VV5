@@ -25,9 +25,7 @@ const HomeView = () => {
             </h1>
           </div>
 
-          <h2 className="text-3xl text-center text-darkText capitalize">
-            Welcome {user?.firstName ?? "Guest"}
-          </h2>
+
 
           <Tabs onToggleCreate={toggleCreateForm} />
         </>

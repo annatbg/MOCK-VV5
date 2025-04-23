@@ -15,14 +15,14 @@ const Tabs = ({ onToggleCreate }: TabsProps) => {
         <div className="flex gap-4">
           <Button
             onClick={() => setActiveTab("demand")}
-            label="Demand List"
+            label="Demand Lista"
             variant={activeTab === "demand" ? "primary" : "secondary"}
             className="py-2 px-4"
           />
 
           <Button
             onClick={() => setActiveTab("match")}
-            label="Match List"
+            label="Match Lista"
             variant={activeTab === "match" ? "primary" : "secondary"}
             className="py-2 px-4"
           />
@@ -30,7 +30,7 @@ const Tabs = ({ onToggleCreate }: TabsProps) => {
 
         <Button
           onClick={onToggleCreate}
-          label="New demand"
+          label="Ny demand"
           variant="primary"
           className="p-2"
         />

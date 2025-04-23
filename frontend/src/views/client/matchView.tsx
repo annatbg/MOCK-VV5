@@ -89,7 +89,7 @@ const MatchView: React.FC = () => {
 
           const matchesResponse = await fetchDemandsByIds(matchIdsToFetch)
             .catch(err => {
-              console.error(`[MatchView] Error fetching matches for demand ${demand.demandId}:`, err);
+              console.error(`[MatchView] Error gick ej att hämta matchningar för demand ${demand.demandId}:`, err);
               return null;
             });
 
@@ -116,7 +116,7 @@ const MatchView: React.FC = () => {
             });
           }
         } catch (err) {
-          console.error(`[MatchView] Error processing demand:`, err);
+          console.error(`[MatchView] Error bearbetar demand:`, err);
         }
       }
 
@@ -135,7 +135,7 @@ const MatchView: React.FC = () => {
 
   const handleConfirm = async (demandId: string, matchId: string) => {
     showModal(
-      "Are you sure you want to confirm this match?",
+      "Är du säker på att du vill bekrafta denna match? ",
       "confirm",
       async () => {
         try {
@@ -155,7 +155,7 @@ const MatchView: React.FC = () => {
           });
           hideModal(); 
         } catch (error) {
-          console.error("Failed to confirm match:", error);
+          console.error("Misslyckad att bekräfta match:", error);
           hideModal();
         }
       },
@@ -165,7 +165,7 @@ const MatchView: React.FC = () => {
   
   const handleReject = async (demandId: string, matchId: string) => {
     showModal(
-      "Are you sure you want to reject this match?",
+      "Är du säker på att du vill avboka denna match?",
       "confirm",
       async () => {
         try {
@@ -185,7 +185,7 @@ const MatchView: React.FC = () => {
           });
           hideModal(); 
         } catch (error) {
-          console.error("Failed to reject match:", error);
+          console.error("Misslyckad att neka match:", error);
           hideModal();
         }
       },
@@ -199,7 +199,7 @@ const MatchView: React.FC = () => {
     let onConfirmAction: () => Promise<void>;
   
     if (status === "confirmedByMe") {
-      modalMessage = "Are you sure you want to cancel your interest in this match?";
+      modalMessage = "är du säker på att du vill avbryta denna match?";
       onConfirmAction = async () => {
         try {
           await undoRejection(demandId, matchId); 
@@ -216,12 +216,12 @@ const MatchView: React.FC = () => {
           });
           hideModal();
         } catch (error) {
-          console.error("Failed to cancel interest:", error);
+          console.error("Misslyckad att avbryta intresse:", error);
           hideModal();
         }
       };
     } else if (status === "rejectedByMe") {
-      modalMessage = "Are you sure you want to reconsider your rejection of this match?";
+      modalMessage = "Är du säker på att du vill ångra denna match?";
       onConfirmAction = async () => {
         try {
           await undoRejection(demandId, matchId); 
@@ -238,7 +238,7 @@ const MatchView: React.FC = () => {
           });
           hideModal();
         } catch (error) {
-          console.error("Failed to reconsider rejection:", error);
+          console.error("Misslyckad att ångra intresse:", error);
           hideModal();
         }
       };
@@ -256,7 +256,7 @@ const MatchView: React.FC = () => {
   const getDeleteHandler = (demandId: string) => {
     return () => {
       showModal(
-        "Are you sure you want to delete this demand?", 
+        "är du säker på att du vill radera denna demand?", 
         "confirm", 
         async () => {
           await handleDeleteDemand(demandId);  
@@ -278,25 +278,25 @@ const MatchView: React.FC = () => {
 
       hideModal();  
     } catch (error) {
-      console.error("Failed to delete demand:", error);
+      console.error("Misslyckad att ta bort demand:", error);
       hideModal();
     }
   };
 
   const getDynamicTitle = (): string => {
     if (matchStats.total === 0) {
-      return "You have no demands with possible matches";
+      return "Du har inga matches.";
     }
 
     if (matchStats.withConfirmed === 0) {
-      return `You have ${matchStats.total} demand${matchStats.total > 1 ? 's' : ''} with possible matches`;
+      return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar`;
     }
 
     if (matchStats.withConfirmed === matchStats.total) {
-      return `You have ${matchStats.total} demand${matchStats.total > 1 ? 's' : ''} with active collaborations`;
+      return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med aktiva samarbeten`;
     }
 
-    return `You have ${matchStats.total} demand${matchStats.total > 1 ? 's' : ''} with possible matches and ${matchStats.withConfirmed} with active collaborations`;
+    return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar och ${matchStats.withConfirmed} med aktiva samarbeten`;
   };
 
   const renderMatchGroup = (item: any) => {

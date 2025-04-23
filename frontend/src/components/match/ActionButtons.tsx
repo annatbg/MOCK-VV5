@@ -25,14 +25,14 @@ const ActionButtons = ({ status, onConfirm, onReject, onCancel }: ActionButtonsP
               onClick={stop(onConfirm)}
               title="Accept this match"
             >
-              Accept
+              Acceptera
             </button>
             <button
               className="match-action-button bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md "
               onClick={stop(onReject)}
               title="Reject this match"
             >
-              Reject
+              Neka
             </button>
           </>
         )}
@@ -43,7 +43,7 @@ const ActionButtons = ({ status, onConfirm, onReject, onCancel }: ActionButtonsP
             onClick={stop(onCancel)} 
             title="Cancel your confirmation"
           >
-            Cancel Interest
+            Avbryt Intresse
           </button>
         )}
 
@@ -53,7 +53,7 @@ const ActionButtons = ({ status, onConfirm, onReject, onCancel }: ActionButtonsP
             onClick={stop(onCancel)}
             title="Undo rejection"
           >
-            Reconsider
+            Ångra
           </button>
         )}
       </div>
