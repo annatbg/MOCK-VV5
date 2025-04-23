@@ -330,10 +330,130 @@ const deleteDemand = async (event) => {
   }
 };
 
+const updateDemandMatches = async (event) => {
+  const user = getUserFromToken(event);
+  const author = user?.username;
+
+  if (!author) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized" }),
+    };
+  }
+
+  const demandId = event.pathParameters?.demandId;
+  const { matchId, status } = JSON.parse(event.body || "{}");
+
+  if (!demandId || !matchId || !status) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Demand ID, match ID, and status are required",
+      }),
+    };
+  }
+
+  const validStatuses = ["new", "confirmedByMe", "confirmedByThem", "matched", "rejectedByMe"];
+  if (!validStatuses.includes(status)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: `Invalid status. Valid statuses are: ${validStatuses.join(", ")}`,
+      }),
+    };
+  }
+
+  try {
+    const getParams = {
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+    };
+    const { Item: demand } = await db.send(new GetCommand(getParams));
+
+    if (!demand) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: "Demand not found" }),
+      };
+    }
+
+    if (demand.author !== author) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({ message: "Unauthorized to update this demand" }),
+      };
+    }
+
+    let matches = demand.matches || [];
+    let matchIndex = -1;
+    let existingMatch = null;
+    let previousStatus = null;
+
+    for (let i = 0; i < matches.length; i++) {
+      const match = matches[i];
+      if (match === matchId || (typeof match === "object" && match.id === matchId)) {
+        matchIndex = i;
+        existingMatch = match;
+        previousStatus = typeof match === "object" ? match.status : "new";
+        break;
+      }
+    }
+
+    if (matchIndex === -1) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: "Match not found in demand" }),
+      };
+    }
+
+    const updatedMatch = {
+      id: matchId,
+      status,
+      updatedAt: new Date().toISOString(),
+      ...(typeof existingMatch === "object" ? Object.fromEntries(
+        Object.entries(existingMatch).filter(([key]) => !["id", "status", "updatedAt"].includes(key))
+      ) : {})
+    };
+
+    const updatedMatches = [...matches];
+    updatedMatches[matchIndex] = updatedMatch;
+
+    const updateParams = {
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+      UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+      ExpressionAttributeValues: {
+        ":matches": updatedMatches,
+        ":updatedAt": new Date().toISOString(),
+      },
+      ReturnValues: "ALL_NEW",
+    };
+
+    const { Attributes: updatedDemand } = await db.send(new UpdateCommand(updateParams));
+
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Match status updated successfully!",
+        data: updatedDemand,
+      }),
+    };
+  } catch (error) {
+    console.error("[updateDemandMatches] Error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "Internal Server Error" }),
+    };
+  }
+};
+
+
 module.exports = {
   createDemand,
   fetchMyDemands,
   fetchAllDemands,
   fetchDemandsByIds,
   deleteDemand,
+  updateDemandMatches
 };
