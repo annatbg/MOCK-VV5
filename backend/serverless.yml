@@ -84,6 +84,14 @@ functions:
           path: /demand/{demandId}
           method: delete
 
+  getAcceptedDemands: 
+    handler: controllers/demand/demandController.getAcceptedDemands
+    events:
+      - httpApi:
+          path: /demand/accepted
+          method: get
+
+
 resources:
   Resources:
     users:
