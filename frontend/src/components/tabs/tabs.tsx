@@ -1,6 +1,7 @@
 import { useState } from "react";
 import MyDemands from "../list/MyDemands";
 import Button from "../button/Button";
+import AcceptedDemands from "../list/AcceptedDemands";
 
 interface TabsProps {
   onToggleCreate: () => void;
@@ -38,7 +39,7 @@ const Tabs = ({ onToggleCreate }: TabsProps) => {
 
       <div>
         {activeTab === "demand" && <MyDemands />}
-        {activeTab === "match" && <p>Här är din Match List 🔎</p>}
+        {activeTab === "match" && <AcceptedDemands />}
       </div>
     </div>
   );

@@ -201,11 +201,36 @@ export const undoRejection = async (demandId: string, matchId: string) => {
   return updateMatchStatus(demandId, matchId, "new");
 };
 
-// Export all functions
+const fetchAcceptedDemands = async (): Promise<any[]> => {
+  const token = useUser.getState().token;
+  if (!token) throw new Error("Not authenticated");
+
+  const response = await fetch(`${API_URL}/demand/accepted`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const { message, data } = await response.json();
+
+  if (!response.ok) {
+
+    throw new Error(message || "Failed to fetch accepted demands");
+  }
+
+
+  return data;
+};
+
+
+
 export {
   createDemand,
   fetchMyDemands,
   fetchAllDemands,
   deleteDemand,
   fetchDemandsByIds,
+  fetchAcceptedDemands
 };

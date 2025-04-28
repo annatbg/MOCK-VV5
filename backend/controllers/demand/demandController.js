@@ -353,7 +353,7 @@ const updateDemandMatches = async (event) => {
     };
   }
 
-  const validStatuses = ["new", "confirmedByMe", "confirmedByThem", "matched", "rejectedByMe"];
+  const validStatuses = ["confirmedByMe", "rejectedByMe"];
   if (!validStatuses.includes(status)) {
     return {
       statusCode: 400,
@@ -364,79 +364,101 @@ const updateDemandMatches = async (event) => {
   }
 
   try {
-    const getParams = {
-      TableName: DEMANDS_TABLE,
-      Key: { demandId },
-    };
-    const { Item: demand } = await db.send(new GetCommand(getParams));
+    // Fetch both demands
+    const [myDemandRes, matchDemandRes] = await Promise.all([
+      db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId } })),
+      db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId: matchId } }))
+    ]);
 
-    if (!demand) {
+    const myDemand = myDemandRes.Item;
+    const theirDemand = matchDemandRes.Item;
+
+    if (!myDemand || !theirDemand) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ message: "Demand not found" }),
+        body: JSON.stringify({ message: "One or both demands not found" }),
       };
     }
 
-    if (demand.author !== author) {
+    if (myDemand.author !== author) {
       return {
         statusCode: 403,
         body: JSON.stringify({ message: "Unauthorized to update this demand" }),
       };
     }
 
-    let matches = demand.matches || [];
-    let matchIndex = -1;
-    let existingMatch = null;
-    let previousStatus = null;
+    // Helper: update or insert match in matches array
+    const updateMatchList = (matches = [], matchId, status) => {
+      const now = new Date().toISOString();
+      const index = matches.findIndex(m => m === matchId || (typeof m === "object" && m.id === matchId));
 
-    for (let i = 0; i < matches.length; i++) {
-      const match = matches[i];
-      if (match === matchId || (typeof match === "object" && match.id === matchId)) {
-        matchIndex = i;
-        existingMatch = match;
-        previousStatus = typeof match === "object" ? match.status : "new";
-        break;
-      }
-    }
-
-    if (matchIndex === -1) {
-      return {
-        statusCode: 404,
-        body: JSON.stringify({ message: "Match not found in demand" }),
+      const updatedMatch = {
+        id: matchId,
+        status,
+        updatedAt: now
       };
-    }
 
-    const updatedMatch = {
-      id: matchId,
-      status,
-      updatedAt: new Date().toISOString(),
-      ...(typeof existingMatch === "object" ? Object.fromEntries(
-        Object.entries(existingMatch).filter(([key]) => !["id", "status", "updatedAt"].includes(key))
-      ) : {})
+      if (index !== -1) {
+        matches[index] = updatedMatch;
+      } else {
+        matches.push(updatedMatch);
+      }
+
+      return matches;
     };
 
-    const updatedMatches = [...matches];
-    updatedMatches[matchIndex] = updatedMatch;
+    // Update my demand
+    const myMatches = updateMatchList(myDemand.matches, matchId, status);
 
-    const updateParams = {
-      TableName: DEMANDS_TABLE,
-      Key: { demandId },
-      UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
-      ExpressionAttributeValues: {
-        ":matches": updatedMatches,
-        ":updatedAt": new Date().toISOString(),
-      },
-      ReturnValues: "ALL_NEW",
-    };
+    // Determine opposite status for them
+    let theirStatus = status === "confirmedByMe" ? "confirmedByThem" : "rejectedByThem";
 
-    const { Attributes: updatedDemand } = await db.send(new UpdateCommand(updateParams));
+    // Check if both confirmed → upgrade both to matched
+    const existingMatchFromThem = theirDemand.matches?.find(m => {
+      return typeof m === "object" && m.id === demandId;
+    });
 
+    const existingStatusFromThem = existingMatchFromThem?.status;
+    const isMutualConfirm = (status === "confirmedByMe" && existingStatusFromThem === "confirmedByMe");
+
+    const finalStatusMe = isMutualConfirm ? "matched" : status;
+    const finalStatusThem = isMutualConfirm ? "matched" : theirStatus;
+
+    const theirMatches = updateMatchList(theirDemand.matches, demandId, finalStatusThem);
+
+    // Perform both updates
+    const now = new Date().toISOString();
+    const [updatedMine, updatedTheirs] = await Promise.all([
+      db.send(new UpdateCommand({
+        TableName: DEMANDS_TABLE,
+        Key: { demandId },
+        UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+        ExpressionAttributeValues: {
+          ":matches": myMatches,
+          ":updatedAt": now
+        },
+        ReturnValues: "ALL_NEW"
+      })),
+      db.send(new UpdateCommand({
+        TableName: DEMANDS_TABLE,
+        Key: { demandId: matchId },
+        UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+        ExpressionAttributeValues: {
+          ":matches": theirMatches,
+          ":updatedAt": now
+        },
+        ReturnValues: "ALL_NEW"
+      }))
+    ]);
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: "Match status updated successfully!",
-        data: updatedDemand,
+        data: {
+          myDemand: updatedMine.Attributes,
+          matchedDemand: updatedTheirs.Attributes,
+        }
       }),
     };
   } catch (error) {
@@ -448,6 +470,68 @@ const updateDemandMatches = async (event) => {
   }
 };
 
+const getAcceptedDemands = async (event) => {
+  const user   = getUserFromToken(event);
+  const author = user?.username;
+
+  if (!author) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized" }),
+    };
+  }
+
+  try {
+  
+    const queryParams = {
+      TableName: DEMANDS_TABLE,
+      IndexName: "author-index",
+      KeyConditionExpression: "author = :author",
+      ExpressionAttributeValues: { ":author": author },
+    };
+    const { Items: myDemands } = await db.send(new QueryCommand(queryParams));
+
+    if (!myDemands || myDemands.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: "You have no demands." }),
+      };
+    }
+
+
+    const acceptedDemands = myDemands.filter((d) =>
+      Array.isArray(d.matches) &&
+      d.matches.some(
+        (m) => m.status === "confirmedByMe" || m.status === "confirmedByThem"
+      )
+    );
+
+    if (acceptedDemands.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: "No accepted demands found." }),
+      };
+    }
+
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Accepted demands retrieved successfully",
+        data: acceptedDemands,
+      }),
+    };
+  } catch (error) {
+    console.error("[getAcceptedDemands] Error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "Internal Server Error" }),
+    };
+  }
+};
+
+
+
 
 module.exports = {
   createDemand,
@@ -455,5 +539,6 @@ module.exports = {
   fetchAllDemands,
   fetchDemandsByIds,
   deleteDemand,
-  updateDemandMatches
+  updateDemandMatches,
+  getAcceptedDemands
 };
