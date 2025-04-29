@@ -353,7 +353,9 @@ const updateDemandMatches = async (event) => {
     };
   }
 
-  const validStatuses = ["confirmedByMe", "rejectedByMe"];
+
+  const validStatuses = ["new", "confirmedByMe", "confirmedByThem", "rejectedByMe"];
+  
   if (!validStatuses.includes(status)) {
     return {
       statusCode: 400,
@@ -364,7 +366,7 @@ const updateDemandMatches = async (event) => {
   }
 
   try {
-    // Fetch both demands
+
     const [myDemandRes, matchDemandRes] = await Promise.all([
       db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId } })),
       db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId: matchId } }))
@@ -407,24 +409,39 @@ const updateDemandMatches = async (event) => {
       return matches;
     };
 
-    // Update my demand
-    const myMatches = updateMatchList(myDemand.matches, matchId, status);
-
-    // Determine opposite status for them
-    let theirStatus = status === "confirmedByMe" ? "confirmedByThem" : "rejectedByThem";
-
-    // Check if both confirmed → upgrade both to matched
+ 
     const existingMatchFromThem = theirDemand.matches?.find(m => {
       return typeof m === "object" && m.id === demandId;
     });
 
-    const existingStatusFromThem = existingMatchFromThem?.status;
-    const isMutualConfirm = (status === "confirmedByMe" && existingStatusFromThem === "confirmedByMe");
+ 
+    const theyHaveConfirmed = existingMatchFromThem?.status === "confirmedByMe";
+    
+   
+    let myFinalStatus, theirFinalStatus;
 
-    const finalStatusMe = isMutualConfirm ? "matched" : status;
-    const finalStatusThem = isMutualConfirm ? "matched" : theirStatus;
 
-    const theirMatches = updateMatchList(theirDemand.matches, demandId, finalStatusThem);
+    if (status === "confirmedByMe" && theyHaveConfirmed) {
+      // Both users have confirmed - set both to matched
+      myFinalStatus = "matched";
+      theirFinalStatus = "matched";
+    } else if (status === "confirmedByMe") {
+      // Only the current user is confirming
+      myFinalStatus = "confirmedByMe";
+      theirFinalStatus = "confirmedByThem";
+    } else if (status === "rejectedByMe") {
+      // Handling rejection
+      myFinalStatus = "rejectedByMe";
+      theirFinalStatus = "rejectedByThem";
+    } else if (status === "new") {
+      // If the status is "new", we just update the match status as "new"
+      myFinalStatus = "new";
+      theirFinalStatus = "new";
+    }
+
+    // Update both match records
+    const myMatches = updateMatchList(myDemand.matches, matchId, myFinalStatus);
+    const theirMatches = updateMatchList(theirDemand.matches, demandId, theirFinalStatus);
 
     // Perform both updates
     const now = new Date().toISOString();
@@ -458,6 +475,7 @@ const updateDemandMatches = async (event) => {
         data: {
           myDemand: updatedMine.Attributes,
           matchedDemand: updatedTheirs.Attributes,
+          matched: myFinalStatus === "matched"
         }
       }),
     };
@@ -469,6 +487,7 @@ const updateDemandMatches = async (event) => {
     };
   }
 };
+
 
 const getAcceptedDemands = async (event) => {
   const user   = getUserFromToken(event);

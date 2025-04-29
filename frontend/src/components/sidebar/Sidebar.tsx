@@ -78,7 +78,7 @@ const Sidebar = ({ activeView }: SidebarProps) => {
           
           <div className="flex flex-col justify-center mb-8 space-y-4">
             <button
-              onClick={() => handleItemClick("profile")}
+              onClick={() => handleItemClick("profil")}
               className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-lightGreen transition-transform transform hover:scale-105"
             >
               <User2Icon size={22} />
@@ -125,7 +125,7 @@ const Sidebar = ({ activeView }: SidebarProps) => {
           {/* Profile and Logout */}
           <div className="flex flex-col justify-center space-y-4">
             <button
-              onClick={() => handleItemClick("profile")}
+              onClick={() => handleItemClick("profil")}
               className="flex items-center justify-start w-full h-12 rounded-xl px-4 hover:bg-lightGreen transition-transform transform hover:scale-105"
             >
               <User2Icon size={22} />
