@@ -22,15 +22,15 @@ function Client() {
 
   const renderView = () => {
     switch (activeView) {
-      case "home":
+      case "hem":
         return <HomeView />;
-      case "profile":
+      case "profil":
         return <ProfileView />;
       case "match":
         return <MatchView />;
       case "demands":
         return <DemandsView />;
-      case "notifications":
+      case "notiser":
         return <NotificationsView />;
       default:
         return <HomeView />;
