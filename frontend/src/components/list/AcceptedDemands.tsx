@@ -3,6 +3,7 @@ import {
   fetchMyDemands,
   fetchDemandsByIds
 } from '../../hooks/api/demandApi'
+import Button from '../button/Button'
 
 interface Match {
   id?: string
@@ -75,35 +76,44 @@ const AcceptedDemands: React.FC = () => {
     load()
   }, [])
 
-  if (loading) return <div>Loading active collaborations…</div>
+  if (loading) return <div>Laddar aktiva sammarbeten...</div>
   if (error) return <div>Error: {error}</div>
-  if (items.length === 0) return <div>No active collaborations found.</div>
+  if (items.length === 0) return <div>Inga aktiv sammarbeten hittades.</div>
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Active Collaborations</h2>
+    <div className="">
+      <h2 className="text-xl font-bold mb-4">Aktiva Sammarbeten</h2>
       <ul className="space-y-4">
         {items.map(({ demand, matches }) => (
           <li
             key={demand.demandId}
-            className="border p-4 rounded shadow-sm bg-white"
+            className="border p-4 rounded-xl shadow-sm bg-white"
           >
-            <p className="font-semibold">{demand.title}</p>
-            <p className="text-sm text-gray-600">{demand.demand}</p>
-            <p className="mt-2 text-xs text-gray-500">
-              Created: {new Date(demand.createdAt).toLocaleString()}
-            </p>
+            <div className="flex justify-between items-center">
+              <p className="font-semibold text-2xl">{demand.title}</p>
+              <p className="text-xs text-gray-700">
+              Skapad: {new Date(demand.createdAt).toLocaleString()}
+              </p>
+            </div>
+              <p className="text-base text-gray-600">{demand.demand}</p>
+
 
             <div className="mt-4">
-              <h3 className="text-lg font-semibold">Matched With:</h3>
+              <h3 className="text-lg font-semibold">Matchat Med:</h3>
               {matches.length === 0 ? (
-                <p>No active collaborations.</p>
+                <p>Inga aktiva sammarbeten.</p>
               ) : (
-                <ul className="space-y-2 mt-2">
+                <ul className="space-y-2 mt-2 ">
                   {matches.map((match: any) => (
-                    <li key={match.demandId} className="text-sm text-gray-700">
-                      {match.title} - {match.status}
-                    </li>
+                   <li key={match.demandId} className="flex justify-between items-center text-sm text-gray-700">
+                   <span>{match.title} - {match.status}</span>
+                 
+                   <Button 
+                     onClick={() => ("")}
+                     label="Välj"
+                     className="py-1.5 px-4"
+                   />
+                 </li>
                   ))}
                 </ul>
               )}

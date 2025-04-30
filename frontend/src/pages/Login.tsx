@@ -111,7 +111,7 @@ const Login: React.FC = () => {
           </div>
 
           <div className="flex flex-col m-2 w-1/2">
-            <label htmlFor="password">Password:</label>
+            <label htmlFor="password">Lösenord:</label>
             <input
               type="password"
               id="password"
@@ -128,7 +128,7 @@ const Login: React.FC = () => {
             type="submit"
             className="bg-gray-800 text-white px-4 py-2 rounded-md mt-4"
           >
-            Log in
+            Logga in
           </button>
         </form>
       ) : (
@@ -160,7 +160,7 @@ const Login: React.FC = () => {
             type="submit"
             className="bg-gray-800 text-white mt-4 rounded-md px-4 py-2"
           >
-            Sign Up
+            Registera dig
           </button>
         </form>
       )}

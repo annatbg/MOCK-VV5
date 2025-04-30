@@ -7,7 +7,7 @@ const HomeView = () => {
   const { user } = useUser();
   const [showCreateForm, setShowCreateForm] = useState(false);
 
-  const organisationName = user?.organisation || "No organisation";
+  const organisationName = user?.organisation || "Ingen organisation";
 
   const toggleCreateForm = () => {
     setShowCreateForm((prev) => !prev);
@@ -21,12 +21,9 @@ const HomeView = () => {
         <>
           <div>
             <h1 className="text-4xl font-semibold text-darkText">
-              {`Organisation: ${organisationName}`}
+              {`${organisationName}`}
             </h1>
           </div>
-
-
-
           <Tabs onToggleCreate={toggleCreateForm} />
         </>
       )}
