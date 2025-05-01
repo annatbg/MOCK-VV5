@@ -1,6 +1,7 @@
 import { useState } from "react";
 import DemandCard from "../demand/DemandCard";
 import MatchCard from "./MatchCard";
+import Pagination from "../pagination/Pagination";
 
 interface MatchData {
   demandId: string;
@@ -36,16 +37,27 @@ const MatchGroup = ({
   onCancelAction,
   onDeleteDemand,
 }: MatchGroupProps) => {
-  const [activeMatchIndex, setActiveMatchIndex] = useState(-1);
-  const [activeConfirmedIndex, setActiveConfirmedIndex] = useState(-1);
+  const [currentPage, setCurrentPage] = useState(0);
+  const matchesPerPage = 2;
   const demandId = demand.demandId;
 
-  const confirmedMatches = matches.filter((m) => m.status === "matched");
   const otherMatches = matches.filter((m) => m.status !== "matched");
 
+  // Paginate the matches
+  const paginatedMatches = otherMatches.slice(
+    currentPage * matchesPerPage,
+    (currentPage + 1) * matchesPerPage
+  );
+
+  const totalPages = Math.ceil(otherMatches.length / matchesPerPage);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
-    <div className="w-full  mb-12 border border-slate-900 rounded-md">
-      <div className="flex flex-col">
+    <div className="w-full mb-12 border border-gray-300 rounded-lg shadow-lg bg-white">
+      <div className="p-6">
         <DemandCard
           title={demand.title}
           demand={demand.demand}
@@ -53,58 +65,46 @@ const MatchGroup = ({
           author={demand.author}
           demandId={demand.demandId}
           onDelete={onDeleteDemand}
-          initialExpanded
+          initialExpanded={false}
         />
 
-        {confirmedMatches.length > 0 && (
-          <div className="flex flex-col mt-4">
-            <h4 className="text-green-700 border-b border-green-700 pb-2 text-lg font-semibold">
-              Aktiva Sammarbeten:
+        {paginatedMatches.length > 0 && (
+          <div className="mt-8">
+            <h4 className="text-xl font-semibold text-lightGreen border-b border-lightGreen pb-2">
+              Matchningar:
             </h4>
-            <div className="flex relative mt-2">
-              {confirmedMatches.map((match, index) => (
+            <div className="grid gap-4 mt-4">
+              {paginatedMatches.map((match) => (
                 <MatchCard
-                  key={`confirmed-${match.demandId}-${index}`}
+                  key={match.demandId}
                   matchData={match}
                   isStackable
-                  isOnTop={activeConfirmedIndex === index}
-                  onSelect={() => setActiveConfirmedIndex(index)}
+                  isOnTop={false}
+                  onSelect={() => {}}
+                  onConfirm={() => onConfirmMatch(demandId, match.demandId)}
+                  onReject={() => onRejectMatch(demandId, match.demandId)}
+                  onCancel={() => onCancelAction(demandId, match.demandId, match.status)}
                   initialExpanded={false}
                 />
               ))}
             </div>
+
+            {totalPages > 1 && (
+              <Pagination
+                currentPage={currentPage}
+                totalItems={totalPages}
+                onPageChange={handlePageChange}
+              />
+            )}
           </div>
         )}
+
+        {otherMatches.length === 0 && (
+          <p className="mt-8 p-5 text-center italic text-darkText bg-gray-100 rounded-lg">
+            Inga matchningar hittades för denna förfrågan.
+          </p>
+        )}
       </div>
-
-      {otherMatches.length > 0 && (
-        <div className="flex flex-col mt-8">
-          <h4 className="text-blue-600 border-b border-blue-600 pb-2 text-lg font-semibold">
-            Potential Match:
-          </h4>
-          <div className="flex flex-col-reverse gap-2">
-            {otherMatches.map((match, index) => (
-              <MatchCard
-                key={`other-${match.demandId}-${index}`}
-                matchData={match}
-                isStackable
-                isOnTop={activeMatchIndex === index}
-                onSelect={() => setActiveMatchIndex(index)}
-                onConfirm={() => onConfirmMatch(demandId, match.demandId)}
-                onReject={() => onRejectMatch(demandId, match.demandId)}
-                onCancel={() => onCancelAction(demandId, match.demandId, match.status)}
-                initialExpanded={false}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {confirmedMatches.length === 0 && otherMatches.length === 0 && (
-        <p className="mt-8 p-5 text-center italic text-neutral-600 bg-neutral-100 rounded-md">
-          Inga matchningar hittades för denna förfrågan.
-        </p>
-      )}
     </div>
   );
 };

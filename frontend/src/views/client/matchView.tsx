@@ -296,7 +296,7 @@ const MatchView: React.FC = () => {
       return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med aktiva samarbeten`;
     }
 
-    return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar och ${matchStats.withConfirmed} med aktiva samarbeten`;
+    return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar`; {/* och ${matchStats.withConfirmed} med aktiva samarbeten */}
   };
 
   const renderMatchGroup = (item: any) => {
