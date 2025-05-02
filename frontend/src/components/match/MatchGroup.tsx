@@ -38,18 +38,26 @@ const MatchGroup = ({
   onDeleteDemand,
 }: MatchGroupProps) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const [filter, setFilter] = useState<string>(""); // Filter state
   const matchesPerPage = 2;
   const demandId = demand.demandId;
 
-  const otherMatches = matches.filter((m) => m.status !== "matched");
+  // Filter matches based on user input
+  const filteredMatches = matches.filter(
+    (m) =>
+      m.status !== "matched" &&
+      (m.title?.toLowerCase().includes(filter.toLowerCase()) ||
+        m.demand?.toLowerCase().includes(filter.toLowerCase()) ||
+        m.category?.toLowerCase().includes(filter.toLowerCase()))
+  );
 
-  // Paginate the matches
-  const paginatedMatches = otherMatches.slice(
+  // Paginate the filtered matches
+  const paginatedMatches = filteredMatches.slice(
     currentPage * matchesPerPage,
     (currentPage + 1) * matchesPerPage
   );
 
-  const totalPages = Math.ceil(otherMatches.length / matchesPerPage);
+  const totalPages = Math.ceil(filteredMatches.length / matchesPerPage);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -67,6 +75,17 @@ const MatchGroup = ({
           onDelete={onDeleteDemand}
           initialExpanded={false}
         />
+
+        {/* Filter input */}
+        <div className="mt-4">
+          <input
+            type="text"
+            className="w-full p-2 border border-gray-300 rounded-lg"
+            placeholder="Filtrera matchningar..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+        </div>
 
         {paginatedMatches.length > 0 && (
           <div className="mt-8">
@@ -99,7 +118,7 @@ const MatchGroup = ({
           </div>
         )}
 
-        {otherMatches.length === 0 && (
+        {filteredMatches.length === 0 && (
           <p className="mt-8 p-5 text-center italic text-darkText bg-gray-100 rounded-lg">
             Inga matchningar hittades för denna förfrågan.
           </p>
