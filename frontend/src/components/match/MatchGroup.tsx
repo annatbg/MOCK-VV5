@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import DemandCard from "../demand/DemandCard";
 import MatchCard from "./MatchCard";
 import Pagination from "../pagination/Pagination";
@@ -39,16 +39,41 @@ const MatchGroup = ({
 }: MatchGroupProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [filter, setFilter] = useState<string>(""); // Filter state
+  const [debouncedFilter, setDebouncedFilter] = useState<string>(""); // For debouncing
   const matchesPerPage = 2;
   const demandId = demand.demandId;
 
-  // Filter matches based on user input
+  // Use effect to debounce the filter value (wait until user stops typing for 500ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedFilter(filter); // Update debounced filter after 500ms
+    }, 500);
+
+    return () => clearTimeout(timer); // Cleanup the timer on component unmount or filter change
+  }, [filter]);
+
+  // Function to search if all words in the search term are present in the text
+  const searchInFields = (text: string, searchTerm: string): boolean => {
+    // Split the search term into words and create a regex for each word
+    const words = searchTerm
+      .trim()
+      .split(/[\s,]+/) // Split by space or comma
+      .filter(word => word.length > 0); // Remove empty strings
+
+    // Check if each word in the filter exists in the text (case insensitive)
+    return words.every(word => text.toLowerCase().includes(word.toLowerCase()));
+  };
+
+  // Filter matches based on debounced input
   const filteredMatches = matches.filter(
     (m) =>
       m.status !== "matched" &&
-      (m.title?.toLowerCase().includes(filter.toLowerCase()) ||
-        m.demand?.toLowerCase().includes(filter.toLowerCase()) ||
-        m.category?.toLowerCase().includes(filter.toLowerCase()))
+      (
+        searchInFields(m.title ?? "", debouncedFilter) ||
+        searchInFields(m.demand ?? "", debouncedFilter) ||
+        searchInFields(m.category ?? "", debouncedFilter) ||
+        searchInFields(m.author ?? "", debouncedFilter)
+      )
   );
 
   // Paginate the filtered matches
