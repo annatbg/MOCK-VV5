@@ -9,7 +9,7 @@ import {
 } from "../../hooks/api/demandApi";
 import ListComponent from "../../components/list/ListComponent";
 import MatchGroup from "../../components/match/MatchGroup";
-import { useModal } from "../../components/modal/ModalContext";  
+import { useModal } from "../../components/modal/ModalContext";
 
 interface Match {
   id?: string; 
@@ -20,6 +20,7 @@ interface Match {
 interface Demand {
   demandId: string;
   matches: (Match | string)[];
+  category?: string; 
 }
 
 interface UpdatedMatches {
@@ -40,7 +41,13 @@ interface FetchResponse {
 const MatchView: React.FC = () => {
   const [updatedMatches, setUpdatedMatches] = useState<UpdatedMatches>({});
   const [matchStats, setMatchStats] = useState<MatchStats>({ total: 0, withConfirmed: 0 });
-  const { showModal, hideModal } = useModal();  
+  const [formData, setFormData] = useState({ category: "" }); // Added state for category
+  const [loading, setLoading] = useState(false);
+  const { showModal, hideModal } = useModal();
+
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
 
   const fetchMatchData = useCallback(async (): Promise<FetchResponse> => {
     console.log("[MatchView] Start fetching my demands");
@@ -49,22 +56,27 @@ const MatchView: React.FC = () => {
       if (!myDemandsResponse || !myDemandsResponse.data) {
         return { data: [] };
       }
-
+  
       const myDemands: Demand[] = myDemandsResponse.data || [];
       const items: any[] = [];
       let demandsWithMatches = 0;
       let demandsWithConfirmed = 0;
-
+  
       for (const demand of myDemands) {
         try {
           if (!demand || !demand.matches || demand.matches.length === 0) {
             continue;
           }
-
+  
+          // Lägg till filtrering av matchningar baserat på kategori
+          if (formData.category && demand.category !== formData.category) {
+            continue;
+          }
+  
           const matchIdsToFetch: string[] = [];
           const matchStatusMap: Record<string, string> = {};
           let hasMatchedStatus = false;
-
+  
           demand.matches.forEach(match => {
             const matchId = typeof match === 'object' ? match.id || "" : match;
             const status = typeof match === 'object' ? match.status : 'new';
@@ -75,39 +87,39 @@ const MatchView: React.FC = () => {
               hasMatchedStatus = true;
             }
           });
-
+  
           if (matchIdsToFetch.length === 0) {
             continue;
           }
-
+  
           demandsWithMatches++;
           if (hasMatchedStatus) {
             demandsWithConfirmed++;
           }
-
+  
           console.log(`[MatchView] Fetching matches for demand ${demand.demandId}`);
-
+  
           const matchesResponse = await fetchDemandsByIds(matchIdsToFetch)
             .catch(err => {
               console.error(`[MatchView] Error gick ej att hämta matchningar för demand ${demand.demandId}:`, err);
               return null;
             });
-
+  
           if (!matchesResponse || !matchesResponse.data) {
             continue;
           }
-
+  
           const matches = Array.isArray(matchesResponse.data) 
             ? matchesResponse.data 
             : [matchesResponse.data];
-
+  
           const matchesWithStatus = matches
             .filter((match: any) => match && match.demandId)
             .map((match: any) => ({
               ...match,
               status: matchStatusMap[match.demandId] || 'new'
             }));
-
+  
           if (matchesWithStatus.length > 0) {
             items.push({ 
               demand,
@@ -119,23 +131,24 @@ const MatchView: React.FC = () => {
           console.error(`[MatchView] Error bearbetar demand:`, err);
         }
       }
-
+  
       setMatchStats({
         total: demandsWithMatches,
         withConfirmed: demandsWithConfirmed
       });
-
+  
       return { data: items };
-
+  
     } catch (err) {
       console.error("[MatchView] Error:", err);
       return { data: [] };
     }
-  }, [updatedMatches]);
+  }, [updatedMatches, formData.category]); 
+  
 
   const handleConfirm = async (demandId: string, matchId: string) => {
     showModal(
-      "Är du säker på att du vill bekrafta denna match? ",
+      "Är du säker på att du vill bekräfta denna match? ",
       "confirm",
       async () => {
         try {
@@ -162,7 +175,7 @@ const MatchView: React.FC = () => {
       () => { console.log("Confirmation canceled."); } 
     );
   };
-  
+
   const handleReject = async (demandId: string, matchId: string) => {
     showModal(
       "Är du säker på att du vill avboka denna match?",
@@ -192,12 +205,11 @@ const MatchView: React.FC = () => {
       () => { console.log("Rejection canceled."); } 
     );
   };
-  
 
   const handleCancel = async (demandId: string, matchId: string, status: string) => {
     let modalMessage = "";
     let onConfirmAction: () => Promise<void>;
-  
+
     if (status === "confirmedByMe") {
       modalMessage = "är du säker på att du vill avbryta denna match?";
       onConfirmAction = async () => {
@@ -245,13 +257,11 @@ const MatchView: React.FC = () => {
     } else {
       return;
     }
-  
+
     showModal(modalMessage, "confirm", onConfirmAction, () => {
       console.log("Action canceled.");
     });
   };
-  
-   
 
   const getDeleteHandler = (demandId: string) => {
     return () => {
@@ -288,15 +298,7 @@ const MatchView: React.FC = () => {
       return "Du har inga matches.";
     }
 
-    if (matchStats.withConfirmed === 0) {
-      return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar`;
-    }
-
-    if (matchStats.withConfirmed === matchStats.total) {
-      return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med aktiva samarbeten`;
-    }
-
-    return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar och ${matchStats.withConfirmed} med aktiva samarbeten`;
+    return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar`;
   };
 
   const renderMatchGroup = (item: any) => {
@@ -314,6 +316,25 @@ const MatchView: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center w-full overflow-y-auto p-6">
+      <div className="mb-4 w-full max-w-md">
+        <label htmlFor="category" className="block font-semibold text-gray-800 mb-1">
+          Kategori
+        </label>
+        <select
+          id="category"
+          value={formData.category}
+          onChange={handleChange}
+          className="w-full p-3 border rounded-xl text-base bg-white focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
+          disabled={loading}
+        >
+          <option value="">Välj en kategori</option>
+          <option value="Health">Hälsa</option>
+          <option value="Technology">Teknologi</option>
+          <option value="Finance">Ekonomi</option>
+          <option value="Environment">Miljö</option>
+          <option value="Education">Utbildning</option>
+        </select>
+      </div>
       <ListComponent
         fetchFunction={fetchMatchData}
         title={getDynamicTitle()}
