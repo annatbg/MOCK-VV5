@@ -39,14 +39,7 @@ function Client() {
 
   return (
     <div className="relative flex flex-col w-full bg-[#ede0d4]">
-      <div
-        className="absolute inset-0 bg-no-repeat bg-bottom"
-        style={{
-          backgroundImage: `url(${bgImg})`,
-          backgroundSize: "contain",
-          backgroundPosition: "bottom right",
-        }}
-      />
+      
       <div className="relative flex flex-row h-screen">
         <Sidebar activeView={activeView || "home"} />
         {renderView()}
