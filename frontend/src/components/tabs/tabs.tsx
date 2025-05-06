@@ -12,11 +12,11 @@ const Tabs = ({ onToggleCreate }: TabsProps) => {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between border-b border-slate-300 mb-4">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex gap-4">
           <Button
             onClick={() => setActiveTab("demand")}
-            label="Demand Lista"
+            label="Behovs Lista"
             variant={activeTab === "demand" ? "primary" : "secondary"}
             className="py-2 px-4"
           />
@@ -31,7 +31,7 @@ const Tabs = ({ onToggleCreate }: TabsProps) => {
 
         <Button
           onClick={onToggleCreate}
-          label="Ny demand"
+          label="Anmäl Behov"
           variant="primary"
           className="p-2"
         />
