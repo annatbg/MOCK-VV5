@@ -18,7 +18,7 @@ interface Demand {
 }
 
 const NotificationsView = () => {
-  const [notifications, setNotifications] = useState<{ message: string }[]>([]);
+  const [notifications, setNotifications] = useState<{ message: string; clickable: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const NotificationsView = () => {
         const resp = await fetchMyDemands();
         const myDemands: Demand[] = resp.data || [];
 
-        const out: { message: string }[] = [];
+        const out: { message: string; clickable: boolean }[] = [];
 
         for (const d of myDemands) {
           if (!Array.isArray(d.matches)) continue;
@@ -37,18 +37,20 @@ const NotificationsView = () => {
           for (const m of d.matches) {
             const status = typeof m === "object" ? m.status : "new";
 
-       
+
             if (status === "confirmedByThem") {
               out.push({
-                message: `Din demand har blivit bekräftad av användaren: "${d.title}". Acceptera för att matcha!`,
+                message: `Din demand har blivit bekräftad av: "${d.title}". Acceptera för att matcha!`,
+                clickable: false, 
               });
               break;
             }
 
-           
+
             if (status === "matched") {
               out.push({
                 message: `Du har matchats med ett behov: "${d.title}"`,
+                clickable: true, 
               });
               break;
             }
@@ -67,7 +69,7 @@ const NotificationsView = () => {
   }, []);
 
   const handleClick = () => {
-    navigate("/user/client/hem?tab=match"); 
+    navigate("/user/client/hem?tab=match");
   };
 
   return (
@@ -85,8 +87,10 @@ const NotificationsView = () => {
           notifications.map((note, idx) => (
             <button
               key={idx}
-              onClick={handleClick}
-              className="bg-white text-darkText px-4 py-2 rounded shadow w-full max-w-md text-sm text-left hover:bg-gray-100 transition"
+              onClick={note.clickable ? handleClick : undefined} 
+              className={`bg-white text-darkText px-4 py-2 rounded shadow w-full max-w-md text-sm text-left ${
+                note.clickable ? "" : "cursor-default" 
+              }`}
             >
               {note.message}
             </button>
