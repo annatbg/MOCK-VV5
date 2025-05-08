@@ -34,7 +34,7 @@ const ProfileView: React.FC = () => {
         setEditData(userWithoutPassword);
 
       } catch (error) {
-        console.error("Error fetching data in ProfileView:", error);
+        console.error("Fel vid hämtning av data i Profil:", error);
       }
     };
 
@@ -51,13 +51,13 @@ const ProfileView: React.FC = () => {
 
     const { firstName, lastName, email, organisation, location, password } = editData;
     if (!firstName || !lastName || !email || !organisation || !location) {
-      showModal("Please fill in all required fields.", "error");
+      showModal("Snälla fyll i allt.", "error");
       return;
     }
 
     const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
     if (email && !emailRegex.test(email)) {
-      showModal("Invalid email address.", "error");
+      showModal("Fel email address.", "error");
       return;
     }
 
@@ -65,7 +65,7 @@ const ProfileView: React.FC = () => {
       const result = (await updateUser(editData)) as unknown as UpdateUserResponse;
       setUserData({ user: result.user });
       setUser(result.user, result.token);
-      showModal("Profile updated successfully!", "success");
+      showModal("Profil uppdaterad!!", "success");
       setIsEditing(false);
     } catch (error: any) {
       showModal(error.message, "error");
