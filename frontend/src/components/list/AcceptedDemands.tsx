@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { fetchMyDemands, fetchDemandsByIds } from '../../hooks/api/demandApi';
 import Button from '../button/Button';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+
 
 interface Match {
   id?: string;
@@ -29,6 +32,10 @@ const AcceptedDemands: React.FC = () => {
   const [selectedDemand, setSelectedDemand] = useState<Demand | null>(null);
   const [selectedMatches, setSelectedMatches] = useState<Match[]>([]);
   const [viewingDemand, setViewingDemand] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
 
   useEffect(() => {
     const load = async () => {
@@ -85,12 +92,23 @@ const AcceptedDemands: React.FC = () => {
     setSelectedDemand(demand);
     setSelectedMatches(matches);
     setViewingDemand(true);
+
+    const slug = demand.title.toLowerCase().replace(/\s+/g, '-');
+    navigate(`${slug}`);
+    const params = new URLSearchParams(location.search);
+    params.set('match', slug); 
+  
+    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
   const handleBackToList = () => {
     setViewingDemand(false);
     setSelectedDemand(null);
     setSelectedMatches([]);
+
+    const params = new URLSearchParams(location.search);
+  params.delete('match');
+  navigate(`${location.pathname}?${params.toString()}`, { replace: true });
   };
 
   if (loading) return <div>Laddar aktiva samarbeten...</div>;
