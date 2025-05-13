@@ -1,5 +1,3 @@
-//MOVE TO ACCUAL BUTTON COMPONENT OR REMOVE 
-
 type ActionButtonsProps = {
   status?: "new" | "confirmedByMe" | "confirmedByThem" | "matched" | "rejectedByMe";
   onConfirm?: () => void;
@@ -21,25 +19,25 @@ const ActionButtons = ({ status, onConfirm, onReject, onCancel }: ActionButtonsP
         {(status === "new" || status === "confirmedByThem") && onConfirm && onReject && (
           <>
             <button
-              className="match-action-button bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md "
-              onClick={stop(onConfirm)}
-              title="Accept this match"
-            >
-              Acceptera
-            </button>
-            <button
-              className="match-action-button bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md "
+              className="match-action-button bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-md"
               onClick={stop(onReject)}
               title="Reject this match"
             >
               Neka
+            </button>
+            <button
+              className="match-action-button bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md"
+              onClick={stop(onConfirm)}
+              title="Accept this match"
+            >
+              Acceptera
             </button>
           </>
         )}
 
         {status === "confirmedByMe" && onCancel && (
           <button
-            className="match-action-button bg-red-500 text-white py-2 px-4 rounded-md "
+            className="match-action-button bg-red-500 text-white py-2 px-4 rounded-md"
             onClick={stop(onCancel)} 
             title="Cancel your confirmation"
           >

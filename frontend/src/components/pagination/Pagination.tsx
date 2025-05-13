@@ -1,30 +1,30 @@
 interface PaginationProps {
   currentPage: number;
   totalItems: number;
+  itemsPerPage: number; 
   onPageChange: (page: number) => void;
 }
 
 const Pagination = ({
   currentPage,
   totalItems,
+  itemsPerPage,
   onPageChange,
 }: PaginationProps) => {
-  const totalPages = Math.ceil(totalItems);
+  const totalPages = Math.max(1, Math.ceil(totalItems / (itemsPerPage || 1))); 
 
   const handlePageClick = (page: number) => {
-    onPageChange(page);
+    if (page >= 0 && page < totalPages) {
+      onPageChange(page);
+    }
   };
 
-  const pageNumbers = [];
-  for (let i = 0; i < totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const pageNumbers = totalPages > 0 ? Array.from({ length: totalPages }, (_, i) => i) : [];
 
   return (
     <div className="flex justify-center gap-1 mt-4">
-      {/* Föregående knapp med vänsterpil */}
       <button
-        onClick={() => onPageChange(currentPage - 1)}
+        onClick={() => handlePageClick(currentPage - 1)}
         disabled={currentPage === 0}
         className="px-2 py-1 text-xs rounded-md bg-gray-300 disabled:opacity-50"
       >
@@ -44,7 +44,6 @@ const Pagination = ({
         </svg>
       </button>
 
-      {/* Sidnummer */}
       {pageNumbers.map((page) => (
         <button
           key={page}
@@ -59,9 +58,8 @@ const Pagination = ({
         </button>
       ))}
 
-      {/* Nästa knapp med högerpil */}
       <button
-        onClick={() => onPageChange(currentPage + 1)}
+        onClick={() => handlePageClick(currentPage + 1)}
         disabled={currentPage === totalPages - 1}
         className="px-2 py-1 text-xs rounded-md bg-gray-300 disabled:opacity-50"
       >
@@ -83,5 +81,6 @@ const Pagination = ({
     </div>
   );
 };
+
 
 export default Pagination;

@@ -54,27 +54,37 @@ const MatchGroup = ({
 
   // Function to search if all words in the search term are present in the text
   const searchInFields = (text: string, searchTerm: string): boolean => {
-    // Split the search term into words and create a regex for each word
     const words = searchTerm
       .trim()
       .split(/[\s,]+/) // Split by space or comma
       .filter(word => word.length > 0); // Remove empty strings
 
-    // Check if each word in the filter exists in the text (case insensitive)
     return words.every(word => text.toLowerCase().includes(word.toLowerCase()));
   };
 
   // Filter matches based on debounced input
-  const filteredMatches = matches.filter(
-    (m) =>
-      m.status !== "matched" &&
-      (
-        searchInFields(m.title ?? "", debouncedFilter) ||
-        searchInFields(m.demand ?? "", debouncedFilter) ||
-        searchInFields(m.category ?? "", debouncedFilter) ||
-        searchInFields(m.author ?? "", debouncedFilter)
-      )
-  );
+  const filteredMatches = matches
+    .filter(
+      (m) =>
+        m.status !== "matched" && // Exclude matches with status "matched"
+        (
+          searchInFields(m.title ?? "", debouncedFilter) ||
+          searchInFields(m.demand ?? "", debouncedFilter) ||
+          searchInFields(m.category ?? "", debouncedFilter) ||
+          searchInFields(m.author ?? "", debouncedFilter)
+        )
+    )
+    .sort((a, b) => {
+      // Prioritize confirmed interest statuses: "confirmedByMe" and "confirmedByThem"
+      if (a.status === "confirmedByMe" || a.status === "confirmedByThem") return -1;
+      if (b.status === "confirmedByMe" || b.status === "confirmedByThem") return 1;
+
+      // Then prioritize "new" status over others
+      if (a.status === "new") return -1;
+      if (b.status === "new") return 1;
+
+      return 0; // Default sorting for other statuses
+    });
 
   // Paginate the filtered matches
   const paginatedMatches = filteredMatches.slice(
@@ -89,7 +99,7 @@ const MatchGroup = ({
   };
 
   return (
-    <div className="w-full mb-12 border border-gray-300 rounded-lg shadow-lg bg-white">
+    <div className="w-full mb-7 border border-gray-300 rounded-lg shadow-lg bg-white">
       <div className="p-6">
         <DemandCard
           title={demand.title}
@@ -112,7 +122,8 @@ const MatchGroup = ({
           />
         </div>
 
-        {paginatedMatches.length > 0 && (
+        {/* Matchningar */}
+        {filteredMatches.length > 0 ? (
           <div className="mt-8">
             <h4 className="text-xl font-semibold text-lightGreen border-b border-lightGreen pb-2">
               Matchningar:
@@ -137,16 +148,13 @@ const MatchGroup = ({
               <Pagination
                 currentPage={currentPage}
                 totalItems={totalPages}
-                onPageChange={handlePageChange}
-              />
+                onPageChange={handlePageChange} itemsPerPage={0}              />
             )}
           </div>
-        )}
-
-        {filteredMatches.length === 0 && (
-          <p className="mt-8 p-5 text-center italic text-darkText bg-gray-100 rounded-lg">
-            Inga matchningar hittades för denna förfrågan.
-          </p>
+        ) : (
+          <div className="mt-8">
+            <h4 className="text-gray-500">Inga matchningar hittades..</h4>
+          </div>
         )}
       </div>
     </div>

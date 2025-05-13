@@ -10,6 +10,7 @@ import {
 import ListComponent from "../../components/list/ListComponent";
 import MatchGroup from "../../components/match/MatchGroup";
 import { useModal } from "../../components/modal/ModalContext";
+import Pagination from "../../components/pagination/Pagination";
 
 interface Match {
   id?: string; 
@@ -44,107 +45,111 @@ const MatchView: React.FC = () => {
   const [formData, setFormData] = useState({ category: "" }); // Added state for category
   const [loading, setLoading] = useState(false);
   const { showModal, hideModal } = useModal();
+  const [currentPage, setCurrentPage] = useState(0); 
+  const itemsPerPage = 3; 
+
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
   const fetchMatchData = useCallback(async (): Promise<FetchResponse> => {
-    console.log("[MatchView] Start fetching my demands");
-    try {
-      const myDemandsResponse = await fetchMyDemands();
-      if (!myDemandsResponse || !myDemandsResponse.data) {
-        return { data: [] };
-      }
-  
-      const myDemands: Demand[] = myDemandsResponse.data || [];
-      const items: any[] = [];
-      let demandsWithMatches = 0;
-      let demandsWithConfirmed = 0;
-  
-      for (const demand of myDemands) {
-        try {
-          if (!demand || !demand.matches || demand.matches.length === 0) {
-            continue;
-          }
-  
-          // Lägg till filtrering av matchningar baserat på kategori
-          if (formData.category && demand.category !== formData.category) {
-            continue;
-          }
-  
-          const matchIdsToFetch: string[] = [];
-          const matchStatusMap: Record<string, string> = {};
-          let hasMatchedStatus = false;
-  
-          demand.matches.forEach(match => {
-            const matchId = typeof match === 'object' ? match.id || "" : match;
-            const status = typeof match === 'object' ? match.status : 'new';
-            if (!matchId) return;
-            matchIdsToFetch.push(matchId);
-            matchStatusMap[matchId] = status;
-            if (status === 'matched') {
-              hasMatchedStatus = true;
-            }
-          });
-  
-          if (matchIdsToFetch.length === 0) {
-            continue;
-          }
-  
-          demandsWithMatches++;
-          if (hasMatchedStatus) {
-            demandsWithConfirmed++;
-          }
-  
-          console.log(`[MatchView] Fetching matches for demand ${demand.demandId}`);
-  
-          const matchesResponse = await fetchDemandsByIds(matchIdsToFetch)
-            .catch(err => {
-              console.error(`[MatchView] Error gick ej att hämta matchningar för demand ${demand.demandId}:`, err);
-              return null;
-            });
-  
-          if (!matchesResponse || !matchesResponse.data) {
-            continue;
-          }
-  
-          const matches = Array.isArray(matchesResponse.data) 
-            ? matchesResponse.data 
-            : [matchesResponse.data];
-  
-          const matchesWithStatus = matches
-            .filter((match: any) => match && match.demandId)
-            .map((match: any) => ({
-              ...match,
-              status: matchStatusMap[match.demandId] || 'new'
-            }));
-  
-          if (matchesWithStatus.length > 0) {
-            items.push({ 
-              demand,
-              ...(updatedMatches[demand.demandId] || {}),
-              matches: matchesWithStatus
-            });
-          }
-        } catch (err) {
-          console.error(`[MatchView] Error bearbetar demand:`, err);
-        }
-      }
-  
-      setMatchStats({
-        total: demandsWithMatches,
-        withConfirmed: demandsWithConfirmed
-      });
-  
-      return { data: items };
-  
-    } catch (err) {
-      console.error("[MatchView] Error:", err);
+  console.log("[MatchView] Start fetching my demands");
+  try {
+    const myDemandsResponse = await fetchMyDemands();
+    if (!myDemandsResponse || !myDemandsResponse.data) {
       return { data: [] };
     }
-  }, [updatedMatches, formData.category]); 
-  
+
+    const myDemands: Demand[] = myDemandsResponse.data || [];
+    const items: any[] = [];
+    let demandsWithMatches = 0;
+    let demandsWithConfirmed = 0;
+
+    // Loopa igenom efterfrågningar
+    for (const demand of myDemands) {
+      try {
+        if (!demand || !demand.matches || demand.matches.length === 0) {
+          continue; 
+        }
+
+        // Filtrera baserat på kategori
+        if (formData.category && demand.category !== formData.category) {
+          continue; 
+        }
+
+        const matchIdsToFetch: string[] = [];
+        const matchStatusMap: Record<string, string> = {};
+        let hasValidMatches = false;
+
+        demand.matches.forEach(match => {
+          const matchId = typeof match === 'object' ? match.id || "" : match;
+          const status = typeof match === 'object' ? match.status : 'new';
+          if (!matchId) return;
+          matchIdsToFetch.push(matchId);
+          matchStatusMap[matchId] = status;
+
+          // Kontrollera om det finns giltiga matchningar
+          if (status !== 'matched' && status !== 'rejectedByMe') {
+            hasValidMatches = true;
+          }
+        });
+
+        if (!hasValidMatches || matchIdsToFetch.length === 0) {
+          continue; 
+        }
+
+        demandsWithMatches++;
+
+        console.log(`[MatchView] Fetching matches for demand ${demand.demandId}`);
+
+        const matchesResponse = await fetchDemandsByIds(matchIdsToFetch).catch(err => {
+          console.error(`[MatchView] Error gick ej att hämta matchningar för demand ${demand.demandId}:`, err);
+          return null;
+        });
+
+        if (!matchesResponse || !matchesResponse.data) {
+          continue;
+        }
+
+        const matches = Array.isArray(matchesResponse.data) 
+          ? matchesResponse.data 
+          : [matchesResponse.data];
+
+        const matchesWithStatus = matches
+          .filter((match: any) => match && match.demandId) 
+          .map((match: any) => ({
+            ...match,
+            status: matchStatusMap[match.demandId] || 'new'
+          }));
+
+        if (matchesWithStatus.length > 0) {
+          items.push({
+            demand,
+            ...(updatedMatches[demand.demandId] || {}),
+            matches: matchesWithStatus
+          });
+        }
+      } catch (err) {
+        console.error(`[MatchView] Error bearbetar demand:`, err);
+      }
+    }
+
+    setMatchStats({
+      total: demandsWithMatches, 
+      withConfirmed: demandsWithConfirmed
+    });
+
+    const paginatedItems = items.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+
+    return { data: paginatedItems };
+  } catch (err) {
+    console.error("[MatchView] Error:", err);
+    return { data: [] };
+  }
+}, [updatedMatches, formData.category, currentPage]);
+
+
 
   const handleConfirm = async (demandId: string, matchId: string) => {
     showModal(
@@ -293,13 +298,6 @@ const MatchView: React.FC = () => {
     }
   };
 
-  const getDynamicTitle = (): string => {
-    if (matchStats.total === 0) {
-      return "Du har inga matches.";
-    }
-
-    return `Du har ${matchStats.total} demand${matchStats.total > 0 ? 's' : ''} med möjliga matchningar`;
-  };
 
   const renderMatchGroup = (item: any) => {
     return (
@@ -315,33 +313,42 @@ const MatchView: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full overflow-y-auto p-6">
-      <div className="mb-4 w-full max-w-md">
-        <label htmlFor="category" className="block font-semibold text-gray-800 mb-1">
-          Kategori
-        </label>
-        <select
-          id="category"
-          value={formData.category}
-          onChange={handleChange}
-          className="w-full p-3 border rounded-xl text-base bg-white focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
-          disabled={loading}
-        >
-          <option value="">Välj en kategori</option>
-          <option value="Health">Hälsa</option>
-          <option value="Technology">Teknologi</option>
-          <option value="Finance">Ekonomi</option>
-          <option value="Environment">Miljö</option>
-          <option value="Education">Utbildning</option>
-        </select>
-      </div>
-      <ListComponent
-        fetchFunction={fetchMatchData}
-        title={getDynamicTitle()}
-        renderItem={renderMatchGroup}
-      />
+  <div className="flex flex-col items-center w-full overflow-y-auto p-6">
+    {/* Dropdown för kategori */}
+    <div className="mb-4 w-full max-w-md">
+      <label htmlFor="category" className="block font-semibold text-gray-800 mb-1"></label>
+      <select
+        id="category"
+        value={formData.category}
+        onChange={handleChange}
+        className="w-full p-3 border rounded-xl text-base bg-white focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
+        disabled={loading}
+      >
+        <option value="">Välj en kategori</option>
+        <option value="Health">Hälsa</option>
+        <option value="Technology">Teknologi</option>
+        <option value="Finance">Ekonomi</option>
+        <option value="Environment">Miljö</option>
+        <option value="Education">Utbildning</option>
+      </select>
     </div>
-  );
+
+    {/* List of items */}
+    <ListComponent
+        fetchFunction={fetchMatchData}
+        renderItem={renderMatchGroup} title={""}    
+        />
+
+    {/* Pagination Component */}
+    <Pagination
+    currentPage={currentPage}
+    totalItems={matchStats.total}
+    onPageChange={(page: number) => setCurrentPage(page)}
+    itemsPerPage={itemsPerPage} 
+  />
+  </div>
+);
+
 };
 
 export default MatchView;

@@ -26,20 +26,20 @@ const Modal: React.FC = () => {
           {type === "success" ? "Success!" : type === "error" ? "Error!" : "Bekräfta"}
         </h2>
         <p className="text-lg">{message}</p>
-
-        {type === "confirm" && (
+        
+          {type === "confirm" && (
           <div className="mt-4 flex justify-center gap-4">
-            <button
-              onClick={handleConfirm}
-              className="px-5 py-2 bg-lightGreen text-lightText rounded-md hover:bg-darkGreen transition"
-            >
-              Bekräfta
-            </button>
             <button
               onClick={handleCancel}
               className="px-5 py-2 bg-red-500 text-lightText rounded-md hover:bg-red-700 transition"
             >
               Avbryt
+            </button>
+            <button
+              onClick={handleConfirm}
+              className="px-5 py-2 bg-lightGreen text-lightText rounded-md hover:bg-darkGreen transition"
+            >
+              Bekräfta
             </button>
           </div>
         )}
