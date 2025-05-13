@@ -14,11 +14,11 @@ const { getUserFromToken } = require("../../services/utils/jwt");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
 
 const allowedCategories = [
-  "Technology",
-  "Health",
-  "Education",
-  "Finance",
-  "Environment",
+  "Teknologi",
+  "Hälsa",
+  "Utbildning",
+  "Ekonomi",
+  "Miljö",
 ];
 
 const createDemand = async (event) => {
@@ -353,23 +353,30 @@ const updateDemandMatches = async (event) => {
     };
   }
 
+  const validStatuses = [
+    "new",
+    "confirmedByMe",
+    "confirmedByThem",
+    "rejectedByMe",
+  ];
 
-  const validStatuses = ["new", "confirmedByMe", "confirmedByThem", "rejectedByMe"];
-  
   if (!validStatuses.includes(status)) {
     return {
       statusCode: 400,
       body: JSON.stringify({
-        message: `Invalid status. Valid statuses are: ${validStatuses.join(", ")}`,
+        message: `Invalid status. Valid statuses are: ${validStatuses.join(
+          ", "
+        )}`,
       }),
     };
   }
 
   try {
-
     const [myDemandRes, matchDemandRes] = await Promise.all([
       db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId } })),
-      db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId: matchId } }))
+      db.send(
+        new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId: matchId } })
+      ),
     ]);
 
     const myDemand = myDemandRes.Item;
@@ -392,12 +399,14 @@ const updateDemandMatches = async (event) => {
     // Helper: update or insert match in matches array
     const updateMatchList = (matches = [], matchId, status) => {
       const now = new Date().toISOString();
-      const index = matches.findIndex(m => m === matchId || (typeof m === "object" && m.id === matchId));
+      const index = matches.findIndex(
+        (m) => m === matchId || (typeof m === "object" && m.id === matchId)
+      );
 
       const updatedMatch = {
         id: matchId,
         status,
-        updatedAt: now
+        updatedAt: now,
       };
 
       if (index !== -1) {
@@ -409,17 +418,13 @@ const updateDemandMatches = async (event) => {
       return matches;
     };
 
- 
-    const existingMatchFromThem = theirDemand.matches?.find(m => {
+    const existingMatchFromThem = theirDemand.matches?.find((m) => {
       return typeof m === "object" && m.id === demandId;
     });
 
- 
     const theyHaveConfirmed = existingMatchFromThem?.status === "confirmedByMe";
-    
-   
-    let myFinalStatus, theirFinalStatus;
 
+    let myFinalStatus, theirFinalStatus;
 
     if (status === "confirmedByMe" && theyHaveConfirmed) {
       // Both users have confirmed - set both to matched
@@ -441,31 +446,39 @@ const updateDemandMatches = async (event) => {
 
     // Update both match records
     const myMatches = updateMatchList(myDemand.matches, matchId, myFinalStatus);
-    const theirMatches = updateMatchList(theirDemand.matches, demandId, theirFinalStatus);
+    const theirMatches = updateMatchList(
+      theirDemand.matches,
+      demandId,
+      theirFinalStatus
+    );
 
     // Perform both updates
     const now = new Date().toISOString();
     const [updatedMine, updatedTheirs] = await Promise.all([
-      db.send(new UpdateCommand({
-        TableName: DEMANDS_TABLE,
-        Key: { demandId },
-        UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
-        ExpressionAttributeValues: {
-          ":matches": myMatches,
-          ":updatedAt": now
-        },
-        ReturnValues: "ALL_NEW"
-      })),
-      db.send(new UpdateCommand({
-        TableName: DEMANDS_TABLE,
-        Key: { demandId: matchId },
-        UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
-        ExpressionAttributeValues: {
-          ":matches": theirMatches,
-          ":updatedAt": now
-        },
-        ReturnValues: "ALL_NEW"
-      }))
+      db.send(
+        new UpdateCommand({
+          TableName: DEMANDS_TABLE,
+          Key: { demandId },
+          UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+          ExpressionAttributeValues: {
+            ":matches": myMatches,
+            ":updatedAt": now,
+          },
+          ReturnValues: "ALL_NEW",
+        })
+      ),
+      db.send(
+        new UpdateCommand({
+          TableName: DEMANDS_TABLE,
+          Key: { demandId: matchId },
+          UpdateExpression: "SET matches = :matches, updatedAt = :updatedAt",
+          ExpressionAttributeValues: {
+            ":matches": theirMatches,
+            ":updatedAt": now,
+          },
+          ReturnValues: "ALL_NEW",
+        })
+      ),
     ]);
 
     return {
@@ -475,8 +488,8 @@ const updateDemandMatches = async (event) => {
         data: {
           myDemand: updatedMine.Attributes,
           matchedDemand: updatedTheirs.Attributes,
-          matched: myFinalStatus === "matched"
-        }
+          matched: myFinalStatus === "matched",
+        },
       }),
     };
   } catch (error) {
@@ -488,9 +501,8 @@ const updateDemandMatches = async (event) => {
   }
 };
 
-
 const getAcceptedDemands = async (event) => {
-  const user   = getUserFromToken(event);
+  const user = getUserFromToken(event);
   const author = user?.username;
 
   if (!author) {
@@ -501,7 +513,6 @@ const getAcceptedDemands = async (event) => {
   }
 
   try {
-  
     const queryParams = {
       TableName: DEMANDS_TABLE,
       IndexName: "author-index",
@@ -517,12 +528,12 @@ const getAcceptedDemands = async (event) => {
       };
     }
 
-
-    const acceptedDemands = myDemands.filter((d) =>
-      Array.isArray(d.matches) &&
-      d.matches.some(
-        (m) => m.status === "confirmedByMe" || m.status === "confirmedByThem"
-      )
+    const acceptedDemands = myDemands.filter(
+      (d) =>
+        Array.isArray(d.matches) &&
+        d.matches.some(
+          (m) => m.status === "confirmedByMe" || m.status === "confirmedByThem"
+        )
     );
 
     if (acceptedDemands.length === 0) {
@@ -531,7 +542,6 @@ const getAcceptedDemands = async (event) => {
         body: JSON.stringify({ message: "No accepted demands found." }),
       };
     }
-
 
     return {
       statusCode: 200,
@@ -549,9 +559,6 @@ const getAcceptedDemands = async (event) => {
   }
 };
 
-
-
-
 module.exports = {
   createDemand,
   fetchMyDemands,
@@ -559,5 +566,5 @@ module.exports = {
   fetchDemandsByIds,
   deleteDemand,
   updateDemandMatches,
-  getAcceptedDemands
+  getAcceptedDemands,
 };

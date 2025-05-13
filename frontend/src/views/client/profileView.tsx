@@ -1,170 +1,138 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from "react";
-import useUser, { User as StoreUser } from "../../store/useUser";
+import useUser from "../../store/useUser";
 import { fetchUserData, updateUser } from "../../hooks/api/userApi";
 import { useModal } from "../../components/modal/ModalContext";
 
-const API_URL = import.meta.env.VITE_API_URL as string;
-
-interface ProfileData {
-  user: StoreUser;
-}
-
-interface UpdateUserResponse {
-  user: StoreUser;
-  token: string;
-}
-
 const ProfileView: React.FC = () => {
-  const [userData, setUserData] = useState<ProfileData | null>(null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editData, setEditData] = useState<Partial<StoreUser>>({});
+  const [userData, setUserData] = useState<any>(null);
+  const [editData, setEditData] = useState<any>({});
+  const [isEditing, setIsEditing] = useState(false);
 
-  const user = useUser((state) => state.user);
   const setUser = useUser((state) => state.login);
+  const { showModal } = useModal();
 
-  const { showModal } = useModal(); 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!user) return;
-      try {
-        const data = (await fetchUserData(user, `${API_URL}/user/fetch`)) as unknown as ProfileData;
-        setUserData(data);
-
-        const { password, ...userWithoutPassword } = data.user;
-        setEditData(userWithoutPassword);
-
-      } catch (error) {
-        console.error("Fel vid hämtning av data i Profil:", error);
-      }
-    };
-
-    fetchData();
-  }, [user]);
-
-  const handleEditChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setEditData((prev) => ({ ...prev, [name]: value }));
+  // Hämta profil
+  const fetchUserProfile = async () => {
+    try {
+      const res = await fetchUserData();
+      setUserData(res.user);
+      setEditData(res.user);
+    } catch (err) {
+      console.error("Fel vid hämtning av användare:", err);
+    }
   };
 
-  const handleEditSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    fetchUserProfile();
+  }, []);
+
+  // Input
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditData((prev: any) => ({ ...prev, [name]: value }));
+  };
+
+  // Spara ändringar
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const { firstName, lastName, email, organisation, location, password } = editData;
+    const { firstName, lastName, email, organisation, location } = editData;
     if (!firstName || !lastName || !email || !organisation || !location) {
-      showModal("Snälla fyll i allt.", "error");
-      return;
-    }
-
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
-    if (email && !emailRegex.test(email)) {
-      showModal("Fel email address.", "error");
+      showModal("Fyll i alla fält", "error");
       return;
     }
 
     try {
-      const result = (await updateUser(editData)) as unknown as UpdateUserResponse;
-      setUserData({ user: result.user });
-      setUser(result.user, result.token);
-      showModal("Profil uppdaterad!!", "success");
+      const result = await updateUser(editData);
+      setUserData(result.user);
+      setUser(
+        { email: result.user.email, role: result.user.role },
+        result.token
+      );
+      showModal("Profil uppdaterad", "success");
       setIsEditing(false);
     } catch (error: any) {
       showModal(error.message, "error");
     }
   };
 
-  const capitalizeFirstLetter = (str: string) => {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
-  };
+  const renderProfileInfo = () => (
+    <div className="w-full">
+      <div className="text-center mb-4">
+        <h1 className="text-3xl font-bold">
+          {userData.firstName} {userData.lastName}
+        </h1>
+      </div>
+      <div className="space-y-2">
+        <p>
+          <strong>Email:</strong> {userData.email}
+        </p>
+        <p>
+          <strong>Organisation:</strong> {userData.organisation}
+        </p>
+        <p>
+          <strong>Plats:</strong> {userData.location}
+        </p>
+        <p>
+          <strong>Roll:</strong> {userData.role}
+        </p>
+      </div>
+      <div className="text-center mt-6">
+        <button onClick={() => setIsEditing(true)} className="btn">
+          Redigera
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderEditForm = () => (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {[
+        "firstName",
+        "lastName",
+        "email",
+        "organisation",
+        "location",
+        "password",
+      ].map((field) => (
+        <div key={field}>
+          <label>{field}:</label>
+          <input
+            type={field === "password" ? "password" : "text"}
+            name={field}
+            value={editData[field] || ""}
+            onChange={handleChange}
+            required={field !== "password"}
+            className="input"
+          />
+        </div>
+      ))}
+      <div className="flex gap-4 justify-end">
+        <button type="submit" className="btn">
+          Spara
+        </button>
+        <button
+          type="button"
+          onClick={() => setIsEditing(false)}
+          className="btn-secondary"
+        >
+          Avbryt
+        </button>
+      </div>
+    </form>
+  );
+
+  if (!userData) return <p>Laddar profil...</p>;
 
   return (
-    <div className="grid grid-cols-1 place-items-center w-full p-6">
-      {userData ? (
-        <div className="w-full max-w-lg bg-lightGreen text-lightText rounded-xl p-6 shadow-lg grid grid-cols-1 gap-6">
-
-          {/* Profile picture */}
-          <div className="w-28 h-28 rounded-full border-4 border-lightText bg-lightText text-lightGreen flex items-center justify-center text-3xl font-bold mb-6 justify-self-center">
-            {userData.user.firstName?.charAt(0).toUpperCase()}
-            {userData.user.lastName?.charAt(0).toUpperCase()}
-          </div>
-
-          {/* Profile information */}
-          {!isEditing ? (
-            <div className="w-full">
-              <div className="text-center mb-4">
-                <h1 className="text-3xl font-bold">
-                  {capitalizeFirstLetter(userData.user.firstName || '')}{" "}
-                  {capitalizeFirstLetter(userData.user.lastName || '')}
-                </h1>
-              </div>
-
-              {/* Left-aligned rows with labels */}
-              <div className="flex flex-col items-start space-y-2 mx-auto w-fit">
-                <p className="text-lg">
-                  <span className="font-semibold">Email:</span> {capitalizeFirstLetter(userData.user.email || '')}
-                </p>
-                <p className="text-lg">
-                  <span className="font-semibold">Organisation:</span> {capitalizeFirstLetter(userData.user.organisation || '')}
-                </p>
-                <p className="text-lg">
-                  <span className="font-semibold">Plats:</span> {capitalizeFirstLetter(userData.user.location || '')}
-                </p>
-                <p className="text-lg">
-                  <span className="font-semibold">Roll:</span> {capitalizeFirstLetter(userData.user.role || '')}
-                </p>
-              </div>
-
-              {/* Edit button */}
-              <div className="w-full flex justify-center mt-8">
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-5 py-3 bg-lightText text-lightGreen font-semibold rounded-md hover:bg-darkGreen hover:text-lightText transition-all ease-in-out duration-200"
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleEditSubmit} className="flex flex-col gap-1 w-full mt-4">
-              {[{ label: "First name:", name: "firstName", type: "text" },
-                { label: "Last name:", name: "lastName", type: "text" },
-                { label: "Email:", name: "email", type: "email" },
-                { label: "Organisation:", name: "organisation", type: "text" },
-                { label: "Location:", name: "location", type: "text" },
-                { label: "Password:", name: "password", type: "password" },
-              ].map(({ label, name, type }) => (
-                <div key={name}>
-                  <label className="block text-sm mb-2">{label}</label>
-                  <input
-                    type={type}
-                    name={name}
-                    value={(editData as any)[name] || ""}
-                    onChange={handleEditChange}
-                    required={name !== "password"}
-                    className="w-full border-2 border-gray-300 rounded-md px-4 py-3 text-darkText focus:outline-none focus:ring-2 focus:ring-lightGreen transition-all ease-in-out duration-200"
-                  />
-                </div>
-              ))}
-              <div className="flex justify-end gap-4 mt-6">
-                <button
-                  type="submit"
-                  className="bg-lightText text-lightGreen px-5 py-3 rounded-md hover:bg-darkGreen hover:text-lightText transition-all ease-in-out duration-200"
-                >
-                  Save
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(false)}
-                  className="bg-lightText text-lightGreen px-5 py-3 rounded-md hover:bg-darkGreen hover:text-lightText transition-all ease-in-out duration-200"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          )}
+    <div className="p-6 max-w-xl mx-auto bg-lightGreen text-lightText rounded-xl shadow-md">
+      <div className="flex justify-center mb-6">
+        <div className="w-24 h-24 bg-lightText text-lightGreen flex items-center justify-center rounded-full text-3xl font-bold">
+          {userData.firstName?.[0]}
+          {userData.lastName?.[0]}
         </div>
-      ) : (
-        <p className="text-darkText">Laddar...</p>
-      )}
+      </div>
+      {isEditing ? renderEditForm() : renderProfileInfo()}
     </div>
   );
 };

@@ -111,12 +111,22 @@ const loginUser = async (event) => {
  */
 const fetchUser = async (event) => {
   try {
-    const { email } = JSON.parse(event.body);
+    const currentUser = event.requestContext?.authorizer;
+
+    if (!currentUser || !currentUser.username) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Unauthorized (backend)" }),
+      };
+    }
+
+    const email = currentUser.username;
     const user = await userExists(email);
+
     if (!user) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ message: "User not found" }),
+        body: JSON.stringify({ message: "User not found (backend)" }),
       };
     }
 
@@ -128,10 +138,10 @@ const fetchUser = async (event) => {
       }),
     };
   } catch (err) {
-    console.error("Error in fetchUser:", err);
+    console.error("Error in fetchUser (backend):", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: "Internal server error" }),
+      body: JSON.stringify({ message: "Internal server error (backend)" }),
     };
   }
 };

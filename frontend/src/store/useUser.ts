@@ -1,14 +1,13 @@
-// In your store file (e.g., src/store/useUser.ts)
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface User {
   email: string;
-  password?: string;      
-  organisation?: string;  
-  firstName?: string;     
-  lastName?: string;      
-  location?: string;      
+  password?: string;
+  organisation?: string;
+  firstName?: string;
+  lastName?: string;
+  location?: string;
   role: string;
 }
 
@@ -26,10 +25,15 @@ const useUser = create<UserStore>()(
       token: null,
       login: (userData, userToken) =>
         set(() => ({ user: userData, token: userToken })),
-      logout: () => set(() => ({ user: null, token: null })),
+      logout: () => {
+        localStorage.removeItem("zustand-user");
+        set(() => ({ user: null, token: null }));
+      },
     }),
     {
       name: "zustand-user",
+      // bara token sparas
+      partialize: (state) => ({ token: state.token }),
     }
   )
 );
