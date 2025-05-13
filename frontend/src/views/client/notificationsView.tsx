@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchMyDemands } from "../../hooks/api/demandApi";
+import { CheckCircle, AlertCircle } from "lucide-react";
 
 interface Match {
   id?: string;
@@ -37,20 +38,18 @@ const NotificationsView = () => {
           for (const m of d.matches) {
             const status = typeof m === "object" ? m.status : "new";
 
-
             if (status === "confirmedByThem") {
               out.push({
                 message: `Din demand har blivit bekräftad av: "${d.title}". Acceptera för att matcha!`,
-                clickable: false, 
+                clickable: false,
               });
               break;
             }
 
-
             if (status === "matched") {
               out.push({
                 message: `Du har matchats med ett behov: "${d.title}"`,
-                clickable: true, 
+                clickable: true,
               });
               break;
             }
@@ -74,26 +73,36 @@ const NotificationsView = () => {
 
   return (
     <div className="flex flex-col w-full overflow-y-auto p-6 items-center gap-4">
-      <h1 className="text-3xl font-semibold text-center text-darkText">Notifications</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="text-3xl font-semibold text-center text-darkText">Notiser</h1>
+      </div>
 
-      <section className="w-full h-full bg-lightGreen rounded-md text-lightText flex flex-col items-center justify-center min-h-[200px] p-4 gap-2">
+      <section className="w-full h-full bg-slate-100 rounded-md text-lightText flex flex-col items-center  min-h-[200px] p-4 gap-2">
         {loading ? (
-          <p>Loading notifications...</p>
+          <p className="text-center">Hämtar notiser...</p>
         ) : error ? (
-          <p>Error: {error}</p>
+          <p className="text-center text-red-600">Fel: {error}</p>
         ) : notifications.length === 0 ? (
-          <p className="text-center">Dina notiser visas här</p>
+          <p className="text-center text-darkText">Dina notiser visas här</p>
         ) : (
           notifications.map((note, idx) => (
-            <button
+            <div
               key={idx}
-              onClick={note.clickable ? handleClick : undefined} 
-              className={`bg-white text-darkText px-4 py-2 rounded shadow w-full max-w-md text-sm text-left ${
-                note.clickable ? "" : "cursor-default" 
+              onClick={note.clickable ? handleClick : undefined}
+              className={`flex items-start gap-3 p-4 rounded-md shadow w-full transition-all ${
+                note.clickable
+                  ? "bg-white cursor-pointer hover:bg-gray-100 border-2 border-lightGreen"
+                  : "bg-gray-100 cursor-default border-2 border-gray-300 opacity-90"
               }`}
             >
-              {note.message}
-            </button>
+              {note.clickable ? (
+                <CheckCircle className="text-lightGreen mt-1" size={25} />
+              ) : (
+                <AlertCircle className="text-yellow-300 mt-1" size={25} />
+              )}
+
+              <p className="text-sm text-darkText">{note.message}</p>
+            </div>
           ))
         )}
       </section>
