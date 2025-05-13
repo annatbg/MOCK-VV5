@@ -36,6 +36,7 @@ const Sidebar = ({ activeView }: SidebarProps) => {
     { label: "demands", icon: <List size={22} /> },
     { label: "match", icon: <Users size={22} /> },
     { label: "notiser", icon: <Bell size={22} /> },
+    { label: "organisation", icon: <Users size={22} /> },
   ];
 
   const handleItemClick = (label: string) => {
