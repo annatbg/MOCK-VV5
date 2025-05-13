@@ -3,8 +3,6 @@ import { fetchMyDemands, fetchDemandsByIds } from '../../hooks/api/demandApi';
 import Button from '../button/Button';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-
-
 interface Match {
   id?: string;
   demandId: string;
@@ -35,7 +33,6 @@ const AcceptedDemands: React.FC = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-
 
   useEffect(() => {
     const load = async () => {
@@ -88,17 +85,34 @@ const AcceptedDemands: React.FC = () => {
     load();
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const selectedSlug = params.get('selected');
+    
+    if (selectedSlug) {
+      const demand = items.find(
+        ({ demand }) => demand.title.toLowerCase().replace(/\s+/g, '-') === selectedSlug
+      );
+
+      if (demand) {
+        setSelectedDemand(demand.demand);
+        setSelectedMatches(demand.matches);
+        setViewingDemand(true);
+      }
+    }
+  }, [location.search, items]);
+
   const handleSelectDemand = (demand: Demand, matches: Match[]) => {
     setSelectedDemand(demand);
     setSelectedMatches(matches);
     setViewingDemand(true);
 
     const slug = demand.title.toLowerCase().replace(/\s+/g, '-');
-    navigate(`${slug}`);
     const params = new URLSearchParams(location.search);
-    params.set('match', slug); 
-  
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    params.set('tab', 'match');
+    params.set('selected', slug);
+
+    navigate(`/user/client/hem?${params.toString()}`);
   };
 
   const handleBackToList = () => {
@@ -107,8 +121,8 @@ const AcceptedDemands: React.FC = () => {
     setSelectedMatches([]);
 
     const params = new URLSearchParams(location.search);
-  params.delete('match');
-  navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+    params.delete('selected');
+    navigate(`/user/client/hem?${params.toString()}`, { replace: true });
   };
 
   if (loading) return <div>Laddar aktiva samarbeten...</div>;

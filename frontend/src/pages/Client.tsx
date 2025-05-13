@@ -5,6 +5,7 @@ import HomeView from "../views/client/homeView";
 import DemandsView from "../views/client/demandsView";
 import MatchView from "../views/client/matchView";
 import ProfileView from "../views/client/profileView";
+import Organisation from "../views/client/organisation";
 import Sidebar from "../components/sidebar/Sidebar";
 import NotificationsView from "../views/client/notificationsView";
 import bgImg from '../assets/Varmland_landscapeV2.svg';
@@ -32,6 +33,8 @@ function Client() {
         return <DemandsView />;
       case "notiser":
         return <NotificationsView />;
+      case "organisation":
+        return <Organisation />;
       default:
         return <HomeView />;
     }

@@ -6,6 +6,7 @@ import { User } from "../store/useUser";
 import logo from '../assets/Värmland2.svg'
 import { useModal } from "../components/modal/ModalContext"; 
 import img from '../assets/login-logo.png'
+import compare from "../assets/compare.png"
 
 interface FormData {
   email: string;
@@ -187,6 +188,7 @@ const Login: React.FC = () => {
     style={{
       backgroundImage: `url(${img})`
     }}
+    
 
     // ----------------- //
 
@@ -206,7 +208,11 @@ const Login: React.FC = () => {
       <p className="text-center text-xl font-semibold text-white z-10 px-4 py-2 rounded-md">
       Tillsammans gör vi skillnad – behovsmatchning gör det enkelt att hitta rätt stöd vid rätt tid.
       </p>
+      <div>
+      <img src={compare} alt="" className="absolute bottom-6 right-6 z-20 w-40" />
+      </div>
     </div>
+
   </main>
   );
 };

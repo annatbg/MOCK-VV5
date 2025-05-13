@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { fetchMyDemands } from "../../hooks/api/demandApi";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
@@ -19,10 +19,11 @@ interface Demand {
 }
 
 const NotificationsView = () => {
-  const [notifications, setNotifications] = useState<{ message: string; clickable: boolean }[]>([]);
+  const [notifications, setNotifications] = useState<{ message: string; clickable: boolean; demand: Demand }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const load = async () => {
@@ -30,7 +31,7 @@ const NotificationsView = () => {
         const resp = await fetchMyDemands();
         const myDemands: Demand[] = resp.data || [];
 
-        const out: { message: string; clickable: boolean }[] = [];
+        const out: { message: string; clickable: boolean; demand: Demand }[] = [];
 
         for (const d of myDemands) {
           if (!Array.isArray(d.matches)) continue;
@@ -42,6 +43,7 @@ const NotificationsView = () => {
               out.push({
                 message: `Din demand har blivit bekräftad av: "${d.title}". Acceptera för att matcha!`,
                 clickable: false,
+                demand: d,
               });
               break;
             }
@@ -50,6 +52,7 @@ const NotificationsView = () => {
               out.push({
                 message: `Du har matchats med ett behov: "${d.title}"`,
                 clickable: true,
+                demand: d,
               });
               break;
             }
@@ -67,8 +70,14 @@ const NotificationsView = () => {
     load();
   }, []);
 
-  const handleClick = () => {
-    navigate("/user/client/hem?tab=match");
+  const handleClick = (demand: Demand) => {
+    const slug = demand.title.toLowerCase().replace(/\s+/g, '-');
+    const params = new URLSearchParams(location.search);
+    params.set('tab', 'match');
+    params.set('selected', slug);
+    
+
+    navigate(`/user/client/hem?${params.toString()}`);
   };
 
   return (
@@ -77,7 +86,7 @@ const NotificationsView = () => {
         <h1 className="text-3xl font-semibold text-center text-darkText">Notiser</h1>
       </div>
 
-      <section className="w-full h-full bg-slate-100 rounded-md text-lightText flex flex-col items-center  min-h-[200px] p-4 gap-2">
+      <section className="w-full h-full bg-slate-100 rounded-md text-lightText flex flex-col items-center min-h-[200px] p-4 gap-2">
         {loading ? (
           <p className="text-center">Hämtar notiser...</p>
         ) : error ? (
@@ -88,7 +97,7 @@ const NotificationsView = () => {
           notifications.map((note, idx) => (
             <div
               key={idx}
-              onClick={note.clickable ? handleClick : undefined}
+              onClick={note.clickable ? () => handleClick(note.demand) : undefined}
               className={`flex items-start gap-3 p-4 rounded-md shadow w-full transition-all ${
                 note.clickable
                   ? "bg-white cursor-pointer hover:bg-gray-100 border-2 border-lightGreen"
