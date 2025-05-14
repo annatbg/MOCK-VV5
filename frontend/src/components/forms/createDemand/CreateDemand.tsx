@@ -117,11 +117,11 @@ return (
           disabled={loading}
         >
           <option value="">Välj en kategori</option>
-          <option value="Health">Hälsa</option>
-          <option value="Technology">Teknologi</option>
-          <option value="Finance">Ekonomi</option>
-          <option value="Environment">Miljö</option>
-          <option value="Education">Utbildning</option>
+          <option value="Hälsa">Hälsa</option>
+          <option value="Teknologi">Teknologi</option>
+          <option value="Ekonomi">Ekonomi</option>
+          <option value="Miljö">Miljö</option>
+          <option value="Utbildning">Utbildning</option>
         </select>
       </div>
 

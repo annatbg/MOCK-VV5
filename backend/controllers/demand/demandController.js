@@ -14,11 +14,11 @@ const { getUserFromToken } = require("../../services/utils/jwt");
 const DEMANDS_TABLE = process.env.DB_TABLE_DEMANDS;
 
 const allowedCategories = [
-  "Technology",
-  "Health",
-  "Education",
-  "Finance",
-  "Environment",
+  "Teknologi",
+  "Hälsa",
+  "Utbildning",
+  "Ekonomi",
+  "Miljö",
 ];
 
 const createDemand = async (event) => {
