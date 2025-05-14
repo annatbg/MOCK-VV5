@@ -33,8 +33,8 @@ function Client() {
         return <DemandsView />;
       case "notiser":
         return <NotificationsView />;
-      case "organisation":
-        return <Organisation />;
+      // case "organisation":
+      //   return <Organisation />;
       default:
         return <HomeView />;
     }

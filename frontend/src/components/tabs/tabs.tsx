@@ -32,7 +32,7 @@ const Tabs = ({ onToggleCreate }: TabsProps) => {
           <Button
 
             onClick={() => handleTabChange("demand")}
-            label="Demand Lista"
+            label="Behovs Lista"
 
             variant={activeTab === "demand" ? "primary" : "secondary"}
             className="py-2 px-4"
@@ -48,7 +48,7 @@ const Tabs = ({ onToggleCreate }: TabsProps) => {
 
         <Button
           onClick={onToggleCreate}
-          label="Anmäl Behov"
+          label="Skapa Behov"
           variant="primary"
           className="p-2"
         />
