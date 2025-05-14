@@ -36,7 +36,7 @@ const ListComponent = <T,>({ fetchFunction, title, renderItem }: ListComponentPr
             </li>
           ))
         ) : (
-          <p className="text-gray-500">Inga resultat hittades.</p>
+          <p className="text-gray-500"></p>
         )}
       </ul>
     </div>
