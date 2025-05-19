@@ -70,7 +70,10 @@ const Login: React.FC = () => {
       login(userData, result.token);
       handleRedirect(fixedRole);
     } catch (error: any) {
-      showModal(error.message || "An error occurred while logging in.", "error");
+      showModal(
+        error.message || "Ett fel inträffade vid inloggning. Försök igen.",
+        "error"
+      );
     }
   };
 
@@ -78,33 +81,36 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       await signupUser(formData);
-      showModal("User created successfully!", "success");
+      showModal("Användare skapad framgångsrikt!", "success");
       setTimeout(() => {
         setIsLogin(true);
       }, 1500);
     } catch (error: any) {
-      showModal(error.message || "An error occurred while signing up.", "error");
+      showModal(
+        error.message || "Ett fel inträffade vid registrering. Försök igen.",
+        "error"
+      );
     }
   };
 
-  return (  
+ return (  
   <main className="grid grid-cols-1 lg:grid-cols-2 justify-center items-center h-screen w-full bg-[#ede0d4]">
     <img src={logo} alt="Logo" className="fixed top-4 left-4" />
     
-    {/* Left Column - Login/Signup Form */}
+    {/* Vänsterkolumn - Inloggnings-/registreringsformulär */}
     <div className="flex flex-col items-center justify-center bg-darkGreen text-white w-full h-full ">
-      <h1 className="text-xl font-bold mb-4">{isLogin ? "Log In" : "Sign Up"}</h1>
+      <h1 className="text-xl font-bold mb-4">{isLogin ? "Logga in" : "Registrera dig"}</h1>
 
       {isLogin ? (
         <form className="flex flex-col items-center w-full" onSubmit={handleLogin}>
           <div className="flex flex-col m-2 w-1/2">
-            <label htmlFor="email">Email:</label>
+            <label htmlFor="email">E-post:</label>
             <input
               type="text"
               id="email"
               name="email"
               required
-              placeholder="Enter your email"
+              placeholder="Ange din e-postadress"
               className="w-full h-10 border border-gray-300 rounded px-2 text-black"
               value={formData.email}
               onChange={handleChange}
@@ -118,7 +124,7 @@ const Login: React.FC = () => {
               id="password"
               name="password"
               required
-              placeholder="Enter your password"
+              placeholder="Ange ditt lösenord"
               className="w-full h-10 border border-gray-300 rounded px-2 text-black"
               value={formData.password}
               onChange={handleChange}
@@ -135,12 +141,12 @@ const Login: React.FC = () => {
       ) : (
         <form className="flex flex-col items-center w-full" onSubmit={handleSignup}>
           {[
-            { id: "email", label: "Email", placeholder: "Enter your email" },
-            { id: "password", label: "Password", type: "password", placeholder: "Enter your password" },
-            { id: "organisation", label: "Organisation", placeholder: "Enter your organisation" },
-            { id: "firstName", label: "First Name", placeholder: "Enter your first name" },
-            { id: "lastName", label: "Last Name", placeholder: "Enter your last name" },
-            { id: "location", label: "Location", placeholder: "Enter your location" },
+            { id: "email", label: "E-post", placeholder: "Ange din e-postadress" },
+            { id: "password", label: "Lösenord", type: "password", placeholder: "Ange ditt lösenord" },
+            { id: "organisation", label: "Organisation", placeholder: "Ange din organisation" },
+            { id: "firstName", label: "Förnamn", placeholder: "Ange ditt förnamn" },
+            { id: "lastName", label: "Efternamn", placeholder: "Ange ditt efternamn" },
+            { id: "location", label: "Plats", placeholder: "Ange din plats" },
           ].map(({ id, label, type, placeholder }) => (
             <div key={id} className="flex flex-col m-2 w-1/2">
               <label htmlFor={id}>{label}:</label>
@@ -161,7 +167,7 @@ const Login: React.FC = () => {
             type="submit"
             className="bg-gray-800 text-white mt-4 rounded-md px-4 py-2"
           >
-            Registera dig
+            Registrera dig
           </button>
         </form>
       )}
@@ -170,19 +176,18 @@ const Login: React.FC = () => {
 
       <div className="flex flex-row items-center mt-4">
         <p className="m-2">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}
-
+          {isLogin ? "Har du inget konto?" : "Har du redan ett konto?"}
         </p>
         <button
           onClick={toggleForm}
           className="underline"
         >
-          {isLogin ? "Sign Up" : "Log In"}
+          {isLogin ? "Registrera dig" : "Logga in"}
         </button>
       </div>
     </div>
 
-    {/* Right Column - img-text */}
+    {/* Högerkolumn - Bild och text */}
     <div
     className="hidden lg:flex relative items-center justify-center p-6 h-full bg-cover bg-center"
     style={{
@@ -212,7 +217,6 @@ const Login: React.FC = () => {
       <img src={compare} alt="" className="absolute bottom-6 right-6 z-20 w-40" />
       </div>
     </div>
-
   </main>
   );
 };
