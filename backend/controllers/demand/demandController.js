@@ -548,9 +548,118 @@ const getAcceptedDemands = async (event) => {
     };
   }
 };
+const updateDemand = async (event) => {
+  const user = getUserFromToken(event);
+  const author = user?.username;
+  const demandId = event.pathParameters?.demandId;
 
+  if (!author) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized" }),
+    };
+  }
 
+  if (!demandId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Demand ID is required" }),
+    };
+  }
 
+  const { title, demand, category } = JSON.parse(event.body || "{}");
+
+  if (!title || !demand || !category) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "All fields are required!" }),
+    };
+  }
+
+  if (!allowedCategories.includes(category)) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: `Invalid category! Allowed categories: ${allowedCategories.join(
+          ", "
+        )}`,
+      }),
+    };
+  }
+
+  try {
+    const getParams = {
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+    };
+
+    const { Item } = await db.send(new GetCommand(getParams));
+
+    if (!Item) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: "Demand not found" }),
+      };
+    }
+
+    if (Item.author !== author) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({ message: "Unauthorized to edit this demand" }),
+      };
+    }
+
+    const isNew = Array.isArray(Item.matches)
+      ? Item.matches.every(
+          (match) =>
+            typeof match === "string" || match.status === "new"
+        )
+      : true;
+
+    if (!isNew) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          message: "Cannot update demand after it has been matched or progressed",
+        }),
+      };
+    }
+
+    const updateParams = {
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+      UpdateExpression: "SET #title = :title, #demand = :demand, #category = :category, updatedAt = :updatedAt",
+      ExpressionAttributeNames: {
+        "#title": "title",
+        "#demand": "demand",
+        "#category": "category",
+      },
+      ExpressionAttributeValues: {
+        ":title": title,
+        ":demand": demand,
+        ":category": category,
+        ":updatedAt": new Date().toISOString(),
+      },
+      ReturnValues: "ALL_NEW",
+    };
+
+    const { Attributes } = await db.send(new UpdateCommand(updateParams));
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Demand updated successfully!",
+        data: Attributes,
+      }),
+    };
+  } catch (error) {
+    console.error("Error updating demand:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "Internal Server Error" }),
+    };
+  }
+};
 
 module.exports = {
   createDemand,
@@ -559,5 +668,6 @@ module.exports = {
   fetchDemandsByIds,
   deleteDemand,
   updateDemandMatches,
-  getAcceptedDemands
+  getAcceptedDemands,
+  updateDemand
 };
