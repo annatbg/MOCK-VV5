@@ -223,6 +223,47 @@ const fetchAcceptedDemands = async (): Promise<any[]> => {
   return data;
 };
 
+const editDemand = async (
+  demandId: string, 
+  updatedData: { title: string; demand: string; category: string }
+) => {
+  try {
+    console.log(`[demandApi] Editing demand: ${demandId}`, updatedData);
+    const token = useUser.getState().token;
+
+    // Input validation
+    if (!demandId) {
+      throw new Error("Demand ID is required");
+    }
+    
+    if (!updatedData.title || !updatedData.demand || !updatedData.category) {
+      throw new Error("All fields (title, demand, category) are required");
+    }
+
+    const response = await fetch(`${API_URL}/demand/${demandId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(updatedData),
+    });
+
+    const result = await response.json();
+    console.log(`[demandApi] Edit demand response:`, result);
+    
+    if (response.ok) {
+      return result.data; // Return the updated demand data
+    } else {
+      throw new Error(result.message || "Failed to update demand");
+    }
+  } catch (error) {
+    console.error("[demandApi] Error editing demand:", error);
+    throw new Error(
+      `An error occurred while updating demand: ${(error as Error).message}`
+    );
+  }
+};
 
 
 export {
@@ -231,5 +272,6 @@ export {
   fetchAllDemands,
   deleteDemand,
   fetchDemandsByIds,
-  fetchAcceptedDemands
+  fetchAcceptedDemands,
+  editDemand
 };

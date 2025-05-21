@@ -91,6 +91,13 @@ functions:
           path: /demand/accepted
           method: get
 
+  editDemand:
+    handler: controllers/demand/demandController.editDemand
+    events:
+      - httpApi:
+          path: /demand/{demandId}
+          method: put
+
 
 resources:
   Resources:
