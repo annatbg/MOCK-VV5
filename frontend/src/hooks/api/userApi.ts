@@ -31,13 +31,13 @@ const fetchUserData = async (user: User, endpoint: string): Promise<UserDataResp
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
+      throw new Error(`HTTP-fel! Status: ${response.status}`);
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
+    console.error("Fel vid hämtning av användardata:", error);
+    throw new Error(`Ett fel inträffade vid hämtning av användardata: ${(error as Error).message}`);
   }
 };
 
@@ -46,7 +46,7 @@ const updateUser = async (updateData: UpdateUserData): Promise<UserDataResponse>
   try {
     const token = useUser.getState().token;
     console.log("updateUser: Token:", token);
-    console.log("updateUser: Update data:", updateData);
+    console.log("updateUser: Uppdateringsdata:", updateData);
 
     const response = await fetch(`${API_URL}/user/edit`, {
       method: "PUT",
@@ -57,18 +57,20 @@ const updateUser = async (updateData: UpdateUserData): Promise<UserDataResponse>
       body: JSON.stringify(updateData),
     });
 
-    console.log("updateUser: Response status:", response.status);
+    console.log("updateUser: Svarstatus:", response.status);
 
     const result: UserDataResponse = await response.json();
-    console.log("updateUser: Response result:", result);
+    console.log("updateUser: Svarresultat:", result);
 
     if (!response.ok) {
-      throw new Error(result.message || "Update failed");
+      throw new Error(result.message || "Uppdatering misslyckades.");
     }
     return result;
   } catch (error) {
-    console.error("updateUser: Error:", error);
-    throw new Error(`An error occurred while updating profile: ${(error as Error).message}`);
+    console.error("updateUser: Fel:", error);
+    throw new Error(
+      `Ett fel inträffade vid uppdatering av profilen: ${(error as Error).message}`
+    );
   }
 };
 

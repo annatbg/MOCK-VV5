@@ -19,11 +19,11 @@ const createDemand = async (formData: { formData: any }) => {
     if (response.ok) {
       return result;
     } else {
-      throw new Error(result.message || "Failed to create demand");
+      throw new Error(result.message || "Kunde inte skapa förfrågan.");
     }
   } catch (error) {
     throw new Error(
-      `An error occurred while creating demand: ${(error as Error).message}`
+      `Ett fel inträffade vid skapandet av förfrågan: ${(error as Error).message}`
     );
   }
 };
@@ -42,26 +42,26 @@ const fetchMyDemands = async () => {
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("No demands found.");
+        throw new Error("Inga förfrågningar hittades.");
       }
-      throw new Error(`Failed to fetch demands (status: ${response.status})`);
+      throw new Error(`Kunde inte hämta förfrågningar (status: ${response.status}).`);
     }
 
     const data = await response.json();
 
     if (Array.isArray(data) && data.length === 0) {
-      throw new Error("You have no demands.");
+      throw new Error("Du har inga förfrågningar.");
     }
 
     return data;
   } catch (error) {
-    console.error("[fetchMyDemands] Error:", (error as Error).message);
+    console.error("[fetchMyDemands] Fel:", (error as Error).message);
     throw error;
   }
 };
 
 const fetchAllDemands = async () => {
-  console.log("Fetching from:", `${API_URL}/demands/all`);
+  console.log("Hämtar från:", `${API_URL}/demands/all`);
 
   try {
     const response = await fetch(`${API_URL}/demands/all`, {
@@ -71,24 +71,24 @@ const fetchAllDemands = async () => {
       },
     });
 
-    console.log("Response status:", response.status);
+    console.log("Svar status:", response.status);
 
     if (!response.ok) {
       if (response.status === 404) {
-        throw new Error("No demands available.");
+        throw new Error("Inga förfrågningar finns tillgängliga.");
       }
-      throw new Error(`Failed to fetch demands (status: ${response.status})`);
+      throw new Error(`Kunde inte hämta förfrågningar (status: ${response.status}).`);
     }
 
     const data = await response.json();
 
     if (Array.isArray(data) && data.length === 0) {
-      throw new Error("There are currently no demands available.");
+      throw new Error("Det finns inga förfrågningar tillgängliga för tillfället.");
     }
 
     return data;
   } catch (error) {
-    console.error("[fetchAllDemands] Fetch error:", (error as Error).message);
+    console.error("[fetchAllDemands] Fel vid hämtning:", (error as Error).message);
     throw error;
   }
 };
@@ -109,11 +109,11 @@ const deleteDemand = async (demandId: string) => {
     if (response.ok) {
       return result;
     } else {
-      throw new Error(result.message || "Failed to delete demand");
+      throw new Error(result.message || "Kunde inte ta bort förfrågan.");
     }
   } catch (error) {
     throw new Error(
-      `An error occurred while deleting demand: ${(error as Error).message}`
+      `Ett fel inträffade vid borttagningen av förfrågan: ${(error as Error).message}`
     );
   }
 };
@@ -134,25 +134,25 @@ const fetchDemandsByIds = async (ids: string | string[]) => {
     });
 
     console.log(
-      "[fetchDemandsByIds] Request URL:",
+      "[fetchDemandsByIds] Begär URL:",
       `${API_URL}/demand/ids?${queryParam}`
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch demand(s)");
+      throw new Error("Kunde inte hämta förfrågan/förfrågningar.");
     }
 
     const result = await response.json();
-    console.log("[fetchDemandsByIds] Response:", result);
+    console.log("[fetchDemandsByIds] Svar:", result);
     return result;
   } catch (error) {
     throw new Error(
-      `An error occurred while fetching demand(s): ${(error as Error).message}`
+      `Ett fel inträffade vid hämtning av förfrågan/förfrågningar: ${(error as Error).message}`
     );
   }
 };
 
-// Match status management functions
+// Hantering av matchningsstatus
 export const updateMatchStatus = async (
   demandId: string,
   matchId: string,
@@ -160,7 +160,7 @@ export const updateMatchStatus = async (
 ) => {
   try {
     console.log(
-      `[demandApi] Updating match status: ${demandId}, ${matchId}, ${status}`
+      `[demandApi] Uppdaterar matchstatus: ${demandId}, ${matchId}, ${status}`
     );
     const token = useUser.getState().token;
 
@@ -174,15 +174,15 @@ export const updateMatchStatus = async (
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to update match status to ${status}`);
+      throw new Error(`Kunde inte uppdatera matchstatus till ${status}.`);
     }
 
     const result = await response.json();
-    console.log(`[demandApi] Match status updated: ${status}`, result);
+    console.log(`[demandApi] Matchstatus uppdaterad: ${status}`, result);
     return result;
   } catch (error) {
     console.error(
-      `[demandApi] Error updating match status to ${status}:`,
+      `[demandApi] Fel vid uppdatering av matchstatus till ${status}:`,
       error
     );
     throw error;
@@ -203,7 +203,7 @@ export const undoRejection = async (demandId: string, matchId: string) => {
 
 const fetchAcceptedDemands = async (): Promise<any[]> => {
   const token = useUser.getState().token;
-  if (!token) throw new Error("Not authenticated");
+  if (!token) throw new Error("Inte autentiserad.");
 
   const response = await fetch(`${API_URL}/demand/accepted`, {
     method: "GET",
@@ -216,8 +216,7 @@ const fetchAcceptedDemands = async (): Promise<any[]> => {
   const { message, data } = await response.json();
 
   if (!response.ok) {
-
-    throw new Error(message || "Failed to fetch accepted demands");
+    throw new Error(message || "Kunde inte hämta accepterade förfrågningar.");
   }
 
 
