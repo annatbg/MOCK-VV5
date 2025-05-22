@@ -83,7 +83,7 @@ const NotificationsView = () => {
   return (
     <div className="flex flex-col w-full overflow-y-auto p-6 items-center gap-4">
       <div className="flex items-center gap-2">
-        <h1 className="text-3xl font-semibold text-center text-darkText">Notiser</h1>
+        <h1 className="text-4xl font-semibold text-center text-darkText">Notiser</h1>
       </div>
 
       <section className="w-full h-full bg-slate-100 rounded-md text-lightText flex flex-col items-center min-h-[200px] p-4 gap-2">

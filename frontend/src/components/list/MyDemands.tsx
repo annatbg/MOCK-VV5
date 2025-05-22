@@ -59,7 +59,7 @@ const MyDemands = () => {
         setDemands(response.data);
         return { data: demands };
       }}
-      title="Mina demands"
+      title="Mina Behov"
       renderItem={(demand: Demand) => (
         <DemandCard
           title={demand.title}
