@@ -33,7 +33,7 @@ const Sidebar = ({ activeView }: SidebarProps) => {
 
   const navItems = [
     { label: "hem", icon: <Home size={22} /> },
-    { label: "demands", icon: <List size={22} /> },
+    { label: "Behov", icon: <List size={22} /> },
     { label: "match", icon: <Users size={22} /> },
     { label: "notiser", icon: <Bell size={22} /> },
     // { label: "organisation", icon: <Users size={22} /> },

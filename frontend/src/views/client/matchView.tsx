@@ -314,6 +314,7 @@ const MatchView: React.FC = () => {
 
   return (
   <div className="flex flex-col items-center w-full overflow-y-auto p-6">
+    <h1 className="text-4xl font-semibold text-darkText">Match</h1>
     {/* Dropdown för kategori */}
     <div className="mb-4 w-full max-w-md">
       <label htmlFor="category" className="block font-semibold text-gray-800 mb-1"></label>
