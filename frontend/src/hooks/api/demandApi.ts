@@ -143,7 +143,7 @@ const fetchDemandsByIds = async (ids: string | string[]) => {
     }
 
     const result = await response.json();
-    console.log("[fetchDemandsByIds] Response:", result);
+    // console.log("[fetchDemandsByIds] Response:", result);
     return result;
   } catch (error) {
     throw new Error(
@@ -224,10 +224,13 @@ const fetchAcceptedDemands = async (): Promise<any[]> => {
 
 // 🆕 markMatchAsSeen – anropas när användaren klickar på en notis
 export const markMatchAsSeen = async (demandId: string, matchId: string) => {
+  
+  console.log("Markera som läst:", demandId, matchId);
+
   try {
     const token = useUser.getState().token;
 
-    const response = await fetch(`${API_URL}/demand/match-seen`, {
+    const response = await fetch(`${API_URL}/demand/mark-match-as-seen`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -235,6 +238,8 @@ export const markMatchAsSeen = async (demandId: string, matchId: string) => {
       },
       body: JSON.stringify({ demandId, matchId }),
     });
+
+    
 
     if (!response.ok) {
       const result = await response.json();

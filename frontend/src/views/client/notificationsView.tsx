@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { fetchMyDemands, markMatchAsSeen } from "../../hooks/api/demandApi";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
@@ -32,12 +32,11 @@ const NotificationsView = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
   const location = useLocation();
 
   const timeAgo = (date: Date) => {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (seconds < 60) return 'just nu';
+    if (seconds < 60) return "just nu";
     if (seconds < 3600) return `${Math.floor(seconds / 60)} min sedan`;
     if (seconds < 86400) return `${Math.floor(seconds / 3600)} tim sedan`;
     if (seconds < 604800) return `${Math.floor(seconds / 86400)} dagar sedan`;
@@ -89,9 +88,7 @@ const NotificationsView = () => {
           }
         }
 
-        // Sortera nyast först
         out.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
         setNotifications(out);
       } catch (err: any) {
         setError(err.message);
@@ -110,17 +107,13 @@ const NotificationsView = () => {
 
     if (match?.id) {
       try {
+        console.log("Markera som läst:", demand.demandId, match.id);
         await markMatchAsSeen(demand.demandId, match.id);
+        window.location.reload(); // 🔄 tvångsuppdatering
       } catch (err) {
         console.error("Kunde inte markera som läst:", err);
       }
     }
-
-    const slug = demand.title.toLowerCase().replace(/\s+/g, '-');
-    const params = new URLSearchParams(location.search);
-    params.set('tab', 'match');
-    params.set('selected', slug);
-    navigate(`/user/client/hem?${params.toString()}`);
   };
 
   const newNotifications = notifications.filter((n) => !n.seen);

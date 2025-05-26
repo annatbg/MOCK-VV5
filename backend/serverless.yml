@@ -91,6 +91,12 @@ functions:
           path: /demand/accepted
           method: get
 
+  markMatchAsSeen: # 🆕 NYTT
+    handler: controllers/demand/demandController.markMatchAsSeen
+    events:
+      - httpApi:
+          path: /demand/mark-match-as-seen
+          method: post
 
 resources:
   Resources:
