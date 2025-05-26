@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { fetchMyDemands } from "../../hooks/api/demandApi";
+import { fetchMyDemands, markMatchAsSeen } from "../../hooks/api/demandApi";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
 interface Match {
   id?: string;
   demandId: string;
   status: string;
+  seen?: boolean;
+  updatedAt?: string;
 }
 
 interface Demand {
@@ -18,12 +20,12 @@ interface Demand {
   matches: (Match | string)[];
 }
 
-// 🔄 ÄNDRAT: Lagt till timestamp i notifikationen
 interface Notification {
   message: string;
   clickable: boolean;
   demand: Demand;
   timestamp: Date;
+  seen: boolean;
 }
 
 const NotificationsView = () => {
@@ -33,7 +35,6 @@ const NotificationsView = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔄 ÄNDRAT: Funktion för att visa "2 dagar sedan"
   const timeAgo = (date: Date) => {
     const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
     if (seconds < 60) return 'just nu';
@@ -54,20 +55,23 @@ const NotificationsView = () => {
         for (const d of myDemands) {
           if (!Array.isArray(d.matches)) continue;
 
-          for (let i = d.matches.length - 1; i >= 0; i--) { // 🔄 ÄNDRAT: loopa baklänges
+          for (let i = d.matches.length - 1; i >= 0; i--) {
             const m = d.matches[i];
             if (typeof m !== "object") continue;
 
             const status = m.status;
-            const baseTime = new Date(d.createdAt).getTime(); // 🔄
-            const fakeRecentTime = new Date(baseTime + i * 1000); // 🔄 olika tid beroende på plats i listan
+            const seen = m.seen ?? false;
+            const updatedAt = m.updatedAt
+              ? new Date(m.updatedAt)
+              : new Date(new Date(d.createdAt).getTime() + i * 1000);
 
             if (status === "confirmedByThem") {
               out.push({
                 message: `Din demand har blivit bekräftad av: "${d.title}". Acceptera för att matcha!`,
                 clickable: false,
                 demand: d,
-                timestamp: fakeRecentTime,
+                timestamp: updatedAt,
+                seen,
               });
               break;
             }
@@ -77,14 +81,15 @@ const NotificationsView = () => {
                 message: `Du har matchats med ett behov: "${d.title}"`,
                 clickable: true,
                 demand: d,
-                timestamp: fakeRecentTime,
+                timestamp: updatedAt,
+                seen,
               });
               break;
             }
           }
         }
 
-        // 🔄 ÄNDRAT: sortera nyaste överst
+        // Sortera nyast först
         out.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
         setNotifications(out);
@@ -98,13 +103,28 @@ const NotificationsView = () => {
     load();
   }, []);
 
-  const handleClick = (demand: Demand) => {
+  const handleClick = async (demand: Demand) => {
+    const match = demand.matches.find(
+      (m) => typeof m === "object" && m.status === "matched"
+    ) as Match | undefined;
+
+    if (match?.id) {
+      try {
+        await markMatchAsSeen(demand.demandId, match.id);
+      } catch (err) {
+        console.error("Kunde inte markera som läst:", err);
+      }
+    }
+
     const slug = demand.title.toLowerCase().replace(/\s+/g, '-');
     const params = new URLSearchParams(location.search);
     params.set('tab', 'match');
     params.set('selected', slug);
     navigate(`/user/client/hem?${params.toString()}`);
   };
+
+  const newNotifications = notifications.filter((n) => !n.seen);
+  const oldNotifications = notifications.filter((n) => n.seen);
 
   return (
     <div className="flex flex-col w-full overflow-y-auto p-6 items-center gap-4">
@@ -120,30 +140,49 @@ const NotificationsView = () => {
         ) : notifications.length === 0 ? (
           <p className="text-center text-darkText">Dina notiser visas här</p>
         ) : (
-          notifications.map((note, idx) => (
-            <div
-              key={idx}
-              onClick={note.clickable ? () => handleClick(note.demand) : undefined}
-              className={`flex items-start gap-3 p-4 rounded-md shadow w-full transition-all ${
-                note.clickable
-                  ? "bg-white cursor-pointer hover:bg-gray-100 border-2 border-lightGreen"
-                  : "bg-gray-100 cursor-default border-2 border-gray-300 opacity-90"
-              }`}
-            >
-              {note.clickable ? (
-                <CheckCircle className="text-lightGreen mt-1" size={25} />
-              ) : (
-                <AlertCircle className="text-yellow-300 mt-1" size={25} />
-              )}
+          <>
+            {newNotifications.length > 0 && (
+              <>
+                <h2 className="text-lg font-bold text-darkText mt-2">Nya notiser</h2>
+                {newNotifications.map((note, idx) => (
+                  <div
+                    key={`new-${idx}`}
+                    onClick={note.clickable ? () => handleClick(note.demand) : undefined}
+                    className="flex items-start gap-3 p-4 rounded-md shadow w-full transition-all bg-white cursor-pointer hover:bg-gray-100 border-2 border-lightGreen"
+                  >
+                    <CheckCircle className="text-lightGreen mt-1" size={25} />
+                    <div className="flex flex-col">
+                      <p className="text-sm text-darkText">{note.message}</p>
+                      <span className="text-xs text-gray-500 mt-1">
+                        Senast uppdaterad: {timeAgo(note.timestamp)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
 
-              <div className="flex flex-col">
-                <p className="text-sm text-darkText">{note.message}</p>
-                <span className="text-xs text-gray-500 mt-1">
-                  Senast uppdaterad: {timeAgo(note.timestamp)}
-                </span> {/* 🔄 ÄNDRAT: visar tidtext */}
-              </div>
-            </div>
-          ))
+            {oldNotifications.length > 0 && (
+              <>
+                <h2 className="text-lg font-bold text-darkText mt-4">Tidigare notiser</h2>
+                {oldNotifications.map((note, idx) => (
+                  <div
+                    key={`old-${idx}`}
+                    onClick={note.clickable ? () => handleClick(note.demand) : undefined}
+                    className="flex items-start gap-3 p-4 rounded-md shadow w-full transition-all bg-gray-100 border-2 border-gray-300 opacity-90"
+                  >
+                    <AlertCircle className="text-yellow-300 mt-1" size={25} />
+                    <div className="flex flex-col">
+                      <p className="text-sm text-darkText">{note.message}</p>
+                      <span className="text-xs text-gray-500 mt-1">
+                        Senast uppdaterad: {timeAgo(note.timestamp)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
+          </>
         )}
       </section>
     </div>

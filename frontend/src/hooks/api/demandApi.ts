@@ -216,15 +216,38 @@ const fetchAcceptedDemands = async (): Promise<any[]> => {
   const { message, data } = await response.json();
 
   if (!response.ok) {
-
     throw new Error(message || "Failed to fetch accepted demands");
   }
-
 
   return data;
 };
 
+// 🆕 markMatchAsSeen – anropas när användaren klickar på en notis
+export const markMatchAsSeen = async (demandId: string, matchId: string) => {
+  try {
+    const token = useUser.getState().token;
 
+    const response = await fetch(`${API_URL}/demand/match-seen`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ demandId, matchId }),
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      throw new Error(result.message || "Failed to mark match as seen");
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("[markMatchAsSeen] Error:", (error as Error).message);
+    throw error;
+  }
+};
 
 export {
   createDemand,
@@ -232,5 +255,5 @@ export {
   fetchAllDemands,
   deleteDemand,
   fetchDemandsByIds,
-  fetchAcceptedDemands
+  fetchAcceptedDemands,
 };

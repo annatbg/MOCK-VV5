@@ -397,7 +397,8 @@ const updateDemandMatches = async (event) => {
       const updatedMatch = {
         id: matchId,
         status,
-        updatedAt: now
+        updatedAt: now,
+         seen: false
       };
 
       if (index !== -1) {
@@ -549,6 +550,67 @@ const getAcceptedDemands = async (event) => {
   }
 };
 
+const markMatchAsSeen = async (event) => {
+  const user = getUserFromToken(event);
+  const author = user?.username;
+
+  if (!author) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({ message: "Unauthorized" }),
+    };
+  }
+
+  const { demandId, matchId } = JSON.parse(event.body || "{}");
+
+  if (!demandId || !matchId) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: "Demand ID and Match ID are required" }),
+    };
+  }
+
+  try {
+    const getRes = await db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId } }));
+    const demand = getRes.Item;
+
+    if (!demand || demand.author !== author) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({ message: "Unauthorized or demand not found" }),
+      };
+    }
+
+    const matches = demand.matches.map((m) => {
+      if (typeof m === "object" && m.id === matchId) {
+        return { ...m, seen: true }; // 🟢 markera som läst
+      }
+      return m;
+    });
+
+    await db.send(new UpdateCommand({
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+      UpdateExpression: "SET matches = :matches",
+      ExpressionAttributeValues: {
+        ":matches": matches
+      }
+    }));
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Match marked as seen" }),
+    };
+  } catch (error) {
+    console.error("[markMatchAsSeen] Error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: "Internal Server Error" }),
+    };
+  }
+};
+
+
 
 
 
@@ -559,5 +621,6 @@ module.exports = {
   fetchDemandsByIds,
   deleteDemand,
   updateDemandMatches,
-  getAcceptedDemands
+  getAcceptedDemands,
+  markMatchAsSeen
 };
