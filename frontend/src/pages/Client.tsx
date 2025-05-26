@@ -29,7 +29,7 @@ function Client() {
         return <ProfileView />;
       case "match":
         return <MatchView />;
-      case "demands":
+      case "behov":
         return <DemandsView />;
       case "notiser":
         return <NotificationsView />;

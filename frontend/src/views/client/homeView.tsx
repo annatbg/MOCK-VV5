@@ -20,7 +20,7 @@ const HomeView = () => {
       ) : (
         <>
           <div>
-            <h1 className="text-5xl font-semibold text-darkText">
+            <h1 className="text-4xl font-semibold text-darkText">
               {`${organisationName}`}
             </h1>
           </div>
