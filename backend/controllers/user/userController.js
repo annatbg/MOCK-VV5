@@ -12,7 +12,7 @@ const { generateToken } = require("../../services/utils/jwt");
  */
 const signupUser = async (event) => {
   try {
-    const { email, password, organisation, firstName, lastName } = JSON.parse(
+    const { email, password, organisation, firstName, lastName, location } = JSON.parse(
       event.body
     );
     console.log("Received signup request with email:", email);
@@ -28,7 +28,7 @@ const signupUser = async (event) => {
     }
 
     // Kolla att alla fält finns
-    if (!email || !password || !organisation || !firstName || !lastName) {
+    if (!email || !password || !organisation || !firstName || !lastName || !location) {
       console.log("Missing required fields in signup request.");
       return {
         statusCode: 400,
@@ -36,7 +36,19 @@ const signupUser = async (event) => {
       };
     }
 
-    await createUser(email, password, organisation, firstName, lastName);
+    // Kontrollera lösenordets längd (minst 6 tecken)
+    const passwordRegex = /^.{6,}$/;
+    if (!passwordRegex.test(password)) {
+      console.log("Password does not meet minimum length requirement.");
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          message: "Password must be at least 6 characters long",
+        }),
+      };
+    }
+
+    await createUser(email, password, organisation, firstName, lastName, location);
 
     console.log(`User ${email} created successfully.`);
     return {
@@ -51,6 +63,7 @@ const signupUser = async (event) => {
     };
   }
 };
+
 
 /**
  * LOGIN
