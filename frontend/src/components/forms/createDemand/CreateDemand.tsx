@@ -99,7 +99,7 @@ return (
           id="demand"
           value={formData.demand}
           onChange={handleChange}
-          placeholder="Beskriv ditt behov..."
+          placeholder="Vad är det du vill förbättra, lösa eller förenkla i din verksamhet?"
           className="w-full p-3 border rounded-xl text-base h-32 resize-none focus:ring-2 focus:ring-green-500 focus:outline-none disabled:bg-gray-100"
           disabled={loading}
         />
