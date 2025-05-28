@@ -21,7 +21,7 @@ const userExists = async (email) => {
   }
 };
 
-const createUser = async (email, password, organisation, firstName, lastName) => {
+const createUser = async (email, password, organisation, firstName, lastName, location) => {
   console.log(`Creating new user with email: ${email}`);
   const hashedPassword = await bcrypt.hash(password, 10);
   console.log(`Password hashed for user ${email}`);
@@ -33,6 +33,7 @@ const createUser = async (email, password, organisation, firstName, lastName) =>
     organisation,
     firstName,
     lastName,
+    location,
     role: "client",
   };
 
