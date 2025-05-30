@@ -40,10 +40,10 @@ const loginUser = async (email: string, password: string): Promise<AuthResponse>
     if (response.ok) {
       return result;
     } else {
-      throw new Error(result.user?.id || "Login failed");
+      throw new Error(result.user?.id || "Inloggning misslyckades");
     }
   } catch (error) {
-    throw new Error("An error occurred while logging in: " + (error as Error).message);
+    throw new Error("Ett fel uppstod vid inloggning: " + (error as Error).message);
   }
 };
 
@@ -59,10 +59,10 @@ const signupUser = async (formData: SignupData): Promise<AuthResponse> => {
     if (response.ok) {
       return result;
     } else {
-      throw new Error(result.user?.id || "Signup failed");
+      throw new Error(result.user?.id || "Registrering misslyckades");
     }
   } catch (error) {
-    throw new Error("An error occurred while signing up: " + (error as Error).message);
+    throw new Error("Ett fel uppstod vid registrering: " + (error as Error).message);
   }
 };
 

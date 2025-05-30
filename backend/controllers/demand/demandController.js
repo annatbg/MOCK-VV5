@@ -550,6 +550,7 @@ const getAcceptedDemands = async (event) => {
   }
 };
 
+
 const markMatchAsSeen = async (event) => {
   const user = getUserFromToken(event);
   const author = user?.username;
@@ -638,6 +639,126 @@ const markMatchAsSeen = async (event) => {
 
 
 
+//EDIT DEMAND
+const editDemand = async (event) => {
+  const user = getUserFromToken(event);
+  const author = user?.username;
+  const demandId = event.pathParameters?.demandId;
+  
+  if (!author) {
+    return { statusCode: 401, body: JSON.stringify({ message: "Unauthorized" }) };
+  }
+  
+  if (!demandId) {
+    return { statusCode: 400, body: JSON.stringify({ message: "Demand ID required" }) };
+  }
+  
+  let body;
+  try {
+    body = JSON.parse(event.body || "{}");
+  } catch (e) {
+    return { statusCode: 400, body: JSON.stringify({ message: "Invalid JSON body" }) };
+  }
+  
+  const { title, demand, category } = body;
+  
+  if (!title || !demand || !category) {
+    return { 
+      statusCode: 400, 
+      body: JSON.stringify({ 
+        message: "All fields are required!",
+        missingFields: [
+          !title ? "title" : null,
+          !demand ? "demand" : null,
+          !category ? "category" : null
+        ].filter(Boolean)
+      }) 
+    };
+  }
+  
+  if (!allowedCategories.includes(category)) {
+    return { 
+      statusCode: 400, 
+      body: JSON.stringify({ 
+        message: `Invalid category! Allowed: ${allowedCategories.join(", ")}` 
+      }) 
+    };
+  }
+  
+  try {
+    const { Item } = await db.send(new GetCommand({ 
+      TableName: DEMANDS_TABLE, 
+      Key: { demandId } 
+    }));
+    
+    if (!Item) {
+      return { 
+        statusCode: 404, 
+        body: JSON.stringify({ message: "Demand not found" }) 
+      };
+    }
+    
+    if (Item.author !== author) {
+      return { 
+        statusCode: 403, 
+        body: JSON.stringify({ message: "Unauthorized to edit this demand" }) 
+      };
+    }
+    
+    const isNew = !Item.matches || !Array.isArray(Item.matches) ||
+      Item.matches.every(match => {
+        if (typeof match === "string") return true;
+        if (match && typeof match === "object") return match.status === "new";
+        return false;
+      });
+    
+    if (!isNew) {
+      return { 
+        statusCode: 400, 
+        body: JSON.stringify({ message: "Cannot update demand after match progression" }) 
+      };
+    }
+    
+    const updateParams = {
+      TableName: DEMANDS_TABLE,
+      Key: { demandId },
+      UpdateExpression: "SET #title=:title, #demand=:demand, #category=:category, updatedAt=:updatedAt",
+      ExpressionAttributeNames: { 
+        "#title": "title", 
+        "#demand": "demand", 
+        "#category": "category" 
+      },
+      ExpressionAttributeValues: {
+        ":title": title,
+        ":demand": demand,
+        ":category": category,
+        ":updatedAt": new Date().toISOString(),
+      },
+      ReturnValues: "ALL_NEW",
+    };
+    
+    const { Attributes } = await db.send(new UpdateCommand(updateParams));
+    
+    return { 
+      statusCode: 200, 
+      body: JSON.stringify({ 
+        message: "Demand updated successfully!", 
+        data: Attributes 
+      }) 
+    };
+  } catch (error) {
+    console.error("Error updating demand:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ 
+        message: "Failed to update demand",
+        error: error.message || "Internal Server Error" 
+      }),
+    };
+  }
+};
+
+
 module.exports = {
   createDemand,
   fetchMyDemands,
@@ -647,4 +768,6 @@ module.exports = {
   updateDemandMatches,
   getAcceptedDemands,
   markMatchAsSeen
+  editDemand
+
 };

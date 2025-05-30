@@ -55,7 +55,7 @@ const DemandsView = () => {
 
   return (
     <div className="flex flex-col w-full overflow-y-auto p-6 gap-6">
-      <h1 className="text-3xl font-bold mb-2"></h1>
+      <h1 className="text-4xl font-semibold text-darkText text-center">Alla Behov</h1>
 
       <div className="flex items-center justify-between">
         <div className="relative w-80">
@@ -100,7 +100,7 @@ const DemandsView = () => {
       {/* Visa demands */}
       <ListComponent
         fetchFunction={async () => ({ data: paginatedDemands })}
-        title="Alla behov"
+        title=""
         renderItem={(demand: Demand) => (
           <DemandCard
             title={demand.title}
