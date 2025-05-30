@@ -24,6 +24,7 @@ interface Notification {
   message: string;
   clickable: boolean;
   demand: Demand;
+  matchId: string;
   timestamp: Date;
   seen: boolean;
 }
@@ -49,6 +50,8 @@ const NotificationsView = () => {
         const resp = await fetchMyDemands();
         const myDemands: Demand[] = resp.data || [];
 
+        console.log("Hämtade demands:", myDemands);
+
         const out: Notification[] = [];
 
         for (const d of myDemands) {
@@ -56,7 +59,7 @@ const NotificationsView = () => {
 
           for (let i = d.matches.length - 1; i >= 0; i--) {
             const m = d.matches[i];
-            if (typeof m !== "object") continue;
+            if (typeof m !== "object" || !m.status) continue;
 
             const status = m.status;
             const seen = m.seen ?? false;
@@ -67,8 +70,9 @@ const NotificationsView = () => {
             if (status === "confirmedByThem") {
               out.push({
                 message: `Din demand har blivit bekräftad av: "${d.title}". Acceptera för att matcha!`,
-                clickable: false,
+                clickable: true, // 🟢 ändrat från false till true
                 demand: d,
+                matchId: m.id ?? "",
                 timestamp: updatedAt,
                 seen,
               });
@@ -80,6 +84,7 @@ const NotificationsView = () => {
                 message: `Du har matchats med ett behov: "${d.title}"`,
                 clickable: true,
                 demand: d,
+                matchId: m.id ?? "",
                 timestamp: updatedAt,
                 seen,
               });
@@ -100,15 +105,11 @@ const NotificationsView = () => {
     load();
   }, []);
 
-  const handleClick = async (demand: Demand) => {
-    const match = demand.matches.find(
-      (m) => typeof m === "object" && m.status === "matched"
-    ) as Match | undefined;
-
-    if (match?.id) {
+  const handleClick = async (demand: Demand, matchId: string) => {
+    if (matchId) {
       try {
-        console.log("Markera som läst:", demand.demandId, match.id);
-        await markMatchAsSeen(demand.demandId, match.id);
+        console.log("Markera som läst:", demand.demandId, matchId);
+        await markMatchAsSeen(demand.demandId, matchId);
         window.location.reload(); // 🔄 tvångsuppdatering
       } catch (err) {
         console.error("Kunde inte markera som läst:", err);
@@ -140,7 +141,7 @@ const NotificationsView = () => {
                 {newNotifications.map((note, idx) => (
                   <div
                     key={`new-${idx}`}
-                    onClick={note.clickable ? () => handleClick(note.demand) : undefined}
+                    onClick={note.clickable ? () => handleClick(note.demand, note.matchId) : undefined}
                     className="flex items-start gap-3 p-4 rounded-md shadow w-full transition-all bg-white cursor-pointer hover:bg-gray-100 border-2 border-lightGreen"
                   >
                     <CheckCircle className="text-lightGreen mt-1" size={25} />
@@ -161,7 +162,7 @@ const NotificationsView = () => {
                 {oldNotifications.map((note, idx) => (
                   <div
                     key={`old-${idx}`}
-                    onClick={note.clickable ? () => handleClick(note.demand) : undefined}
+                    onClick={note.clickable ? () => handleClick(note.demand, note.matchId) : undefined}
                     className="flex items-start gap-3 p-4 rounded-md shadow w-full transition-all bg-gray-100 border-2 border-gray-300 opacity-90"
                   >
                     <AlertCircle className="text-yellow-300 mt-1" size={25} />

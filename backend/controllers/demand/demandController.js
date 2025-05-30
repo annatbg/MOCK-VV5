@@ -557,6 +557,10 @@ const markMatchAsSeen = async (event) => {
   if (!author) {
     return {
       statusCode: 401,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+      },
       body: JSON.stringify({ message: "Unauthorized" }),
     };
   }
@@ -566,45 +570,65 @@ const markMatchAsSeen = async (event) => {
   if (!demandId || !matchId) {
     return {
       statusCode: 400,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+      },
       body: JSON.stringify({ message: "Demand ID and Match ID are required" }),
     };
   }
 
   try {
-    const getRes = await db.send(new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId } }));
+    const getRes = await db.send(
+      new GetCommand({ TableName: DEMANDS_TABLE, Key: { demandId } })
+    );
     const demand = getRes.Item;
 
     if (!demand || demand.author !== author) {
       return {
         statusCode: 403,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type,Authorization",
+        },
         body: JSON.stringify({ message: "Unauthorized or demand not found" }),
       };
     }
 
     const matches = demand.matches.map((m) => {
       if (typeof m === "object" && m.id === matchId) {
-        return { ...m, seen: true }; // 🟢 markera som läst
+        return { ...m, seen: true };
       }
       return m;
     });
 
-    await db.send(new UpdateCommand({
-      TableName: DEMANDS_TABLE,
-      Key: { demandId },
-      UpdateExpression: "SET matches = :matches",
-      ExpressionAttributeValues: {
-        ":matches": matches
-      }
-    }));
+    await db.send(
+      new UpdateCommand({
+        TableName: DEMANDS_TABLE,
+        Key: { demandId },
+        UpdateExpression: "SET matches = :matches",
+        ExpressionAttributeValues: {
+          ":matches": matches,
+        },
+      })
+    );
 
     return {
       statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+      },
       body: JSON.stringify({ message: "Match marked as seen" }),
     };
   } catch (error) {
     console.error("[markMatchAsSeen] Error:", error);
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,Authorization",
+      },
       body: JSON.stringify({ message: "Internal Server Error" }),
     };
   }

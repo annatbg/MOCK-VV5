@@ -222,8 +222,8 @@ const fetchAcceptedDemands = async (): Promise<any[]> => {
   return data;
 };
 
-// 🆕 markMatchAsSeen – anropas när användaren klickar på en notis
-export const markMatchAsSeen = async (demandId: string, matchId: string) => {
+// anropas när användaren klickar på en notis
+const markMatchAsSeen = async (demandId: string, matchId: string) => {
   
   console.log("Markera som läst:", demandId, matchId);
 
@@ -261,4 +261,5 @@ export {
   deleteDemand,
   fetchDemandsByIds,
   fetchAcceptedDemands,
+  markMatchAsSeen
 };
